@@ -10,8 +10,10 @@ import EditSubcategory from '../pages/EditSubcategory';
 import AddInventory from '../pages/AddInventory';
 import EditInventory from '../pages/EditInventory';
 import AddCoupon from '../pages/AddCoupon';
-
-
+import ProductGrid from '../component/ProductGrid';
+import ProductList from '../component/ProductList';
+import CategoryList from '../component/CategoryList';
+import OrderList from '../component/OrderList';
 import Login from '../component/auth/Login';
 import Register from '../component/auth/Register';
 import ForgotPassword from '../component/auth/ForgotPassword';
@@ -32,6 +34,17 @@ function UserRoutes() {
             <Route path="/AddInventory" element={<AddInventory />} />
             <Route path="/EditInventory" element={<EditInventory />} />
             <Route path="/AddCoupon" element={<AddCoupon />} />
+
+
+            
+
+            {/* krupali */}
+            <Route path="/Productgrid" element={<ProductGrid />} />
+            <Route path="/Productlist" element={<ProductList />} />
+            <Route path="/Categorylist" element={<CategoryList />} />
+            <Route path="/Orderlist" element={<OrderList />} />
+
+
 
 
             {/* denisha */}

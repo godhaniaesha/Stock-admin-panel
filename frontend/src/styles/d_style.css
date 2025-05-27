@@ -1,5 +1,756 @@
-*{
-    margin: 0 !important;
-    padding: 0 !important;
-    box-sizing: border-box !important;
+:root {
+    --dark-bg: #22282e;
+    --dark-card-bg: #282f36;
+    --dark-text: #ccd1d6;
+    --dark-text-secondary: #dadee2;
+    --dark-border: rgba(255, 255, 255, 0.1);
+    --accent-color: #ef5f5f;
+  
+    --light-bg: #f8f9fa;
+    --light-card-bg: #ffffff;
+    --light-text: #282f36;
+    --light-text-secondary: #282f36;
+    --light-border: rgba(12, 12, 12, 0.034);
+  }
+  
+  [data-theme='dark'] {
+    --bg: var(--dark-bg);
+    --card-bg: var(--dark-card-bg);
+    --text: var(--dark-text);
+    --text-secondary: var(--dark-text-secondary);
+    --border: var(--dark-border);
+  }
+  
+  [data-theme='light'] {
+    --bg: var(--light-bg);
+    --card-bg: var(--light-card-bg);
+    --text: var(--light-text);
+    --text-secondary: var(--light-text-secondary);
+    --border: var(--light-border);
+  }
+  
+  .db_profile {
+    background: var(--card-bg);
+    color: var(--text);
+    padding: 24px;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+    max-width: 860px;
+    margin: 30px auto;
+    font-family: sans-serif;
+  }
+  
+  .db_profile_header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+  }
+  
+  .db_profile_header h2 {
+    font-size: 22px;
+    font-weight: 600;
+    margin: 0;
+  }
+  
+  .db_button {
+    background-color: var(--accent-color);
+    color: #fff;
+    border: none;
+    padding: 8px 18px;
+    border-radius: 6px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+  
+  .db_button:hover {
+    background-color: #d84f4f;
+  }
+  
+  .db_button_success {
+    grid-column: span 2;
+    justify-self: start;
+    margin-top: 12px;
+  }
+  
+  .db_profile_content {
+    display: grid;
+    grid-template-columns: 200px 1fr;
+    gap: 32px;
+    align-items: start;
+  }
+  
+  .db_profile_image {
+    text-align: center;
+  }
+  
+  .db_profile_avatar {
+    position: relative;
+    width: 150px;
+    height: 150px;
+    margin: auto;
+  }
+  
+  .db_profile_avatar img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 50%;
+    border: 2px solid var(--border);
+  }
+  
+  .db_photo_button {
+    position: absolute;
+    bottom: 0;
+    right: 0;
+    background: var(--accent-color);
+    color: white;
+    border-radius: 50%;
+    padding: 6px;
+    cursor: pointer;
+    font-size: 14px;
+  }
+  
+  .db_file_input {
+    display: none;
+  }
+  
+  .db_profile_form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 18px 28px;
+  }
+  
+  .db_input_group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .db_input_group label {
+    font-size: 14px;
+    margin-bottom: 4px;
+    color: var(--text-secondary);
+  }
+  
+  .db_input_wrapper {
+    display: flex;
+    align-items: center;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: transparent;
+    padding: 6px 10px;
+  }
+  
+  .db_input_icon {
+    margin-right: 8px;
+    color: var(--text-secondary);
+    font-size: 14px;
+  }
+  
+  .db_input_wrapper input {
+    flex: 1;
+    padding: 6px;
+    border: none;
+    outline: none;
+    background: transparent;
+    color: var(--text);
+    font-size: 14px;
+  }
+  
+  .db_error {
+    color: #ef5f5f;
+    font-size: 12px;
+    margin-top: 4px;
+  }
+
+.avatar-info {
+  margin-top: 16px;
+  text-align: center;
 }
+
+.avatar-info h3 {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 4px 0;
+}
+
+.avatar-info span {
+  font-size: 14px;
+  color: var(--text-secondary);
+  background: var(--border);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.required {
+  color: var(--accent-color);
+  margin-left: 4px;
+}
+
+.spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.cancel-btn {
+  background-color: var(--danger-color);
+}
+
+.error {
+  border-color: var(--accent-color) !important;
+}
+
+.db_header_content {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.db_subtitle {
+  color: var(--text-secondary);
+  margin: 0;
+  font-size: 14px;
+}
+
+.db_button_cancel {
+  background-color: var(--accent-color);
+}
+
+.db_button_edit {
+  background-color: var(--accent-color);
+}
+
+.db_camera_label {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  cursor: pointer;
+}
+
+.db_user_info {
+  margin-top: 16px;
+  text-align: center;
+}
+
+.db_user_name {
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--text);
+  margin: 0 0 8px 0;
+}
+
+.db_user_role {
+  font-size: 14px;
+  color: var(--text-secondary);
+  background: var(--border);
+  padding: 4px 12px;
+  border-radius: 12px;
+}
+
+.db_input_label {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 8px;
+  display: block;
+}
+
+.db_required {
+  color: var(--accent-color);
+  margin-left: 4px;
+}
+
+.db_error_input {
+  border-color: var(--accent-color);
+}
+
+.db_input_field {
+  width: 100%;
+  padding: 8px 12px;
+  border: none;
+  outline: none;
+  background: transparent;
+  color: var(--text);
+  font-size: 14px;
+}
+
+.db_error_text {
+  color: var(--accent-color);
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.db_form_actions {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: 24px;
+}
+
+.db_spinner {
+  width: 18px;
+  height: 18px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top: 2px solid white;
+  border-radius: 50%;
+  animation: db_spin 1s linear infinite;
+}
+
+@keyframes db_spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.db_container {
+  padding: 0 12%;
+  max-width: 1400px;
+  margin: 0 auto;
+}
+
+.db_profile {
+  background: var(--card-bg);
+  border-radius: 16px;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.1);
+  margin: 2rem auto;
+  overflow: hidden;
+}
+
+.db_profile_header {
+  padding: 2rem;
+  background: linear-gradient(to right, var(--accent-color), #ff7676);
+  color: white;
+}
+
+.db_profile_content {
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 2rem;
+}
+
+.db_profile_sidebar {
+  position: sticky;
+  top: 2rem;
+}
+
+.db_profile_form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+@media (max-width: 1200px) {
+  .db_container {
+    padding: 0 8%;
+  }
+  
+  .db_profile_content {
+    grid-template-columns: 250px 1fr;
+    gap: 1.5rem;
+  }
+}
+
+@media (max-width: 992px) {
+  .db_profile_content {
+    grid-template-columns: 1fr;
+  }
+  
+  .db_profile_sidebar {
+    position: static;
+    max-width: 300px;
+    margin: 0 auto;
+  }
+  
+  .db_profile_form {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 768px) {
+  .db_container {
+    padding: 0 4%;
+  }
+  
+  .db_profile {
+    margin: 1rem auto;
+  }
+  
+  .db_profile_header {
+    padding: 1.5rem;
+  }
+  
+  .db_profile_content {
+    padding: 1.5rem;
+  }
+  
+  .db_profile_form {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 480px) {
+  .db_container {
+    padding: 0;
+  }
+  
+  .db_profile {
+    margin: 0;
+    border-radius: 0;
+  }
+  
+  .db_profile_header,
+  .db_profile_content {
+    padding: 1rem;
+  }
+}
+.db_profile_image {
+  text-align: center;
+}
+
+.db_profile_avatar {
+  width: 180px;
+  height: 180px;
+  margin: 0 auto 1.5rem;
+  position: relative;
+  border-radius: 50%;
+  overflow: hidden;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+.db_avatar_img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.db_photo_overlay {
+  position: absolute;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.db_profile_avatar:hover .db_photo_overlay {
+  opacity: 1;
+}
+
+.db_camera_label {
+  width: 40px;
+  height: 40px;
+  background: var(--accent-color);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  cursor: pointer;
+  transition: transform 0.3s;
+}
+
+.db_camera_label:hover {
+  transform: scale(1.1);
+}
+
+.db_user_info {
+  margin-bottom: 2rem;
+}
+
+.db_user_name {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 0 0 0.5rem;
+  color: var(--text);
+}
+
+.db_user_role {
+  display: inline-block;
+  padding: 0.5rem 1rem;
+  background: var(--accent-color);
+  color: white;
+  border-radius: 20px;
+  font-size: 0.875rem;
+}
+
+.db_profile_form {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1.5rem;
+}
+
+.db_input_group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+.db_input_label {
+  font-weight: 500;
+  color: var(--text);
+}
+
+.db_input_wrapper {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.75rem 1rem;
+  background: var(--input-bg);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  transition: all 0.3s;
+}
+
+.db_input_wrapper:focus-within {
+  border-color: var(--accent-color);
+  box-shadow: 0 0 0 2px rgba(239, 95, 95, 0.1);
+}
+
+.db_input_icon {
+  color: var(--text-secondary);
+}
+
+.db_input_field {
+  width: 100%;
+  border: none;
+  background: none;
+  color: var(--text);
+  font-size: 0.875rem;
+}
+
+.db_input_field::placeholder {
+  color: var(--text-secondary);
+}
+
+.db_form_actions {
+  grid-column: span 2;
+  padding-top: 1rem;
+}
+
+.db_button {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.3s;
+}
+
+.db_button_text {
+  font-size: 0.875rem;
+}
+
+.db_button_edit,
+.db_button_success {
+  background: var(--accent-color);
+  color: white;
+}
+
+.db_button_cancel {
+  background: #dc3545;
+  color: white;
+}
+
+.db_button:hover:not(:disabled) {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.db_button:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+}
+
+@media (max-width: 1024px) {
+  .db_profile_content {
+    grid-template-columns: 1fr;
+  }
+
+  .db_profile_sidebar {
+    position: static;
+    margin-bottom: 2rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* .db_container {
+    padding: 1rem;
+  } */
+
+  .db_profile_header {
+    padding: 1.5rem;
+    flex-direction: column;
+    text-align: center;
+  }
+
+  .db_profile_content {
+    padding: 1.5rem;
+  }
+
+  .db_profile_form {
+    grid-template-columns: 1fr;
+  }
+
+  .db_form_actions {
+    grid-column: 1;
+  }
+}
+
+/* Responsive Design */
+@media (max-width: 1200px) {
+  .db_profile {
+    margin: 15px auto;
+  }
+
+  .db_profile_content {
+    grid-template-columns: 180px 1fr;
+    gap: 24px;
+  }
+
+  .db_profile_form {
+    grid-template-columns: 1fr 1fr;
+    gap: 16px 20px;
+  }
+}
+
+@media (max-width: 992px) {
+  .db_profile_content {
+    grid-template-columns: 1fr;
+  }
+
+  .db_profile_sidebar {
+    max-width: 300px;
+    margin: 0 auto 32px;
+  }
+
+  .db_profile_avatar {
+    width: 120px;
+    height: 120px;
+  }
+
+  .db_user_name {
+    font-size: 1.1rem;
+  }
+
+  .db_user_role {
+    font-size: 0.9rem;
+  }
+}
+
+@media (max-width: 768px) {
+  /* .db_container {
+    padding: 10px;
+  } */
+
+  .db_profile {
+    margin: 10px auto;
+    padding: 16px;
+  }
+
+  .db_profile_header {
+    flex-direction: column;
+    text-align: center;
+    gap: 16px;
+    padding: 16px;
+  }
+
+  .db_title {
+    font-size: 1.5rem;
+  }
+
+  .db_subtitle {
+    font-size: 0.9rem;
+  }
+
+  .db_profile_form {
+    grid-template-columns: 1fr;
+  }
+
+  .db_input_wrapper {
+    padding: 8px 12px;
+  }
+
+  .db_input_field {
+    font-size: 1rem;
+  }
+
+  .db_button {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .db_form_actions {
+    padding-top: 16px;
+  }
+      .db_profile_sidebar {
+        max-width: 300px;
+        margin: 0 auto 32px;
+    }
+
+}
+
+@media (max-width: 480px) {
+  /* .db_container {
+    padding: 0;
+  } */
+
+  .db_profile {
+    margin: 0;
+    border-radius: 0;
+    min-height: 100vh;
+  }
+
+  .db_profile_header {
+    padding: 12px;
+  }
+
+  .db_title {
+    font-size: 1.25rem;
+  }
+
+  .db_profile_avatar {
+    width: 100px;
+    height: 100px;
+  }
+
+  .db_input_label {
+    font-size: 0.9rem;
+  }
+
+  .db_input_field {
+    font-size: 0.95rem;
+  }
+
+  .db_button {
+    padding: 10px 16px;
+  }
+
+  .db_button_text {
+    font-size: 0.9rem;
+  }
+  .db_profile_content {
+    padding: 5px;
+  }
+}
+  

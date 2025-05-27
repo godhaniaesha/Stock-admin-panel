@@ -9,7 +9,7 @@ import {
   FaBars
 } from 'react-icons/fa';
 import { Link, useLocation } from 'react-router-dom';
-
+  
 const Sidebar = ({ show, isDarkMode }) => {
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
@@ -148,37 +148,71 @@ const Sidebar = ({ show, isDarkMode }) => {
 
   return (
     <div 
-      className={`sidebar ${isDarkMode ? 'bg-dark' : 'bg-light'} ${show ? 'show' : ''} ${isExpanded ? 'expanded' : 'collapsed'}`}
+      className={`sidebar overflow-hidden ${show ? 'show' : ''} ${isExpanded ? 'expanded' : 'collapsed'} ${!isDarkMode ? 'light-mode' : ''}`}
       onMouseEnter={() => setIsExpanded(true)}
       onMouseLeave={() => setIsExpanded(false)}
+      style={{ 
+        backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`,
+        color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
+        borderRight: `1px solid var(${isDarkMode ? '--dark-border' : '--light-border'})`
+      }}
     >
-      <div className={`sidebar-header p-3 border-bottom ${isDarkMode ? 'border-secondary' : 'border-gray'}`}>
+      <div 
+        className="sidebar-header p-3 border-bottom"
+        style={{ 
+          borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`,
+          backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`
+        }}
+      >
         <div className="d-flex justify-content-between align-items-center mb-3">
           {isExpanded ? (
-            <h5 className={`${isDarkMode ? 'text-white' : 'text-dark'} mb-0 fw-bold`}>Admin Panel</h5>
+            <h5 
+              className="mb-0 fw-bold"
+              style={{ color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}
+            >
+              Admin Panel
+            </h5>
           ) : (
-            <div className={`${isDarkMode ? 'text-white' : 'text-dark'} mb-0 fw-bold text-center w-100`}>
+            <div 
+              className="mb-0 fw-bold text-center w-100"
+              style={{ color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}
+            >
               <FaBars size={20} />
             </div>
           )}
           {isExpanded && (
             <div className="d-flex align-items-center">
               <FaBell 
-                className={`${isDarkMode ? 'text-light' : 'text-dark'}`} 
-                style={{ cursor: 'pointer' }} 
+                style={{ 
+                  cursor: 'pointer',
+                  color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` 
+                }} 
               />
             </div>
           )}
         </div>
         {isExpanded && (
           <InputGroup>
-            <InputGroup.Text className={`bg-transparent ${isDarkMode ? 'border-secondary text-light' : 'border-gray text-dark'}`}>
+            <InputGroup.Text 
+              style={{ 
+                backgroundColor: 'transparent',
+                borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`,
+                color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` 
+              }}
+            >
               <FaSearch size={14} />
             </InputGroup.Text>
             <Form.Control
               type="text"
               placeholder="Search menu..."
-              className={`bg-transparent ${isDarkMode ? 'border-secondary text-light' : 'border-gray text-dark'}`}
+              style={{ 
+                backgroundColor: 'transparent',
+                borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`,
+                color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
+                '::placeholder': {
+                  color: `var(${isDarkMode ? '--dark-text-secondary' : '--light-text-secondary'})`
+                }
+              }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -186,7 +220,20 @@ const Sidebar = ({ show, isDarkMode }) => {
         )}
       </div>
       <Nav className="flex-column py-2">
-        {filteredMenuItems.map(renderMenuItem)}
+        {filteredMenuItems.map(item => (
+          <div 
+            key={item.title} 
+            className="nav-item"
+            style={{
+              backgroundColor: location.pathname === item.path ? 
+                `var(${isDarkMode ? '--dark-border' : '--light-border'})` : 'transparent',
+              borderLeft: `3px solid ${location.pathname === item.path ? 
+                'var(--accent-color)' : 'transparent'}`
+            }}
+          >
+            {renderMenuItem(item)}
+          </div>
+        ))}
       </Nav>
     </div>
   );

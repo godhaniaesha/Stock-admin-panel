@@ -19,6 +19,8 @@ import Register from '../component/auth/Register';
 import ForgotPassword from '../component/auth/ForgotPassword';
 import VerifyOTP from '../component/auth/VerifyOTP';
 import ChangePassword from '../component/auth/ChangePassword';
+import SubcategoryList from '../component/SubcategoryList';
+import UserList from '../component/UserList';
 
 function UserRoutes() {
     return (
@@ -43,7 +45,8 @@ function UserRoutes() {
             <Route path="/Productlist" element={<ProductList />} />
             <Route path="/Categorylist" element={<CategoryList />} />
             <Route path="/Orderlist" element={<OrderList />} />
-
+            <Route path="/SubcategoryList" element={<SubcategoryList />} />
+            <Route path="/Userlist" element={<UserList />} />
 
 
 

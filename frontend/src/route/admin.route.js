@@ -38,6 +38,8 @@ import SalesReport from '../pages/SalesReport';
 import InventoryReport from '../pages/InventoryReport';
 import Settings from '../pages/Settings';
 import EditUser from '../pages/EditUser';
+import StockAlert from '../component/StockAlert';
+import ListCoupons from '../component/ListCoupons';
 
 function UserRoutes() {
     return (
@@ -63,9 +65,12 @@ function UserRoutes() {
             {/* krupali */}
             <Route path="/Productgrid" element={<ProductGrid />} />
             <Route path="/Productlist" element={<ProductList />} />
-            <Route path="/Categorylist" element={<CategoryList />} />
+            <Route path="/Categorylist" elem    ent={<CategoryList />} />
             <Route path="/Orderlist" element={<OrderList />} />
             <Route path="/Userlist" element={<UserList />} />
+            <Route path="/Stockalert" element={<StockAlert />} />
+            <Route path="/Listcoupon" element={<ListCoupons />} />
+
 
 
 

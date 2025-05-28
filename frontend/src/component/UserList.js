@@ -1,37 +1,57 @@
 import React from 'react';
 import { Row, Col, Card, Button, Form, InputGroup } from 'react-bootstrap';
-import { BiSearchAlt } from 'react-icons/bi';
-import { FaEye, FaEdit, FaTrash } from 'react-icons/fa';
 import { FaUsersViewfinder } from 'react-icons/fa6';
 import { LuClipboardList } from 'react-icons/lu';
 import { RiCustomerServiceLine, RiDeleteBin6Line } from 'react-icons/ri';
 import { TbEdit, TbEye, TbFileInvoice } from 'react-icons/tb';
 
 function UserList() {
-    const customers = [
+    const users = [
         {
             id: 1,
-            name: "Michael A. Miner",
+            name: "Michael Anderson",
             image: "https://randomuser.me/api/portraits/men/1.jpg",
-            invoiceId: "#INV2540",
-            status: "Completed",
-            totalAmount: "$4,521",
-            amountDue: "$8,901",
-            dueDate: "07 Jan, 2023",
-            paymentMethod: "Mastercard"
+            email: "michael.anderson@example.com",
+            phone: "+1 (555) 123-4567",
+            city: "New York",
+            role: "Admin"
         },
         {
             id: 2,
-            name: "Theresa T. Brose",
+            name: "Sarah Johnson",
             image: "https://randomuser.me/api/portraits/women/2.jpg",
-            invoiceId: "#INV3924",
-            status: "Cancel",
-            totalAmount: "$7,836",
-            amountDue: "$9,902",
-            dueDate: "03 Dec, 2023",
-            paymentMethod: "Visa"
+            email: "sarah.johnson@example.com",
+            phone: "+1 (555) 234-5678",
+            city: "Los Angeles",
+            role: "Manager"
+        },
+        {
+            id: 3,
+            name: "David Wilson",
+            image: "https://randomuser.me/api/portraits/men/3.jpg",
+            email: "david.wilson@example.com",
+            phone: "+1 (555) 345-6789",
+            city: "Chicago",
+            role: "User"
+        },
+        {
+            id: 4,
+            name: "Emily Brown",
+            image: "https://randomuser.me/api/portraits/women/4.jpg",
+            email: "emily.brown@example.com",
+            phone: "+1 (555) 456-7890",
+            city: "Houston",
+            role: "Editor"
+        },
+        {
+            id: 5,
+            name: "James Taylor",
+            image: "https://randomuser.me/api/portraits/men/5.jpg",
+            email: "james.taylor@example.com",
+            phone: "+1 (555) 567-8901",
+            city: "Phoenix",
+            role: "User"
         }
-        // ... Add more customer data as needed
     ];
 
     return (
@@ -93,7 +113,7 @@ function UserList() {
 
             <div className="Z_table_wrapper">
                 <div className="Z_table_header">
-                    <h4>All Customers List</h4>
+                    <h4>All Users List</h4>
                     <div className="Z_table_actions">
                         <Form.Select className="Z_time_filter">
                             <option>This Month</option>
@@ -111,38 +131,34 @@ function UserList() {
                                 <th>
                                     <Form.Check type="checkbox" className="Z_table_checkbox" />
                                 </th>
-                                <th>Customer Name</th>
-                                <th>Invoice ID</th>
-                                <th>Status</th>
-                                <th>Total Amount</th>
-                                <th>Amount Due</th>
-                                <th>Due Date</th>
-                                <th>Payment Method</th>
+                                <th>User Details</th>
+                                <th>Email</th>
+                                <th>Phone</th>
+                                <th>City</th>
+                                <th>Role</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
                         <tbody>
-                            {customers.map(customer => (
-                                <tr key={customer.id}>
+                            {users.map(user => (
+                                <tr key={user.id}>
                                     <td>
                                         <Form.Check type="checkbox" className="Z_table_checkbox" />
                                     </td>
                                     <td>
                                         <div className="Z_product_info_cell">
-                                            <img src={customer.image} alt={customer.name} className="Z_table_product_img" />
-                                            <span className="Z_table_product_name">{customer.name}</span>
+                                            <img src={user.image} alt={user.name} className="Z_table_product_img" />
+                                            <span className="Z_table_product_name">{user.name}</span>
                                         </div>
                                     </td>
-                                    <td>{customer.invoiceId}</td>
+                                    <td>{user.email}</td>
+                                    <td>{user.phone}</td>
+                                    <td>{user.city}</td>
                                     <td>
-                                        <span className={`Z_order_status ${customer.status.toLowerCase()}`}>
-                                            {customer.status}
+                                        <span className={`Z_user_role ${user.role.toLowerCase()}`}>
+                                            {user.role}
                                         </span>
                                     </td>
-                                    <td>{customer.totalAmount}</td>
-                                    <td>{customer.amountDue}</td>
-                                    <td>{customer.dueDate}</td>
-                                    <td>{customer.paymentMethod}</td>
                                     <td>
                                         <div className="Z_action_buttons">
                                             <button className="Z_action_btn Z_view_btn">

@@ -1446,6 +1446,7 @@
     padding: 4px 12px;
     border-radius: 4px;
     font-size: 0.85rem;
+    
 }
 
 .Z_order_status.completed {
@@ -1463,7 +1464,7 @@
     color: #2196f3;
 }
 
-.Z_order_status.canceled {
+.Z_order_status.cancel {
     background: #fbe9e7;
     color: #f44336;
 }
@@ -1594,3 +1595,49 @@
     align-items: center;
     gap: 12px;
 }
+
+/* StockAlert.js */
+
+.Z_order_status.critical {
+    background: #fbe9e7;
+    color: #f44336;
+}
+
+.Z_order_status.warning {
+    background: #fff3e0;
+    color: #ff9800;
+}
+
+
+/* ListCoupons.js */
+/* ... existing code ... */
+
+.Z_coupon_code {
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.Z_coupon_status {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.Z_coupon_status.active {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.Z_coupon_status.inactive {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* ... existing code ... */
+

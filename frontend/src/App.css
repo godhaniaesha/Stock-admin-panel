@@ -1,43 +1,28 @@
-/* .App {
-  text-align: center;
-}
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
-}
+@import url('https://fonts.googleapis.com/css2?family=Exo+2:ital,wght@0,100..900;1,100..900&display=swap');
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
-}
+:root {
+  /* Dark theme colors */
+  --dark-bg: #22282e;
+  --dark-card-bg: #282f36;
+  --dark-text: #ccd1d6;
+  --dark-text-secondary: #dadee2;
+  --dark-border: rgba(255, 255, 255, 0.1);
+  --accent-color: #6A9C89;
+  
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
-  color: white;
+  /* Light theme colors */
+  --light-bg: #f3f3f3;
+  --light-card-bg: #ffffff;
+  --light-text: #282f36;
+  --light-text-secondary: #282f36;
+  --light-border: rgba(12, 12, 12, 0.034);
 }
-
-.App-link {
-  color: #61dafb;
-}
-
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+body {
+  font-family: "Exo 2", sans-serif !important;
 }
 
 input:focus-visible{
   outline: none !important;
 }
-} */
+

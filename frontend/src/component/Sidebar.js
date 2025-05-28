@@ -5,11 +5,16 @@ import {
   FaChartLine, FaCog, FaSearch, FaAngleDown, 
   FaBoxOpen, FaClipboardList, FaShoppingCart, FaFileInvoice,
   FaUserCog, FaUserPlus, FaChartBar, FaChartPie,
-  FaBell, FaStar, FaMoon, FaSun,
-  FaBars
+  FaBell, FaStar, FaMoon, FaSun, FaEdit, FaEye,
+  FaPlus, FaHeart, FaShoppingBag, FaBars, FaTags,
+  FaLayerGroup, FaList
 } from 'react-icons/fa';
+import { AiFillProduct } from "react-icons/ai";
+import { RiCoupon3Fill } from "react-icons/ri";
+import { BsFillGrid1X2Fill } from "react-icons/bs";
 import { Link, useLocation } from 'react-router-dom';
-  
+import '../styles/admin.css';  
+
 const Sidebar = ({ show, isDarkMode }) => {
   const location = useLocation();
   const [searchTerm, setSearchTerm] = useState('');
@@ -26,10 +31,18 @@ const Sidebar = ({ show, isDarkMode }) => {
   };
 
   const toggleSubmenu = (menu) => {
-    setExpandedMenus(prev => ({
-      ...prev,
-      [menu]: !prev[menu]
-    }));
+    setExpandedMenus(prev => {
+      const newState = {};
+      // Close all menus except the clicked one
+      Object.keys(prev).forEach(key => {
+        newState[key] = key === menu ? !prev[menu] : false;
+      });
+      // If the menu wasn't previously in state, add it as open
+      if (!(menu in prev)) {
+        newState[menu] = true;
+      }
+      return newState;
+    });
   };
 
   const menuItems = [
@@ -40,19 +53,62 @@ const Sidebar = ({ show, isDarkMode }) => {
       notifications: 3
     },
     {
-      title: 'Inventory',
-      icon: <FaBoxes size={18} />,
+      title: 'Stock Management',
+      icon: <AiFillProduct size={18} />,
       submenu: [
-        { title: 'Stock Items', path: '/inventory', icon: <FaBoxOpen size={16} />, notifications: 5 },
-        { title: 'Categories', path: '/categories', icon: <FaClipboardList size={16} /> },
-        { title: 'Orders', path: '/orders', icon: <FaShoppingCart size={16} />, notifications: 2 },
-        { title: 'Invoices', path: '/invoices', icon: <FaFileInvoice size={16} /> }
+        { title: 'Stock Overview', path: '/stock', icon: <FaList size={14} /> },
+        { title: 'Add Stock', path: '/stock/add', icon: <FaPlus size={14} /> },
+        { title: 'Stock Adjustments', path: '/stock/adjust', icon: <FaExchangeAlt size={14} /> },
+        { title: 'Low Stock Alerts', path: '/stock/alerts', icon: <FaBell size={14} /> }
       ]
     },
     {
-      title: 'Transactions',
-      path: '/transactions',
-      icon: <FaExchangeAlt size={18} />
+      title: 'Categories',
+      icon: <FaTags size={18} />,
+      submenu: [
+        { title: 'Category List', path: '/categories', icon: <FaList size={14} /> },
+        { title: 'Add Category', path: '/categories/add', icon: <FaPlus size={14} /> },
+        { title: 'Edit Category', path: '/categories/edit', icon: <FaEdit size={14} /> },
+      
+      ]
+    },
+    { 
+      title: 'Subcategories',
+      icon: <FaLayerGroup size={16} />,
+      submenu: [
+        { title: 'Subcategory List', path: '/subcategories', icon: <FaList size={14} /> },
+        { title: 'Add Subcategory', path: '/subcategories/add', icon: <FaPlus size={14} /> },
+        { title: 'Edit Subcategory', path: '/subcategories/edit', icon: <FaEdit size={14} /> }
+      ]
+    },
+    {
+      title: 'Products',
+      icon: <FaBoxes size={18} />,
+      submenu: [
+        { title: 'Product Grid', path: '/products', icon: <BsFillGrid1X2Fill size={16} />, notifications: 5 },
+        { title: 'Add Product', path: '/products/add', icon: <FaPlus size={16} /> },
+        { title: 'Edit Product', path: '/products/edit', icon: <FaEdit size={16} /> },
+        { title: 'View Product', path: '/products/view', icon: <FaEye size={16} /> }
+      ]
+    },
+    {
+      title: 'Coupons',
+      icon: <RiCoupon3Fill size={18} />,
+      submenu: [
+        { title: 'Coupon List', path: '/coupons', icon: <FaList size={14} /> },
+        { title: 'Add Coupon', path: '/coupons/add', icon: <FaPlus size={14} /> },
+        { title: 'Edit Coupon', path: '/coupons/edit', icon: <FaEdit size={14} /> }
+      ]
+    },
+    {
+      title: 'Orders',
+      icon: <FaShoppingCart size={18} />,
+      submenu: [
+        { title: 'Order List', path: '/orders', icon: <FaClipboardList size={16} />, notifications: 2 },
+        { title: 'Shopping Cart', path: '/cart', icon: <FaShoppingBag size={16} /> },
+        { title: 'Wishlist', path: '/wishlist', icon: <FaHeart size={16} /> },
+        { title: 'Checkout', path: '/checkout', icon: <FaFileInvoice size={16} /> }
+      ]
     },
     {
       title: 'Users',
@@ -63,6 +119,7 @@ const Sidebar = ({ show, isDarkMode }) => {
         { title: 'Add User', path: '/add-user', icon: <FaUserPlus size={16} /> }
       ]
     },
+ 
     {
       title: 'Reports',
       icon: <FaChartLine size={18} />,
@@ -83,12 +140,13 @@ const Sidebar = ({ show, isDarkMode }) => {
     const hasSubmenu = item.submenu && item.submenu.length > 0;
     const isMenuExpanded = expandedMenus[item.title];
     const isFavorite = item.path && favorites.includes(item.path);
+    const isSubmenuActive = hasSubmenu && item.submenu.some(subItem => location.pathname === subItem.path);
 
     const menuContent = (
-      <div className="d-flex align-items-center justify-content-between w-100">
+      <div className={`d-flex align-items-center justify-content-between w-100 ${(isActive || isSubmenuActive) ? 'active-item' : ''}`}>
         <div className="d-flex align-items-center">
-          <span className="me-3">{item.icon}</span>
-          {isExpanded && <span>{item.title}</span>}
+          <span className={`me-3 ${(isActive || isSubmenuActive) ? 'active-icon' : ''}`}>{item.icon}</span>
+          {isExpanded && <span className={isActive ? 'active-text' : ''}>{item.title}</span>}
         </div>
         {isExpanded && (
           <div className="d-flex align-items-center">
@@ -115,9 +173,9 @@ const Sidebar = ({ show, isDarkMode }) => {
 
     if (hasSubmenu) {
       return (
-        <div key={item.title} className="nav-item-wrapper">
+        <div key={item.title} className={`nav-item-wrapper ${isSubmenuActive ? 'active-submenu' : ''}`}>
           <div 
-            className={`nav-link ${isMenuExpanded ? 'active' : ''}`}
+            className={`nav-link ${isMenuExpanded ? 'expanded' : ''} ${isSubmenuActive ? 'active' : ''}`}
             onClick={() => toggleSubmenu(item.title)}
             style={{ cursor: 'pointer' }}
           >

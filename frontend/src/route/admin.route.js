@@ -19,40 +19,81 @@ import Register from '../component/auth/Register';
 import ForgotPassword from '../component/auth/ForgotPassword';
 import VerifyOTP from '../component/auth/VerifyOTP';
 import ChangePassword from '../component/auth/ChangePassword';
+import Profile from '../component/Profile';
+import CartList from '../component/CartList';
+import CheckoutPage from '../component/CheckoutPage';
+// Add new imports
+import StockOverview from '../pages/StockOverview';
+import StockAdjustments from '../pages/StockAdjustments';
+import LowStockAlerts from '../pages/LowStockAlerts';
+import SubcategoryList from '../pages/SubcategoryList';
+import CouponList from '../pages/CouponList';
+import EditCoupon from '../pages/EditCoupon';
+import UserList from '../pages/UserList';
+import UserRoles from '../pages/UserRoles';
+import AddUser from '../pages/AddUser';
+import Wishlist from '../pages/Wishlist';
+import SalesReport from '../pages/SalesReport';
+import InventoryReport from '../pages/InventoryReport';
+import Settings from '../pages/Settings';
 
 function UserRoutes() {
     return (
         <Routes>
-            {/* aesha */}
-            <Route path="/" element={<Main />} />
-            <Route path="/AddProduct" element={<AddProduct />} />
-            <Route path="/EditProduct" element={<EditProduct />} />
-            <Route path="/AddCategory" element={<AddCategory />} />
-            <Route path="/EditCategory" element={<EditCategory />} />
-            <Route path="/AddSubcategory" element={<AddSubcategory />} />
-            <Route path="/EditSubcategory" element={<EditSubcategory />} />
-            <Route path="/AddInventory" element={<AddInventory />} />
-            <Route path="/EditInventory" element={<EditInventory />} />
-            <Route path="/AddCoupon" element={<AddCoupon />} />
+            <Route path="/" element={<Main />}>
+                {/* Stock Management */}
+                <Route path="stock" element={<StockOverview />} />
+                <Route path="stock/add" element={<AddInventory />} />
+                <Route path="stock/adjust" element={<StockAdjustments />} />
+                <Route path="stock/alerts" element={<LowStockAlerts />} />
+                
+                {/* Categories */}
+                <Route path="categories" element={<CategoryList />} />
+                <Route path="categories/add" element={<AddCategory />} />
+                <Route path="categories/edit" element={<EditCategory />} />
+                
+                {/* Subcategories */}
+                <Route path="subcategories" element={<SubcategoryList />} />
+                <Route path="subcategories/add" element={<AddSubcategory />} />
+                <Route path="subcategories/edit" element={<EditSubcategory />} />
+                
+                {/* Products */}
+                <Route path="products" element={<ProductGrid />} />
+                <Route path="products/add" element={<AddProduct />} />
+                <Route path="products/edit" element={<EditProduct />} />
+                <Route path="products/view" element={<ProductList />} />
+                
+                {/* Coupons */}
+                <Route path="coupons" element={<CouponList />} />
+                <Route path="coupons/add" element={<AddCoupon />} />
+                <Route path="coupons/edit" element={<EditCoupon />} />
+                
+                {/* Orders */}
+                <Route path="orders" element={<OrderList />} />
+                <Route path="cart" element={<CartList />} />
+                <Route path="wishlist" element={<Wishlist />} />
+                <Route path="checkout" element={<CheckoutPage />} />
+                
+                {/* Users */}
+                <Route path="users" element={<UserList />} />
+                <Route path="user-roles" element={<UserRoles />} />
+                <Route path="add-user" element={<AddUser />} />
+                
+                {/* Reports */}
+                <Route path="sales-report" element={<SalesReport />} />
+                <Route path="inventory-report" element={<InventoryReport />} />
+                
+                {/* Settings */}
+                <Route path="settings" element={<Settings />} />
+            </Route>
 
-
-            
-
-            {/* krupali */}
-            <Route path="/Productgrid" element={<ProductGrid />} />
-            <Route path="/Productlist" element={<ProductList />} />
-            <Route path="/Categorylist" element={<CategoryList />} />
-            <Route path="/Orderlist" element={<OrderList />} />
-
-
-
-
-            {/* denisha */}
+            {/* Auth Routes - These should remain outside of Main layout */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-otp" element={<VerifyOTP />} />
             <Route path="/change-password" element={<ChangePassword />} />
+            <Route path="/profile" element={<Profile />} />
         </Routes>
     );
 }

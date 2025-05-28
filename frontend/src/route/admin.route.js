@@ -28,9 +28,7 @@ import CheckoutPage from '../component/CheckoutPage';
 // Add new imports
 import StockOverview from '../pages/StockOverview';
 import StockAdjustments from '../pages/StockAdjustments';
-import LowStockAlerts from '../pages/LowStockAlerts';
 import SubcategoryList from '../pages/SubcategoryList';
-import CouponList from '../pages/CouponList';
 import EditCoupon from '../pages/EditCoupon';
 import UserRoles from '../pages/UserRoles';
 import Wishlist from '../pages/Wishlist';
@@ -45,33 +43,6 @@ import Dashboard from '../component/Dashboard';
 function UserRoutes() {
     return (
         <Routes>
-            {/* <Route path="/" element={<Main />} />
-            <Route path="/AddProduct" element={<AddProduct />} />
-            <Route path="/EditProduct" element={<EditProduct />} />
-            <Route path="/AddCategory" element={<AddCategory />} />
-            <Route path="/EditCategory" element={<EditCategory />} />
-            <Route path="/AddSubcategory" element={<AddSubcategory />} />
-            <Route path="/EditSubcategory" element={<EditSubcategory />} />
-            <Route path="/AddInventory" element={<AddInventory />} />
-            <Route path="/EditInventory" element={<EditInventory />} />
-            <Route path="/AddCoupon" element={<AddCoupon />} />
-            <Route path="/AddUser" element={<AddUser />} />
-            <Route path="/EditUser" element={<EditUser />} />
-
-
-
-            
-
-     
-            <Route path="/Productgrid" element={<ProductGrid />} />
-            <Route path="/Productlist" element={<ProductList />} />
-            <Route path="/Categorylist" elem    ent={<CategoryList />} />
-            <Route path="/Orderlist" element={<OrderList />} />
-            <Route path="/Userlist" element={<UserList />} /> */}
-
-
-
-            {/* denisha */}
             <Route path="/" element={<Main />}>
                 {/* Stock Management */}
                 <Route index element={<Dashboard />} />

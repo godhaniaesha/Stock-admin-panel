@@ -6,6 +6,8 @@ import { MdReceipt } from "react-icons/md";
 
 const AddProduct = () => {
     const [productData, setProductData] = useState({
+        category: '',
+        subcategory: '',
         productName: '',
         brand: '',
         weight: '',
@@ -23,18 +25,35 @@ const AddProduct = () => {
     const [error, setError] = useState('');
     const [isGenderOpen, setIsGenderOpen] = useState(false);
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+    const [isSubcategoryOpen, setIsSubcategoryOpen] = useState(false);
 
     const categoryOptions = [
         { value: 'clothing', label: 'Clothing' },
         { value: 'shoes', label: 'Shoes' },
         { value: 'accessories', label: 'Accessories' }
     ];
-
+    const subcategoryOptions = {
+        clothing: [
+            { value: 'subcategory1', label: 'Subcategory 1' },
+            { value: 'subcategory2', label: 'Subcategory 2' }
+        ],
+        shoes: [
+            { value: 'subcategory3', label: 'Subcategory 3' },
+            { value: 'subcategory4', label: 'Subcategory 4' }
+        ],
+        accessories: [
+            { value: 'subcategory5', label: 'Subcategory 5' },
+            { value: 'subcategory6', label: 'Subcategory 6' }
+        ]
+    };
     const handleCategorySelect = (value) => {
         setProductData(prev => ({ ...prev, category: value }));
         setIsCategoryOpen(false);
     };
-
+    const handleSubcategorySelect = (value) => {
+        setProductData(prev => ({ ...prev, subcategory: value, product: '' }));
+        setIsSubcategoryOpen(false);
+    };
     const genderOptions = [
         { value: 'men', label: 'Men' },
         { value: 'women', label: 'Women' },
@@ -159,26 +178,16 @@ const AddProduct = () => {
                         <h2 className="x_product_title">Product Information</h2>
 
                         <div className='x_form_p'>
+                            {/* add field */}
                             <div className="x_form_row">
                                 <div className="x_form_group">
-                                    <label>Product Name</label>
-                                    <input
-                                        type="text"
-                                        name="productName"
-                                        placeholder="Items Name"
-                                        value={productData.productName}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
-                                </div>
-                                <div className="x_form_group">
-                                    <label>Product Categories</label>
+                                    <label>Category</label>
                                     <div className="x_custom_dropdown">
                                         <div
                                             className="x_dropdown_header"
                                             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                                         >
-                                            <span>{productData.category || 'Choose a categories'}</span>
+                                            <span>{productData.category || 'Select Category'}</span>
                                             <svg
                                                 className={`x_dropdown_arrow ${isCategoryOpen ? 'open' : ''}`}
                                                 width="10"
@@ -203,9 +212,52 @@ const AddProduct = () => {
                                         )}
                                     </div>
                                 </div>
-                            </div>
 
+                                <div className="x_form_group">
+                                    <label>Subcategory</label>
+                                    <div className="x_custom_dropdown">
+                                        <div
+                                            className="x_dropdown_header"
+                                            onClick={() => setIsSubcategoryOpen(!isSubcategoryOpen)}
+                                        >
+                                            <span>{productData.subcategory || 'Select Subcategory'}</span>
+                                            <svg
+                                                className={`x_dropdown_arrow ${isSubcategoryOpen ? 'open' : ''}`}
+                                                width="10"
+                                                height="6"
+                                                viewBox="0 0 10 6"
+                                            >
+                                                <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" fill="none" />
+                                            </svg>
+                                        </div>
+                                        {isSubcategoryOpen && (
+                                            <div className="x_dropdown_options">
+                                                {productData.category && subcategoryOptions[productData.category].map((option) => (
+                                                    <div
+                                                        key={option.value}
+                                                        className="x_dropdown_option"
+                                                        onClick={() => handleSubcategorySelect(option.value)}
+                                                    >
+                                                        {option.label}
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            </div>
                             <div className="x_form_row">
+                                <div className="x_form_group">
+                                    <label>Product Name</label>
+                                    <input
+                                        type="text"
+                                        name="productName"
+                                        placeholder="Items Name"
+                                        value={productData.productName}
+                                        onChange={handleInputChange}
+                                        className="x_input"
+                                    />
+                                </div>
                                 <div className="x_form_group">
                                     <label>Brand</label>
                                     <input
@@ -217,6 +269,10 @@ const AddProduct = () => {
                                         className="x_input"
                                     />
                                 </div>
+                            </div>
+
+                            <div className="x_form_row">
+                                
                                 <div className="x_form_group">
                                     <label>Weight</label>
                                     <input

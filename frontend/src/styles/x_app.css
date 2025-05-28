@@ -538,6 +538,7 @@
     font-size: 0.875rem;
     margin: 0;
 }
+
 .x_error_message {
     color: #dc3545;
     font-size: 0.875rem;
@@ -547,19 +548,19 @@
 /* Add these styles to your existing CSS */
 .x_error {
     border-color: #ff4d4f !important;
-  }
-  
-  .x_error_text {
+}
+
+.x_error_text {
     color: #ff4d4f;
     font-size: 12px;
     margin-top: 4px;
-  }
-  
-  .x_size_btn.x_error {
-    border-color: #ff4d4f !important;
-  }
+}
 
-  .x_custom_dropdown {
+.x_size_btn.x_error {
+    border-color: #ff4d4f !important;
+}
+
+.x_custom_dropdown {
     position: relative;
     width: 100%;
 }
@@ -571,7 +572,7 @@
     padding: 10px 15px;
     background: white;
     border: 1px solid #ddd;
-    border-radius: 8px;
+    border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
 }
@@ -597,7 +598,7 @@
     background: white;
     border: 1px solid #ddd;
     border-radius: 8px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     z-index: 100;
 }
 
@@ -641,9 +642,34 @@
     padding-left: 0rem !important;
 }
 
-.x_d_gap{
-    gap: 10rem ;
+.x_d_gap {
+    gap: 10rem;
 }
+
 /* end redio  */
 
 /* calender start */
+.x_password_input_wrapper {
+    position: relative;
+    width: 100%;
+}
+
+.x_password_toggle {
+    position: absolute;
+    right: 10px;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    color: #666;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.x_password_toggle:hover {
+    color: #333;
+}
+
+.x_password_input_wrapper .x_input {
+    padding-right: 40px;
+}

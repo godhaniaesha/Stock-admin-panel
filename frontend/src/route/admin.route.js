@@ -24,6 +24,7 @@ import EditCoupon from '../pages/EditCoupon';
 import AddUser from '../pages/AddUser';
 import SubcategoryList from '../component/SubcategoryList';
 import UserList from '../component/UserList';
+import EditUser from '../pages/EditUser';
 
 function UserRoutes() {
     return (
@@ -41,6 +42,7 @@ function UserRoutes() {
             <Route path="/AddCoupon" element={<AddCoupon />} />
             <Route path="/EditCoupon" element={<EditCoupon />} />
             <Route path="/AddUser" element={<AddUser />} />
+            <Route path="/EditUser" element={<EditUser />} />
 
 
 

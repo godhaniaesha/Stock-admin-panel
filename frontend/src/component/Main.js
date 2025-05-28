@@ -8,6 +8,7 @@ import Dashboard from './Dashboard';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CartList from './CartList';
 import CheckoutPage from './CheckoutPage';
+import D_StockManagementChart from './D_StockManagementChart';
 
 export default function Main() {
   const [showSidebar, setShowSidebar] = useState(false);
@@ -57,14 +58,16 @@ export default function Main() {
             <Profile isDarkMode={isDarkMode} />
           ) : (
             <div 
-              className="rounded shadow-sm p-4"
+              className="rounded shadow-sm p-md-4 p-1"
               style={{
                 backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`,
                 color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
                 borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`
               }}
             >
-              <Dashboard isDarkMode={isDarkMode} />
+              {/* <Dashboard isDarkMode={isDarkMode} /> */}
+              <Outlet context={{ isDarkMode }} />
+              {/* <D_StockManagementChart /> */}
             </div>
           )}
         </div>

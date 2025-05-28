@@ -37,6 +37,7 @@ import Wishlist from '../pages/Wishlist';
 import SalesReport from '../pages/SalesReport';
 import InventoryReport from '../pages/InventoryReport';
 import Settings from '../pages/Settings';
+import EditUser from '../pages/EditUser';
 
 function UserRoutes() {
     return (
@@ -53,6 +54,7 @@ function UserRoutes() {
             <Route path="/EditInventory" element={<EditInventory />} />
             <Route path="/AddCoupon" element={<AddCoupon />} />
             <Route path="/AddUser" element={<AddUser />} />
+            <Route path="/EditUser" element={<EditUser />} />
 
 
 

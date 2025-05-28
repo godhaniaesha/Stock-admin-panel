@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import '../styles/x_app.css';
 
-const AddUser = () => {
+const EditUser = () => {
     const [userData, setUserData] = useState({
         firstName: '',
         lastName: '',
@@ -22,9 +22,9 @@ const AddUser = () => {
     const [error, setError] = useState('');
     const [isGenderOpen, setIsGenderOpen] = useState(false);
     const [isRoleOpen, setIsRoleOpen] = useState(false);
-     // Add these two new state variables for password visibility
-     const [showPassword, setShowPassword] = useState(false);
-     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+    // Add these two new state variables for password visibility
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const genderOptions = [
         { value: 'male', label: 'Male' },
@@ -318,7 +318,7 @@ const AddUser = () => {
                                             onChange={handleInputChange}
                                             className="x_input"
                                         />
-                                        <div 
+                                        <div
                                             className="x_password_toggle"
                                             onClick={() => setShowPassword(!showPassword)}
                                         >
@@ -347,7 +347,7 @@ const AddUser = () => {
                                             onChange={handleInputChange}
                                             className="x_input"
                                         />
-                                        <div 
+                                        <div
                                             className="x_password_toggle"
                                             onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                                         >
@@ -371,7 +371,7 @@ const AddUser = () => {
                 </div>
 
                 <div className="x_btn_wrapper mt-3">
-                    <button type="submit" className="x_btn x_btn_create">Create User</button>
+                    <button type="submit" className="x_btn x_btn_create">Save Changes</button>
                     <button type="button" className="x_btn x_btn_cancel">Cancel</button>
                 </div>
             </div>
@@ -379,4 +379,4 @@ const AddUser = () => {
     );
 };
 
-export default AddUser;
+export default EditUser;

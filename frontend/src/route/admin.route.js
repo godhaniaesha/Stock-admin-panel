@@ -78,7 +78,7 @@ function UserRoutes() {
                 <Route path="stock" element={<StockOverview />} />
                 <Route path="stock/add" element={<AddInventory />} />
                 <Route path="stock/adjust" element={<StockAdjustments />} />
-                <Route path="stock/alerts" element={<LowStockAlerts />} />
+                <Route path="stock/alerts" element={<StockAlert />} />
                 
                 {/* Categories */}
                 <Route path="categories" element={<CategoryList />} />
@@ -97,7 +97,7 @@ function UserRoutes() {
                 <Route path="products/view" element={<ProductList />} />
                 
                 {/* Coupons */}
-                <Route path="coupons" element={<CouponList />} />
+                <Route path="coupons" element={<ListCoupons />} />
                 <Route path="coupons/add" element={<AddCoupon />} />
                 <Route path="coupons/edit" element={<EditCoupon />} />
                 
@@ -111,6 +111,8 @@ function UserRoutes() {
                 <Route path="users" element={<UserList />} />
                 <Route path="user-roles" element={<UserRoles />} />
                 <Route path="add-user" element={<AddUser />} />
+                <Route path="edit-user" element={<EditUser />} />
+
                 
                 {/* Reports */}
                 <Route path="sales-report" element={<SalesReport />} />

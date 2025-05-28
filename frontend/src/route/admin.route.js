@@ -37,12 +37,12 @@ import Wishlist from '../pages/Wishlist';
 import SalesReport from '../pages/SalesReport';
 import InventoryReport from '../pages/InventoryReport';
 import Settings from '../pages/Settings';
+import Dashboard from '../component/Dashboard';
 
 function UserRoutes() {
     return (
         <Routes>
-            {/* aesha */}
-            <Route path="/" element={<Main />} />
+            {/* <Route path="/" element={<Main />} />
             <Route path="/AddProduct" element={<AddProduct />} />
             <Route path="/EditProduct" element={<EditProduct />} />
             <Route path="/AddCategory" element={<AddCategory />} />
@@ -58,18 +58,19 @@ function UserRoutes() {
 
             
 
-            {/* krupali */}
+     
             <Route path="/Productgrid" element={<ProductGrid />} />
             <Route path="/Productlist" element={<ProductList />} />
             <Route path="/Categorylist" element={<CategoryList />} />
             <Route path="/Orderlist" element={<OrderList />} />
-            <Route path="/Userlist" element={<UserList />} />
+            <Route path="/Userlist" element={<UserList />} /> */}
 
 
 
             {/* denisha */}
             <Route path="/" element={<Main />}>
                 {/* Stock Management */}
+                <Route index element={<Dashboard />} />
                 <Route path="stock" element={<StockOverview />} />
                 <Route path="stock/add" element={<AddInventory />} />
                 <Route path="stock/adjust" element={<StockAdjustments />} />

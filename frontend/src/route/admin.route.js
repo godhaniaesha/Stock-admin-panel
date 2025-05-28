@@ -14,11 +14,14 @@ import ProductGrid from '../component/ProductGrid';
 import ProductList from '../component/ProductList';
 import CategoryList from '../component/CategoryList';
 import OrderList from '../component/OrderList';
+
 import Login from '../component/auth/Login';
 import Register from '../component/auth/Register';
 import ForgotPassword from '../component/auth/ForgotPassword';
 import VerifyOTP from '../component/auth/VerifyOTP';
 import ChangePassword from '../component/auth/ChangePassword';
+import EditCoupon from '../pages/EditCoupon';
+import AddUser from '../pages/AddUser';
 
 function UserRoutes() {
     return (
@@ -34,6 +37,9 @@ function UserRoutes() {
             <Route path="/AddInventory" element={<AddInventory />} />
             <Route path="/EditInventory" element={<EditInventory />} />
             <Route path="/AddCoupon" element={<AddCoupon />} />
+            <Route path="/EditCoupon" element={<EditCoupon />} />
+            <Route path="/AddUser" element={<AddUser />} />
+
 
 
             

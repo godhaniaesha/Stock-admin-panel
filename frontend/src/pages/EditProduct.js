@@ -407,7 +407,7 @@ const EditProduct = () => {
 
                 <div className="x_btn_wrapper mt-3">
                     <button type="submit" className="x_btn x_btn_create">Save Changes</button>
-                    <button type="button" className="x_btn x_btn_cancel">Reset</button>
+                    <button type="button" className="x_btn x_btn_cancel">Cancel</button>
                 </div>
             </div>
         </div>

@@ -1,9 +1,8 @@
 import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
-import moment from 'moment';
 import '../styles/x_app.css';
 
-const AddCoupon = () => {
+const EditCoupon = () => {
     const [couponData, setCouponData] = useState({
         status: 'active',
         startDate: '',
@@ -16,16 +15,6 @@ const AddCoupon = () => {
         discountValue: ''
     });
 
-    const DayNames = () => (
-        <div className="x_week names">
-            {['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'].map((name, i) => (
-                <span key={i} className="x_day">{name}</span>
-            ))}
-        </div>
-    );
-
-
-    
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setCouponData(prev => ({
@@ -160,7 +149,7 @@ const AddCoupon = () => {
                     </div>
                 </div>
                 <div className="x_btn_wrapper mt-3">
-                    <button type="submit" className="x_btn x_btn_create" onClick={handleSubmit}>Create Coupon</button>
+                    <button type="submit" className="x_btn x_btn_create">Save Changes</button>
                     <button type="button" className="x_btn x_btn_cancel">Cancel</button>
                 </div>
             </div >
@@ -169,4 +158,4 @@ const AddCoupon = () => {
     );
 };
 
-export default AddCoupon;
+export default EditCoupon;

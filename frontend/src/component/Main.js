@@ -1,8 +1,10 @@
 import '../styles/admin.css';
 import React, { useState } from 'react';
+import { Outlet } from 'react-router-dom';
 import TopNavbar from './Navbar';
 import Sidebar from './Sidebar';
 import Profile from './Profile';
+import Dashboard from './Dashboard';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import CartList from './CartList';
 import CheckoutPage from './CheckoutPage';
@@ -52,9 +54,7 @@ export default function Main() {
         />
         <div className="content">
           {showProfile ? (
-            // <Profile isDarkMode={isDarkMode} />
-            // <CartList isDarkMode={isDarkMode} />
-            <CheckoutPage isDarkMode={isDarkMode} />
+            <Profile isDarkMode={isDarkMode} />
           ) : (
             <div 
               className="rounded shadow-sm p-4"
@@ -64,10 +64,7 @@ export default function Main() {
                 borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`
               }}
             >
-              <h2 className="mb-4">Welcome to Stock Admin Panel</h2>
-              <p style={{ color: `var(${isDarkMode ? '--dark-text-secondary' : '--light-text-secondary'})` }}>
-                Select an option from the sidebar to get started.
-              </p>
+              <Dashboard isDarkMode={isDarkMode} />
             </div>
           )}
         </div>

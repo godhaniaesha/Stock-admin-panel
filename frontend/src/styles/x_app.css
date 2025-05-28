@@ -163,7 +163,7 @@
 .x_tag {
     display: inline-flex;
     align-items: center;
-    background-color: #ff6b35;
+    background-color: #6A9C89;
     color: white;
     padding: 0.25rem 0.5rem;
     border-radius: 4px;
@@ -290,7 +290,7 @@
 }
 
 .x_btn_cancel {
-    background-color: #ff6b35;
+    background-color: #6A9C89;
     color: white;
     border: none;
 }
@@ -392,7 +392,7 @@
 }
 
 .x_btn_cancel {
-    background-color: #ff6b35;
+    background-color: #6A9C89;
     color: white;
     border: none;
 }
@@ -503,7 +503,7 @@
 }
 
 .x_upload_area:hover {
-    border-color: #ff6b35;
+    border-color: #6A9C89;
     background-color: #fff8f6;
 }
 
@@ -529,7 +529,7 @@
 }
 
 .x_browse_text {
-    color: #ff6b35;
+    color: #6A9C89;
     cursor: pointer;
 }
 
@@ -609,7 +609,7 @@
 
 .x_dropdown_option:hover {
     background: #f5f5f5;
-    color: #ff6b35;
+    color: #6A9C89;
 }
 
 .x_dropdown_option:first-child {

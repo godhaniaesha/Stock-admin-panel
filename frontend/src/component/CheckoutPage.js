@@ -1,13 +1,40 @@
-import React from 'react';
+import React, { useState } from 'react';
 import '../styles/checkout.css';
 import { CreditCard, Truck, MapPin } from 'lucide-react';
 
 const CheckoutPage = ({ isDarkMode }) => {
+  const [formData, setFormData] = useState({
+    firstName: '',
+    lastName: '',
+    email: '',
+    phone: '',
+    address: '',
+    zipCode: '',
+    city: '',
+    country: '',
+    shippingMethod: 'dhl',
+    promoCode: ''
+  });
+
+  const handleInputChange = (e) => {
+    const { name, value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleShippingMethodChange = (method) => {
+    setFormData(prev => ({
+      ...prev,
+      shippingMethod: method
+    }));
+  };
+
   return (
     <div className="d_checkout_container" data-theme={isDarkMode ? 'dark' : 'light'}>
       <div className="d_checkout_header">
         <h1>Checkout</h1>
-       
       </div>
 
       <div className="row g-4">
@@ -21,25 +48,53 @@ const CheckoutPage = ({ isDarkMode }) => {
               <div className="col-md-6">
                 <div className="d_form_group">
                   <label>First Name</label>
-                  <input type="text" className="d_input" placeholder="John" />
+                  <input
+                    type="text"
+                    name="firstName"
+                    className="d_input"
+                    placeholder="Enter your first name"
+                    value={formData.firstName}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
               <div className="col-md-6">
                 <div className="d_form_group">
                   <label>Last Name</label>
-                  <input type="text" className="d_input" placeholder="Doe" />
+                  <input
+                    type="text"
+                    name="lastName"
+                    className="d_input"
+                    placeholder="Enter your last name"
+                    value={formData.lastName}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
               <div className="col-md-6">
                 <div className="d_form_group">
                   <label>Email Address</label>
-                  <input type="email" className="d_input" placeholder="john@example.com" />
+                  <input
+                    type="email"
+                    name="email"
+                    className="d_input"
+                    placeholder="Enter your email address"
+                    value={formData.email}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
               <div className="col-md-6">
                 <div className="d_form_group">
                   <label>Phone Number</label>
-                  <input type="tel" className="d_input" placeholder="+1 234 567 890" />
+                  <input
+                    type="tel"
+                    name="phone"
+                    className="d_input"
+                    placeholder="Enter your phone number"
+                    value={formData.phone}
+                    onChange={handleInputChange}
+                  />
                 </div>
               </div>
             </div>
@@ -53,34 +108,62 @@ const CheckoutPage = ({ isDarkMode }) => {
             <div className="d_shipping_form">
               <div className="d_form_group">
                 <label>Full Address</label>
-                <textarea className="d_input" placeholder="Enter your full address" rows="3"></textarea>
+                <textarea
+                  name="address"
+                  className="d_input"
+                  placeholder="Enter your complete shipping address"
+                  rows="3"
+                  value={formData.address}
+                  onChange={handleInputChange}
+                ></textarea>
               </div>
               <div className="row g-3 mt-2">
                 <div className="col-md-4">
                   <div className="d_form_group">
                     <label>Zip Code</label>
-                    <input type="text" className="d_input" placeholder="12345" />
+                    <input
+                      type="text"
+                      name="zipCode"
+                      className="d_input"
+                      placeholder="Enter zip code"
+                      value={formData.zipCode}
+                      onChange={handleInputChange}
+                    />
                   </div>
                 </div>
                 <div className="col-md-4">
                   <div className="d_form_group">
                     <label>City</label>
-                    <select className="d_input">
-                      <option value="">Select City</option>
+                    <select
+                      name="city"
+                      className="d_input"
+                      value={formData.city}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Choose your city</option>
                       <option value="new-york">New York</option>
                       <option value="london">London</option>
                       <option value="paris">Paris</option>
+                      <option value="tokyo">Tokyo</option>
+                      <option value="sydney">Sydney</option>
                     </select>
                   </div>
                 </div>
                 <div className="col-md-4">
                   <div className="d_form_group">
                     <label>Country</label>
-                    <select className="d_input">
-                      <option value="">Select Country</option>
+                    <select
+                      name="country"
+                      className="d_input"
+                      value={formData.country}
+                      onChange={handleInputChange}
+                    >
+                      <option value="">Select your country</option>
                       <option value="us">United States</option>
                       <option value="uk">United Kingdom</option>
                       <option value="fr">France</option>
+                      <option value="jp">Japan</option>
+                      <option value="au">Australia</option>
                     </select>
                   </div>
                 </div>
@@ -95,7 +178,12 @@ const CheckoutPage = ({ isDarkMode }) => {
             </div>
             <div className="d_shipping_methods">
               <label className="d_shipping_option">
-                <input type="radio" name="shipping" defaultChecked />
+                <input
+                  type="radio"
+                  name="shippingMethod"
+                  checked={formData.shippingMethod === 'dhl'}
+                  onChange={() => handleShippingMethodChange('dhl')}
+                />
                 <div className="d_option_content">
                   <img src="/dhl-logo.png" alt="DHL" className="d_courier_logo" />
                   <div className="d_option_details">
@@ -107,7 +195,12 @@ const CheckoutPage = ({ isDarkMode }) => {
               </label>
 
               <label className="d_shipping_option">
-                <input type="radio" name="shipping" />
+                <input
+                  type="radio"
+                  name="shippingMethod"
+                  checked={formData.shippingMethod === 'fedex'}
+                  onChange={() => handleShippingMethodChange('fedex')}
+                />
                 <div className="d_option_content">
                   <img src="/fedex-logo.png" alt="FedEx" className="d_courier_logo" />
                   <div className="d_option_details">
@@ -119,7 +212,12 @@ const CheckoutPage = ({ isDarkMode }) => {
               </label>
 
               <label className="d_shipping_option">
-                <input type="radio" name="shipping" />
+                <input
+                  type="radio"
+                  name="shippingMethod"
+                  checked={formData.shippingMethod === 'ups'}
+                  onChange={() => handleShippingMethodChange('ups')}
+                />
                 <div className="d_option_content">
                   <img src="/ups-logo.png" alt="UPS" className="d_courier_logo" />
                   <div className="d_option_details">
@@ -143,7 +241,15 @@ const CheckoutPage = ({ isDarkMode }) => {
             <div className="d_promo_section">
               <h3 style={{ color: 'white', marginBottom: '1rem' }}>Have a Promo Code ?</h3>
               <div className="d_promo_input">
-                <input type="text" placeholder="CODE123" className="d_input" style={{ flex: 1 }} />
+                <input
+                  type="text"
+                  name="promoCode"
+                  placeholder="Enter your promo code"
+                  className="d_input"
+                  style={{ flex: 1 }}
+                  value={formData.promoCode}
+                  onChange={handleInputChange}
+                />
                 <button className="d_apply_btn">Apply</button>
               </div>
             </div>
@@ -190,7 +296,27 @@ const CheckoutPage = ({ isDarkMode }) => {
               </div>
             </div>
 
-            <button className="d_checkout_btn">Proceed to Payment</button>
+            <button 
+              className="d_checkout_btn" 
+              style={{
+                width: '100%',
+                padding: '15px',
+                fontSize: '1.1rem',
+                fontWeight: '600',
+                backgroundColor: '#6A9C89',
+                color: '#ffffff',
+                border: 'none',
+                borderRadius: '8px',
+                cursor: 'pointer',
+                transition: 'all 0.3s ease',
+                boxShadow: '0 2px 4px rgba(0,0,0,0.1)',
+                marginTop: '20px'
+              }}
+              onMouseOver={(e) => e.target.style.backgroundColor = '#6c8d80'}
+              onMouseOut={(e) => e.target.style.backgroundColor = '#6A9C89'}
+            >
+              Proceed to Payment
+            </button>
           </div>
         </div>
       </div>

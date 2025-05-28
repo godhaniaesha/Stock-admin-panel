@@ -197,7 +197,7 @@
 
 .Z_apply_button {
     width: 100%;
-    background-color: #ff6b35;
+    background-color: #6A9C89;
     color: #fff;
 
     border: none;
@@ -432,7 +432,7 @@
 }
 
 .Z_add_product_btn {
-    background: #ff6b35;
+    background: #6A9C89;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -686,9 +686,9 @@
 }
 
 
-.Z_checkbox_input:checked+.Z_checkbox_label {
-    background: #ff6b35;
-    border-color: #ff6b35;
+.Z_checkbox_input:checked + .Z_checkbox_label {
+    background: #6A9C89;
+    border-color: #6A9C89;
 }
 
 .Z_checkbox_input:checked+.Z_checkbox_label:after {
@@ -715,17 +715,17 @@
 }
 
 .form-check-input:hover {
-    border-color: #ff6b35;
+    border-color: #6A9C89;
 }
 
 .form-check-input:checked {
-    background-color: #ff6b35;
-    border-color: #ff6b35;
+    background-color: #6A9C89;
+    border-color: #6A9C89;
 }
 
 .form-check-input:focus {
     box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
-    border-color: #ff6b35;
+    border-color: #6A9C89;
 }
 
 /* Radio button specific styles */
@@ -759,8 +759,8 @@
 }
 
 .Z_filter_option .form-check-input:checked {
-    background-color: #ff6b35;
-    border-color: #ff6b35;
+    background-color: #6A9C89;
+    border-color: #6A9C89;
 }
 
 .Z_filter_option .form-check-label {
@@ -771,7 +771,7 @@
 }
 
 .Z_filter_option:hover .form-check-input {
-    border-color: #ff6b35;
+    border-color: #6A9C89;
 }
 
 .Z_filter_option {
@@ -967,7 +967,7 @@
 }
 
 .Z_add_product_btn {
-    background: #ff6b35;
+    background: #6A9C89;
     color: white;
     border: none;
     padding: 8px 16px;
@@ -1232,9 +1232,9 @@
 }
 
 
-.Z_checkbox_input:checked+.Z_checkbox_label {
-    background: #ff6b35;
-    border-color: #ff6b35;
+.Z_checkbox_input:checked + .Z_checkbox_label {
+    background: #6A9C89;
+    border-color: #6A9C89;
 }
 
 .Z_checkbox_input:checked+.Z_checkbox_label:after {
@@ -1312,7 +1312,7 @@
 }
 
 .Z_progress_icon {
-    background-color: #ff6b35;
+    background-color: #6A9C89;
 }
 
 @media (max-width: 1200px) {
@@ -1401,7 +1401,7 @@
 }
 
 .Z_customer_name {
-    color: #ff6b35;
+    color: #6A9C89;
     font-weight: 500;
 }
 
@@ -1523,9 +1523,9 @@
 }
 
 .Z_page_btn.active {
-    background: #ff6b35;
+    background: #6A9C89;
     color: white;
-    border-color: #ff6b35;
+    border-color: #6A9C89;
 }
 
 .Z_page_btn:hover:not(.active):not(:disabled) {

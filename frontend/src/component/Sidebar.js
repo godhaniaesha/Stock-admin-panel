@@ -9,7 +9,6 @@ import {
   FaPlus, FaHeart, FaShoppingBag, FaBars, FaTags,
   FaLayerGroup, FaList
 } from 'react-icons/fa';
-import { AiFillProduct } from "react-icons/ai";
 import { RiCoupon3Fill } from "react-icons/ri";
 import { BsFillGrid1X2Fill } from "react-icons/bs";
 import { Link, useLocation } from 'react-router-dom';
@@ -54,7 +53,7 @@ const Sidebar = ({ show, isDarkMode }) => {
     },
     {
       title: 'Stock Management',
-      icon: <AiFillProduct size={18} />,
+      icon: <FaList size={18} />,
       submenu: [
         { title: 'Stock Overview', path: '/stock', icon: <FaList size={14} /> },
         { title: 'Add Stock', path: '/stock/add', icon: <FaPlus size={14} /> },

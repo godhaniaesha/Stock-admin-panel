@@ -127,7 +127,7 @@ function UserRoutes() {
             <Route path="/verify-otp" element={<VerifyOTP />} />
             <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/profile" element={<Profile />} />
-        </Routes>
+            </Routes>
     );
 }
 

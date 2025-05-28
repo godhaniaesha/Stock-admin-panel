@@ -464,16 +464,6 @@
         gap: 16px;
         align-items: flex-start;
     }
-
-    .Z_table_actions {
-        width: 100%;
-        flex-direction: column;
-    }
-
-    .Z_add_product_btn,
-    .Z_time_filter {
-        width: 100%;
-    }
 }
 
 @media (max-width: 576px) {
@@ -576,6 +566,13 @@
 .Z_table_product_img {
     width: 48px;
     height: 48px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.Z_table_subcategory_img {
+    width: 60px;
+    height: 60px;
     border-radius: 4px;
     object-fit: cover;
 }
@@ -689,12 +686,12 @@
 }
 
 
-.Z_checkbox_input:checked + .Z_checkbox_label {
+.Z_checkbox_input:checked+.Z_checkbox_label {
     background: #ff6b35;
     border-color: #ff6b35;
 }
 
-.Z_checkbox_input:checked + .Z_checkbox_label:after {
+.Z_checkbox_input:checked+.Z_checkbox_label:after {
     content: '';
     position: absolute;
     left: 5px;
@@ -1005,13 +1002,14 @@
 
     .Z_table_actions {
         width: 100%;
-        flex-direction: column;
+        flex-direction: row-reverse;
+        align-items: center;
     }
 
-    .Z_add_product_btn,
+    /* .Z_add_product_btn,
     .Z_time_filter {
         width: 100%;
-    }
+    } */
 }
 
 @media (max-width: 576px) {
@@ -1114,6 +1112,13 @@
 .Z_table_product_img {
     width: 48px;
     height: 48px;
+    border-radius: 4px;
+    object-fit: cover;
+}
+
+.Z_table_subcategory_img {
+    width: 60px;
+    height: 60px;
     border-radius: 4px;
     object-fit: cover;
 }
@@ -1227,12 +1232,12 @@
 }
 
 
-.Z_checkbox_input:checked + .Z_checkbox_label {
+.Z_checkbox_input:checked+.Z_checkbox_label {
     background: #ff6b35;
     border-color: #ff6b35;
 }
 
-.Z_checkbox_input:checked + .Z_checkbox_label:after {
+.Z_checkbox_input:checked+.Z_checkbox_label:after {
     content: '';
     position: absolute;
     left: 5px;
@@ -1326,11 +1331,11 @@
     .Z_order_title {
         font-size: 0.85rem;
     }
-    
+
     .Z_order_count {
         font-size: 1.5rem;
     }
-    
+
     .Z_order_icon {
         width: 40px;
         height: 40px;
@@ -1375,13 +1380,13 @@
 
 .Z_order_table tbody tr {
     background: #fff;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s;
 }
 
 .Z_order_table tbody tr:hover {
     transform: translateY(-2px);
-    box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
 }
 
 .Z_order_table tbody td {
@@ -1499,16 +1504,22 @@
 
 .Z_pagination {
     margin-top: 20px;
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
 }
 
 .Z_page_btn {
     padding: 6px 12px;
-    margin: 0 4px;
     border: 1px solid #e0e0e0;
     background: transparent;
     border-radius: 4px;
     cursor: pointer;
     transition: all 0.2s;
+    min-width: 40px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .Z_page_btn.active {
@@ -1526,6 +1537,30 @@
     cursor: not-allowed;
 }
 
+@media (max-width: 768px) {
+    .Z_pagination {
+        justify-content: center;
+        width: 100%;
+    }
+
+    .Z_page_btn {
+        padding: 8px 14px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 576px) {
+    .Z_pagination {
+        gap: 4px;
+    }
+
+    .Z_page_btn {
+        padding: 6px 10px;
+        font-size: 0.85rem;
+        min-width: 35px;
+    }
+}
+
 /* Responsive Styles */
 @media (max-width: 1200px) {
     .Z_order_table {
@@ -1539,14 +1574,6 @@
         padding: 15px;
     }
 
-    .Z_order_header {
-        flex-direction: column;
-        gap: 10px;
-    }
-
-    .Z_action_buttons {
-        flex-wrap: wrap;
-    }
 }
 
 @media (max-width: 576px) {
@@ -1558,4 +1585,12 @@
         padding: 6px 12px;
         font-size: 0.85rem;
     }
+}
+
+
+/* SubcategoryList.js */
+.Z_subcategory_details_cell {
+    display: flex;
+    align-items: center;
+    gap: 12px;
 }

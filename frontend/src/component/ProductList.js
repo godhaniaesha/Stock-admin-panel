@@ -80,7 +80,7 @@ function ProductList(props) {
 
     return (
         <>
-            <section className='Z_product_section mx-5 my-3'>
+            <section className='Z_product_section mx-0 mx-lg-5 my-3'>
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
                         <h4>All Product List</h4>

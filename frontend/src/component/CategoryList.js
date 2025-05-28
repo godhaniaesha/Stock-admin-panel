@@ -58,9 +58,9 @@ function CategoryList(props) {
                                             <label htmlFor="selectAll" className="Z_checkbox_label"></label>
                                         </div>
                                     </th>
+                                    <th>Category ID</th>
                                     <th>Category Image</th>
                                     <th>Category Name</th>
-                                    <th>Category ID</th>
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -80,6 +80,7 @@ function CategoryList(props) {
                                                 ></label>
                                             </div>
                                         </td>
+                                        <td>#{category.id}</td>
                                         <td>
                                             <div className="Z_category_img_cell">
                                                 <img src={category.image} alt={category.name} className="Z_table_product_img" />
@@ -90,7 +91,6 @@ function CategoryList(props) {
                                                 <div className="Z_table_product_name">{category.name}</div>
                                             </div>
                                         </td>
-                                        <td>#{category.id}</td>
                                         <td>
                                             <div className="Z_action_buttons">
                                                 <button className="Z_action_btn Z_view_btn">

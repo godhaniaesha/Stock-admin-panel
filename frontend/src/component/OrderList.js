@@ -1,6 +1,6 @@
 import React from 'react';
 import { Row, Col, Card, Dropdown, Table } from 'react-bootstrap';
-import { FaMoneyBillWave, FaTimesCircle, FaShippingFast, FaTruck, FaClipboardList, FaClock, FaBox, FaEnvelope } from 'react-icons/fa';
+import { FaMoneyBillWave, FaTimesCircle, FaShippingFast, FaTruck, FaClipboardList, FaClock, FaBox, FaEnvelope, FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { GiProgression } from 'react-icons/gi';
 import { MdCancelPresentation, MdPendingActions, MdPlaylistAddCheck } from 'react-icons/md';
 import { RiDeleteBin6Line } from 'react-icons/ri';
@@ -182,11 +182,15 @@ function OrderList(props) {
                     </Table>
 
                     <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
-                        <button className="Z_page_btn" disabled>Previous</button>
+                        <button className="Z_page_btn" disabled>
+                            <FaAngleLeft /> 
+                        </button>
                         <button className="Z_page_btn active">1</button>
                         <button className="Z_page_btn">2</button>
                         <button className="Z_page_btn">3</button>
-                        <button className="Z_page_btn">Next</button>
+                        <button className="Z_page_btn">
+                         <FaAngleRight />
+                        </button>
                     </div>
                 </div>
             </section>

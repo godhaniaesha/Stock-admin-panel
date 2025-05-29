@@ -1,6 +1,7 @@
 .Z_product_section {
     background-color: #f9f7f7;
     padding: 20px;
+   
 }
 
 .Z_topbar_wrapper {
@@ -1063,6 +1064,9 @@
     .Z_action_buttons {
         justify-content: flex-start;
     }
+    .Z_product_section {
+        padding: 5px;
+    }
 }
 
 @media (max-width: 576px) {
@@ -1641,3 +1645,26 @@
 
 /* ... existing code ... */
 
+@media screen and (min-width:1400px) {
+    .Z_product_section {
+        width: 86vw;
+    }
+}
+@media screen and (min-width:1200px) {
+    .Z_product_section {
+        width: 78vw;
+    }
+}
+@media screen and (min-width:768px) {
+    .Z_product_section {
+        width: 75vw;
+    }
+}
+@media screen and (max-width:767px) {
+    .Z_product_section {
+        width: 86vw;
+    }
+    .Z_product_table {
+        font-size: 12px;
+    }
+}

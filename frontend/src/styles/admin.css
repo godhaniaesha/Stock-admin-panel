@@ -282,3 +282,8 @@
 .badge.bg-danger {
   background-color: var(--accent-color) !important;
 }
+@media (max-width:992px){
+  .content {
+    padding: 0.5rem !important;
+  }
+}

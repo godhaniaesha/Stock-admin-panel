@@ -1,0 +1,97 @@
+.d_sales-report-container {
+  padding: 2rem;
+}
+
+.d_header-section {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+}
+
+.d_main-title {
+  font-size: 2rem;
+  font-weight: 700;
+  margin: 0;
+}
+
+.d_subtitle {
+  font-size: 1rem;
+  color: var(--text-color-light);
+}
+
+.d_filter-select {
+  padding: 0.5rem 1rem;
+  border-radius: 8px;
+  border: 1px solid #ccc;
+  background: #fff;
+}
+
+.d_dark .d_filter-select {
+  background: #333;
+  color: #fff;
+  border: 1px solid #555;
+}
+
+.d_summary-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
+}
+
+.d_summary-card {
+  background-color: var(--dark-card-bg);
+  padding: 1rem;
+  border-radius: 0.75rem;
+  box-shadow: 0 0 8px rgba(0,0,0,0.05);
+}
+
+.d_dark{
+  background-color: var(--dark-bg);
+  /* color: #fff; */
+}
+.d_dark .d_summary-card ,.d_dark .Z_table_wrapper{
+  background-color: var(--dark-card-bg);
+}
+.d_light .d_summary-card,.d_light .Z_table_wrapper {
+  background-color: var( --light-card-bg);
+}
+
+.d_chart-section {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 2rem;
+}
+
+.d_chart-container {
+  background-color: var(--light-card-bg);
+  border-radius: 0.75rem;
+  padding: 1rem;
+  box-shadow: 0 0 8px rgba(0,0,0,0.05);
+  min-height: 250px; /* <-- Add this line */
+}
+.d_chart-container canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+.d_dark .d_chart-container {
+  background-color: var(--dark-card-bg) !important;
+}
+
+.d_chart-title {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+@media (min-width: 769px) {
+  .d_chart-section {
+    flex-direction: row;
+  }
+
+  .d_chart-container {
+    flex: 1;
+  }
+}

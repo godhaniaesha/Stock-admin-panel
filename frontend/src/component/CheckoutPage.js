@@ -1,8 +1,10 @@
 import React, { useState } from 'react';
 import '../styles/checkout.css';
 import { CreditCard, Truck, MapPin } from 'lucide-react';
+import { useOutletContext } from 'react-router-dom';
 
-const CheckoutPage = ({ isDarkMode }) => {
+const CheckoutPage = () => {
+  const { isDarkMode } = useOutletContext();
   const [formData, setFormData] = useState({
     firstName: '',
     lastName: '',
@@ -303,7 +305,7 @@ const CheckoutPage = ({ isDarkMode }) => {
                 padding: '15px',
                 fontSize: '1.1rem',
                 fontWeight: '600',
-                backgroundColor: '#6A9C89',
+                backgroundColor: 'var(--accent-color)',
                 color: '#ffffff',
                 border: 'none',
                 borderRadius: '8px',
@@ -313,7 +315,7 @@ const CheckoutPage = ({ isDarkMode }) => {
                 marginTop: '20px'
               }}
               onMouseOver={(e) => e.target.style.backgroundColor = '#6c8d80'}
-              onMouseOut={(e) => e.target.style.backgroundColor = '#6A9C89'}
+              onMouseOut={(e) => e.target.style.backgroundColor = 'var(--accent-color)'}
             >
               Proceed to Payment
             </button>

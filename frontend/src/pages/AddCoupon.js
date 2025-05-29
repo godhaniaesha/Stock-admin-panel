@@ -2,8 +2,10 @@ import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
 import moment from 'moment';
 import '../styles/x_app.css';
+import { useOutletContext } from 'react-router-dom';
 
 const AddCoupon = () => {
+    const { isDarkMode } = useOutletContext();
     const [couponData, setCouponData] = useState({
         status: 'active',
         startDate: '',
@@ -56,7 +58,7 @@ const AddCoupon = () => {
 
     return (
         <div>
-            <div className="x_add_product_container">
+            <div className={`x_add_product_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <div className="x_product_form">
                     <div className="x_product_info">
                         <h2 className="x_product_title">Coupon Status</h2>

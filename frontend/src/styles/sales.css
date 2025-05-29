@@ -47,16 +47,49 @@
   box-shadow: 0 0 8px rgba(0,0,0,0.05);
 }
 
-.d_dark{
-  background-color: var(--dark-bg);
+
+
+
+
+
+.d_dark,.d_dark .x_add_product_container,.d_dark .Z_product_table.table{
+  background-color: var(--dark-bg) !important;
   /* color: #fff; */
 }
-.d_dark .d_summary-card ,.d_dark .Z_table_wrapper{
-  background-color: var(--dark-card-bg);
+.d_dark .d_summary-card,.d_dark .x_product_form ,.d_dark .Z_filter_sidebar .Z_filter_button,.d_dark .Z_table_wrapper,.d_dark .Z_filter_sidebar,.d_dark .Z_heading,.d_dark .Z_product_card,.d_dark .Z_input_grp,.d_dark .Z_input_grp input,.d_dark .d_show_result,.d_dark .x_dropdown_header,.d_dark .x_dropdown_options,.d_dark .x_input,.d_dark .x_select,.d_dark .x_textarea,.d_dark .x_btn_wrapper,.d_dark .Z_product_table tr,.d_dark .x_upload_section,.d_dark .x_upload_area:hover,.d_dark .x_size_buttons .x_size_btn ,.d_dark .Z_order_card,.d_dark .Z_time_filter{
+
+  background-color: var(--dark-card-bg) !important;
 }
 .d_light .d_summary-card,.d_light .Z_table_wrapper {
-  background-color: var( --light-card-bg);
+  background-color: var( --light-card-bg) !important;
 }
+.d_dark .Z_product_card .Z_product_title,.d_dark .Z_product_card .Z_price_current,.d_dark .Z_product_card .Z_rating_count,.d_dark .Z_filter_sidebar label,.d_dark .Z_input_grp,.d_dark .Z_input_grp input,.d_dark .x_product_title,.d_dark .x_input,.d_dark .x_select,.d_dark .x_textarea,.d_dark .Z_table_header h4,.d_dark .Z_product_table,.d_dark .Z_table_product_name,.d_dark .Z_product_table tbody tr,.d_dark .table>:not(caption)>*>*,.d_dark .x_upload_content .x_upload_text ,.d_dark .Z_pagination .Z_page_btn,.d_dark .Z_filter_option label, .d_dark .Z_order_card,.d_dark .Z_order_title ,.d_dark .Z_time_filter{
+  color: var(--light-bg) !important;
+}
+.d_dark .Z_product_card .Z_product_category,.d_dark .Z_product_card .Z_price_original,.d_dark .Z_order_count,.d_dark .x_password_toggle:hover {
+  color: var(--accent-color)!important;
+}
+.d_dark .Z_add_to_cart_btn,.d_dark .Z_filter_sidebar .Z_filter_button,.d_dark .x_size_buttons .x_size_btn{
+  border: 1px solid var(--accent-color)!important;
+  color: var(--accent-color)!important;
+}
+.d_dark .Z_card_wishlist_btn {
+  border: 1px solid var(--accent-color)!important;
+}
+.d_dark .Z_product_table tbody tr {
+  --bs-table-bg: var(--dark-card-bg)!important;
+  background: var(--dark-card-bg)!important;
+}
+.d_light.Z_product_section{
+  background-color: var(--light-bg)!important;
+}
+.d_dark .Z_order_table tbody tr{
+  --bs-table-bg: var(--dark-bg)!important;
+  background: var(--dark-bg)!important;
+  box-shadow: 0 2px 4px rgba(187, 216, 205, 0.21) !important;
+}
+
+
 
 .d_chart-section {
   display: flex;

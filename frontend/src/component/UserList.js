@@ -4,8 +4,10 @@ import { FaUsersViewfinder } from 'react-icons/fa6';
 import { LuClipboardList } from 'react-icons/lu';
 import { RiCustomerServiceLine, RiDeleteBin6Line } from 'react-icons/ri';
 import { TbEdit, TbEye, TbFileInvoice } from 'react-icons/tb';
+import { useOutletContext } from 'react-router-dom';
 
 function UserList() {
+    const { isDarkMode } = useOutletContext();
     const users = [
         {
             id: 1,
@@ -55,7 +57,7 @@ function UserList() {
     ];
 
     return (
-        <section className="Z_product_section mx-0 mx-lg-5 my-3">
+        <section className={`Z_product_section w-100 ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-5 my-3`}>
             <Row className="mb-4">
                 <Col lg={3} className="mb-3">
                     <Card className="Z_order_card">

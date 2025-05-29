@@ -1,8 +1,10 @@
     import React from 'react';
     import { Minus, Plus, Trash2, Heart, Code } from 'lucide-react';
     import '../styles/cart.css';
+import { useOutletContext } from 'react-router-dom';
 
-    const CartList = ({ isDarkMode }) => {
+    const CartList = () => {
+      const { isDarkMode } = useOutletContext();
         const cartItems = [
             {
               id: 1,
@@ -34,7 +36,7 @@
           ];
       
         return (
-          <div className="d_cart_container" data-theme={isDarkMode ? 'dark' : 'light'}>
+          <div className="d_cart_container w-100" data-theme={isDarkMode ? 'dark' : 'light'}>
             <div className="d_cart_header">
               <div className="d_cart_title">
                 <span>There are 4 product in your cart</span>

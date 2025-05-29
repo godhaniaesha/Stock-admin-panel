@@ -3,8 +3,11 @@ import '../styles/Z_styles.css';
 import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import { useOutletContext } from 'react-router-dom';
 
 function StockAlert(props) {
+    const { isDarkMode } = useOutletContext();
+
     const lowStockProducts = [
         {
             id: 1,
@@ -49,7 +52,7 @@ function StockAlert(props) {
 
     return (
         <>
-            <section className='Z_product_section mx-0 mx-lg-5 my-3'>
+            <section className={`Z_product_section mx-0 mx-lg-5 my-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
                         <h4>Low Stock Alert</h4>
@@ -62,7 +65,7 @@ function StockAlert(props) {
                         </div>
                     </div>
                     <div className="Z_table_scroll_container">
-                        <Table className="Z_product_table">
+                        <Table className="Z_product_table p-1">
                             <thead>
                                 <tr>
                                     <th>

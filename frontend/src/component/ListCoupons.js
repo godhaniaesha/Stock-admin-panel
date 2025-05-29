@@ -6,8 +6,10 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FaCircleCheck, FaCircleXmark } from 'react-icons/fa6';
 import { BsCheckAll } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
+import { useOutletContext } from 'react-router-dom';
 
 function ListCoupons(props) {
+    const { isDarkMode } = useOutletContext();
     const coupons = [
         {
             id: 1,
@@ -46,7 +48,7 @@ function ListCoupons(props) {
 
     return (
         <>
-            <section className='Z_product_section mx-0 mx-lg-5 my-3'>
+            <section className={`Z_product_section mx-0 mx-lg-5 my-3 w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
                         <h4>All Coupons List</h4>
@@ -60,7 +62,7 @@ function ListCoupons(props) {
                         </div>
                     </div>
                     <div className="Z_table_scroll_container">
-                        <Table className="Z_product_table">
+                        <Table className="Z_product_table p-1">
                             <thead>
                                 <tr>
                                     <th>

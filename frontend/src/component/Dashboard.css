@@ -451,7 +451,7 @@
   --card-dark: #22282e;
   --text-primary: #e2e8f0;
   --text-secondary: #94a3b8;
-  --accent-green: #6A9C89;
+  --accent-green: var(--accent-color);
   --accent-green-light: #8BBEA8;
   --success: #4ade80;
   --warning: #fbbf24;

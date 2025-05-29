@@ -3,8 +3,10 @@ import '../styles/Z_styles.css';
 import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
+import { useOutletContext } from 'react-router-dom';
 
 function Wishlist() {
+    const { isDarkMode } = useOutletContext();
     const wishlistItems = [
         {
             id: 1,
@@ -52,7 +54,7 @@ function Wishlist() {
 
     return (
         <>
-            <section className='Z_product_section mx-5 my-3'>
+            <section className={`Z_product_section w-100 ${isDarkMode ? 'd_dark' : 'd_light'} mx-5 my-3`}>
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
                         <h4>My Wishlist</h4>
@@ -65,7 +67,7 @@ function Wishlist() {
                         </div>
                     </div>
                     <div className="Z_table_scroll_container">
-                        <Table className="Z_product_table">
+                        <Table className="Z_product_table p-1">
                             <thead>
                                 <tr>
                                     <th>

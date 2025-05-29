@@ -61,6 +61,7 @@ function UserRoutes() {
                 <Route path="subcategories/add" element={<AddSubcategory />} />
                 <Route path="subcategories/edit" element={<EditSubcategory />} />
                 
+                
                 {/* Products */}
                 <Route path="products" element={<ProductGrid />} />
                 <Route path="products/add" element={<AddProduct />} />

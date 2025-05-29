@@ -15,6 +15,17 @@
   --light-border: rgba(12, 12, 12, 0.034);
 }
 
+/* .sidebar {
+  width: 280px;
+  min-height: 100vh;
+  background-color: var(--dark-card-bg);
+  transition: all 0.3s ease;
+  position: fixed;
+  left: -280px;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 2px 0 5px var(--dark-border);
+} */
 .sidebar {
   width: 280px;
   min-height: 100vh;
@@ -78,13 +89,28 @@
     left: 0;
   }
 }
-
+@media (min-width: 1100px) {
+  .sidebar {
+      position: sticky;
+      left: 0;
+  }
+  
+  .content-wrapper {
+      margin-left: 0;
+  }
+}
 .content-wrapper {
   flex: 1;
   transition: all 0.3s ease;
   background-color: var(--dark-bg);
   min-height: 100vh;
 }
+/* .content-wrapper {
+  flex: 1;
+  transition: all 0.3s ease;
+  background-color: var(--dark-bg);
+  min-height: 100vh;
+} */
 
 .sidebar .nav-item-wrapper {
   margin-bottom: 2px;

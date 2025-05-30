@@ -53,7 +53,7 @@ function UserRoutes() {
                 <Route path="stock" element={<StockOverview />} />
                 <Route path="stock/add" element={<AddInventory />} />
                 <Route path="stock/adjust" element={<StockAdjustments />} />
-                <Route path="stock/alerts" element={<LowStockAlerts />} />
+                <Route path="stock/alerts" element={<StockAlert />} />
 
                 {/* Categories */}
                 <Route path="categories" element={<CategoryList />} />

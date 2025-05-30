@@ -39,6 +39,7 @@ import EditUser from '../pages/EditUser';
 import StockAlert from '../component/StockAlert';
 import ListCoupons from '../component/ListCoupons';
 import Dashboard from '../component/Dashboard';
+import Calendar from '../component/Calendar';
 
 function UserRoutes() {
     return (
@@ -92,6 +93,11 @@ function UserRoutes() {
                 
                 {/* Settings */}
                 <Route path="settings" element={<Settings />} />
+
+
+                {/* Calendar */}
+                <Route path="Calendar" element={<Calendar />} />
+
             </Route>
 
             {/* Auth Routes - These should remain outside of Main layout */}

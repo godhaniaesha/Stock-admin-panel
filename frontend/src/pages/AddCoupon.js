@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Form } from 'react-bootstrap';
 import moment from 'moment';
 import '../styles/x_app.css';
+import Calendar from '../component/Calendar';
 
 const AddCoupon = () => {
     const [couponData, setCouponData] = useState({
@@ -24,7 +25,17 @@ const AddCoupon = () => {
         </div>
     );
 
-
+    const [showCalendar, setShowCalendar] = useState(false);
+    const [selectedField, setSelectedField] = useState(null);
+    
+    const handleDateSelect = (day) => {
+        const selectedDate = moment(day.date).format('DD-MM-YYYY');
+        setCouponData(prev => ({
+            ...prev,
+            [selectedField]: selectedDate
+        }));
+        setShowCalendar(false);
+    };
     
     const handleInputChange = (e) => {
         const { name, value } = e.target;
@@ -97,25 +108,60 @@ const AddCoupon = () => {
                         {/* Date Schedule */}
                         <div className="x_form_section"> <div className='x_form_p'>
                             <div className="x_form_row">
+                               
                                 <div className="x_form_group">
                                     <label>Start Date</label>
-                                    <input
-                                        type="date"
-                                        name="startDate"
-                                        value={couponData.startDate}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
+                                    <div className="x_date_input_wrapper">
+                                        <input
+                                            type="text"
+                                            name="startDate"
+                                            value={couponData.startDate}
+                                            readOnly
+                                            className="x_input"
+                                            placeholder="dd-mm-yyyy"
+                                        />
+                                        <span 
+                                            className="x_calendar_icon" 
+                                            onClick={() => {
+                                                setShowCalendar(true);
+                                                setSelectedField('startDate');
+                                            }}
+                                        >
+                                            <i className="fas fa-calendar"></i>
+                                        </span>
+                                        {showCalendar && selectedField === 'startDate' && (
+                                            <div className="x_calendar_popup">
+                                                <Calendar onSelect={handleDateSelect} />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                                 <div className="x_form_group">
                                     <label>End Date</label>
-                                    <input
-                                        type="date"
-                                        name="endDate"
-                                        value={couponData.endDate}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
+                                    <div className="x_date_input_wrapper">
+                                        <input
+                                            type="text"
+                                            name="endDate"
+                                            value={couponData.endDate}
+                                            readOnly
+                                            className="x_input"
+                                            placeholder="dd-mm-yyyy"
+                                        />
+                                        <span 
+                                            className="x_calendar_icon" 
+                                            onClick={() => {
+                                                setShowCalendar(true);
+                                                setSelectedField('endDate');
+                                            }}
+                                        >
+                                            <i className="fas fa-calendar"></i>
+                                        </span>
+                                        {showCalendar && selectedField === 'endDate' && (
+                                            <div className="x_calendar_popup">
+                                                <Calendar onSelect={handleDateSelect} />
+                                            </div>
+                                        )}
+                                    </div>
                                 </div>
                             </div>
                         </div>

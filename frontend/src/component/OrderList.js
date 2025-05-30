@@ -5,8 +5,10 @@ import { GiProgression } from 'react-icons/gi';
 import { MdCancelPresentation, MdPendingActions, MdPlaylistAddCheck } from 'react-icons/md';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { TbEdit, TbEye } from 'react-icons/tb';
+import { useOutletContext } from 'react-router-dom';
 
 function OrderList(props) {
+    const { isDarkMode } = useOutletContext();
 
     const orders = [
         {
@@ -68,7 +70,7 @@ function OrderList(props) {
 
     return (
         <>
-            <section className='Z_product_section mx-0 mx-lg-5 my-3'>
+            <section className={`Z_product_section mx-0 mx-lg-5 my-3 w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <div className="Z_order_header d-flex justify-content-between align-items-center mb-4">
                     <h4 className="Z_order_title mb-0">ORDER LIST</h4>
 

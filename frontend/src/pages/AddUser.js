@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import '../styles/x_app.css';
+import { useOutletContext } from 'react-router-dom';
 
 const AddUser = () => {
+    const { isDarkMode } = useOutletContext();
     const [userData, setUserData] = useState({
         firstName: '',
         lastName: '',
@@ -85,7 +87,7 @@ const AddUser = () => {
     };
 
     return (
-        <div className="x_product_page_container">
+        <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
             <div className="x_add_product_container">
                 {/* Image Upload Section */}
                 <div className="x_upload_section">

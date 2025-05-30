@@ -28,7 +28,6 @@ import CheckoutPage from '../component/CheckoutPage';
 // Add new imports
 import StockOverview from '../pages/StockOverview';
 import StockAdjustments from '../pages/StockAdjustments';
-import SubcategoryList from '../pages/SubcategoryList';
 import EditCoupon from '../pages/EditCoupon';
 import UserRoles from '../pages/UserRoles';
 import Wishlist from '../pages/Wishlist';
@@ -40,6 +39,7 @@ import StockAlert from '../component/StockAlert';
 import ListCoupons from '../component/ListCoupons';
 import Dashboard from '../component/Dashboard';
 import Calendar from '../component/Calendar';
+import SubcategoryList from '../component/SubcategoryList';
 
 function UserRoutes() {
     return (
@@ -49,7 +49,6 @@ function UserRoutes() {
                 <Route index element={<Dashboard />} />
                 <Route path="stock" element={<StockOverview />} />
                 <Route path="stock/add" element={<AddInventory />} />
-                <Route path="stock/adjust" element={<StockAdjustments />} />
                 <Route path="stock/alerts" element={<StockAlert />} />
                 
                 {/* Categories */}

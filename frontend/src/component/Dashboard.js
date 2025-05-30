@@ -82,7 +82,7 @@ const Dashboard = () => {
     };
 
     const pieData = [
-        { name: 'Desktop', value: 45, color: '#6A9C89', icon: <FaDesktop /> },
+        { name: 'Desktop', value: 45, color: 'var(--accent-color)', icon: <FaDesktop /> },
         { name: 'Mobile', value: 35, color: '#8BBEA8', icon: <FaMobileAlt /> },
         { name: 'Tablet', value: 20, color: '#A8D5BA', icon: <FaTabletAlt /> },
     ];
@@ -151,7 +151,7 @@ const Dashboard = () => {
           {/* Time & Welcome Section */}
           <div className="row mb-md-4 mb-2">
             <div className="col-12">
-              <div className="d_card d_gradient-bg text-white">
+              <div className="d_card d_gradient-bg ">
                 <div className="row align-items-center">
                   <div className="col-md-8">
                     <h2 className="fw-bold mb-2">
@@ -428,7 +428,7 @@ const Dashboard = () => {
                         width: "12px",
                         height: "12px",
                         borderRadius: "50%",
-                        background: "#6A9C89",
+                        background: "var(--accent-color)",
                       }}
                     ></div>
                     <span className="small">Revenue</span>
@@ -640,7 +640,7 @@ const Dashboard = () => {
                           borderRadius: "10px",
                           background:
                             event.type === "meeting"
-                              ? "#6A9C89"
+                              ? "var(--accent-color)"
                               : event.type === "launch"
                               ? "#8BBEA8"
                               : "#A8D5BA",

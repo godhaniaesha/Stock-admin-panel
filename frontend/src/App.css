@@ -8,12 +8,13 @@
   --dark-text: #ccd1d6;
   --dark-text-secondary: #dadee2;
   --dark-border: rgba(255, 255, 255, 0.1);
-  --accent-color: #6A9C89;
+  --accent-color: #\;
+  --accent-hover-color: #638679;
   
 
   /* Light theme colors */
   --light-bg: #f3f3f3;
-  --light-card-bg: #ffffff;
+  --light-card-bg: #fbf7f7;
   --light-text: #282f36;
   --light-text-secondary: #282f36;
   --light-border: rgba(12, 12, 12, 0.034);
@@ -22,7 +23,7 @@ body {
   font-family: "Exo 2", sans-serif !important;
 }
 
-input:focus-visible{
+input:focus-visible,.nav-item:focus-visible{
   outline: none !important;
 }
 

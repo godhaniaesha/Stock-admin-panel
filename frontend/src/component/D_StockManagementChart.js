@@ -30,7 +30,7 @@ const D_StockManagementChart = ({ theme = "light" }) => {
       {
         label: "Stock Level",
         data: [120, 150, 100, 180, 90, 140],
-        borderColor: "#6A9C89",
+        borderColor: "var(--accent-color)",
         backgroundColor: "transparent",
         tension: 0.4,
       },

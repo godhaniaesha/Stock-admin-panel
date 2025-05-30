@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import '../styles/x_app.css';
+import { useOutletContext } from 'react-router-dom';
 
 const AddSubcategory = () => {
+    const { isDarkMode } = useOutletContext();
     const [subcategoryData, setsubcategoryData] = useState({
         subcategoryTitle: '',
         description: '',
@@ -61,7 +63,7 @@ const AddSubcategory = () => {
     };
 
     return (
-        <div className="x_product_page_container">
+        <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
             <div className="x_add_product_container">
                 {/* IMAGE UPLOAD */}
                 <div className="x_upload_section">
@@ -85,7 +87,7 @@ const AddSubcategory = () => {
                             />
                             <div className="x_upload_content">
                                 <div className="x_upload_icon">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="#6A9C89">
+                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent-color)">
                                         <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
                                     </svg>
                                 </div>

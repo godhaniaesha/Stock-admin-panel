@@ -58,7 +58,6 @@ const Sidebar = ({ show, isDarkMode }) => {
       submenu: [
         { title: 'Stock Overview', path: '/stock', icon: <FaList size={14} /> },
         { title: 'Add Stock', path: '/stock/add', icon: <FaPlus size={14} /> },
-        { title: 'Stock Adjustments', path: '/stock/adjust', icon: <FaExchangeAlt size={14} /> },
         { title: 'Low Stock Alerts', path: '/stock/alerts', icon: <FaBell size={14} /> }
       ]
     },

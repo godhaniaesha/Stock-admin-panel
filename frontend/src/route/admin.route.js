@@ -40,6 +40,9 @@ import ListCoupons from '../component/ListCoupons';
 import Dashboard from '../component/Dashboard';
 import Calendar from '../component/Calendar';
 import SubcategoryList from '../component/SubcategoryList';
+import PaymentList from '../component/PaymentList';
+import FAQs from '../component/FAQs';
+import TeamsNDConditions from '../component/TeamsNDConditions';
 
 function UserRoutes() {
     return (
@@ -49,36 +52,35 @@ function UserRoutes() {
                 <Route index element={<Dashboard />} />
                 <Route path="stock" element={<StockOverview />} />
                 <Route path="stock/add" element={<AddInventory />} />
-                <Route path="stock/alerts" element={<StockAlert />} />
-                
+                <Route path="stock/adjust" element={<StockAdjustments />} />
+                <Route path="stock/alerts" element={<LowStockAlerts />} />
+
                 {/* Categories */}
                 <Route path="categories" element={<CategoryList />} />
                 <Route path="categories/add" element={<AddCategory />} />
                 <Route path="categories/edit" element={<EditCategory />} />
-                
+
                 {/* Subcategories */}
                 <Route path="subcategories" element={<SubcategoryList />} />
                 <Route path="subcategories/add" element={<AddSubcategory />} />
                 <Route path="subcategories/edit" element={<EditSubcategory />} />
-                
-                
                 {/* Products */}
                 <Route path="products" element={<ProductGrid />} />
                 <Route path="products/add" element={<AddProduct />} />
                 <Route path="products/edit" element={<EditProduct />} />
                 <Route path="products/view" element={<ProductList />} />
-                
+
                 {/* Coupons */}
                 <Route path="coupons" element={<ListCoupons />} />
                 <Route path="coupons/add" element={<AddCoupon />} />
                 <Route path="coupons/edit" element={<EditCoupon />} />
-                
+
                 {/* Orders */}
                 <Route path="orders" element={<OrderList />} />
                 <Route path="cart" element={<CartList />} />
                 <Route path="wishlist" element={<Wishlist />} />
                 <Route path="checkout" element={<CheckoutPage />} />
-                
+
                 {/* Users */}
                 <Route path="users" element={<UserList />} />
                 <Route path="user-roles" element={<UserRoles />} />
@@ -89,13 +91,19 @@ function UserRoutes() {
                 {/* Reports */}
                 <Route path="sales-report" element={<SalesReport />} />
                 <Route path="inventory-report" element={<InventoryReport />} />
-                
+
+                {/* Payment */}
+                <Route path="paymentList" element={< PaymentList />} />
+
+
                 {/* Settings */}
                 <Route path="settings" element={<Settings />} />
 
 
                 {/* Calendar */}
                 <Route path="Calendar" element={<Calendar />} />
+                <Route path="FAQs" element={<FAQs />} />
+                <Route path="tearmsconditions" element={<TeamsNDConditions />} />
 
             </Route>
 

@@ -1,1 +1,1 @@
-// fd ewdesdf 
+module.exports.User = require('./addUser.model');

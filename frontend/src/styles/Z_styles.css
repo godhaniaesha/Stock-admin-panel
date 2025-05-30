@@ -443,9 +443,9 @@
     transition: background-color 0.2s;
 }
 
-.Z_add_product_btn:hover {
+/* .Z_add_product_btn:hover {
     background: var(--accent-hover-color);
-}
+} */
 
 .Z_time_filter {
     padding: 8px 12px;
@@ -978,9 +978,9 @@
     transition: background-color 0.2s;
 }
 
-.Z_add_product_btn:hover {
+/* .Z_add_product_btn:hover {
     background: var(--accent-hover-color);
-}
+} */
 
 .Z_time_filter {
     padding: 8px 12px;

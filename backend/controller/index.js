@@ -1,1 +1,1 @@
-// fd ewdesdf 
+module.exports.userController = require('./addUser.controller');

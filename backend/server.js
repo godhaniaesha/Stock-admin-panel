@@ -24,7 +24,7 @@ const port = process.env.PORT || 2221
 
 connectDB()
 
-app.use("/api/v1", router);
+app.use("/api/a1", router);
 
 app.listen(port, () => {
     console.log(`Server is running on port ${port}`);

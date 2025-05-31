@@ -4,11 +4,13 @@ const {Category} = require('../model');
 const createCategory = async (req, res) => {
     try {
         const { title, description } = req.body;
-        let imageUrl = '';
+        console.log(req.body);
+        
+        let image = '';
         if (req.file) {
-            imageUrl = req.file.path; // If using multer for file upload
+            image = req.file.path; // If using multer for file upload
         }
-        const category = new Category({ title, description, imageUrl });
+        const category = new Category({ title, description, image });
         await category.save();
         res.status(201).json(category);
     } catch (err) {
@@ -42,7 +44,7 @@ const updateCategory = async (req, res) => {
         const { title, description } = req.body;
         let updateData = { title, description };
         if (req.file) {
-            updateData.imageUrl = req.file.path;
+            updateData.image = req.file.path;
         }
         const category = await Category.findByIdAndUpdate(req.params.id, updateData, { new: true });
         res.json(category);

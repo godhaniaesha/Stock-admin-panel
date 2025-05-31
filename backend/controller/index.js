@@ -2,5 +2,9 @@ module.exports.userController = require('./addUser.controller');
 module.exports.categoryController = require('./category.Controller');
 module.exports.subcategoryController = require('./subcategory.Controller');
 module.exports.inventoryController = require('./inventory.Controller');
-
-
+module.exports.couponController = require('./coupon.controller');
+module.exports.productController = require('./product.controller');
+module.exports.cartController = require('./cart.controller');
+module.exports.wishlistController = require('./wishlist.controller');
+module.exports.orderController = require('./order.controller');
+module.exports.paymentController = require('./payment.controller');

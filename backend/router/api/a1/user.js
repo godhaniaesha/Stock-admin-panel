@@ -3,7 +3,7 @@ const { userController } = require("../../../controller")
 
 const router = express.Router();
 
-router.get("/",
+router.get("/getallUsers",
     userController.getAllUsers
 )
 
@@ -11,7 +11,7 @@ router.get("/:id",
     userController.getUserById
 )
 
-router.post("/",
+router.post("/createUser",
     userController.createUser
 )
 

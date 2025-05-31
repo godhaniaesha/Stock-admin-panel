@@ -3,8 +3,10 @@ import '../styles/Z_styles.css';
 import { Container, Row, Col, Form, InputGroup, Button, Offcanvas } from 'react-bootstrap';
 import { FaSearch, FaCog, FaFilter, FaChevronDown, FaHeart } from 'react-icons/fa';
 import { BiSearchAlt } from 'react-icons/bi';
+import { useOutletContext } from 'react-router-dom';
 
 function ProductGrid() {
+    const { isDarkMode } = useOutletContext();
     const [expandedFilter, setExpandedFilter] = useState(null);
     const [showOffcanvas, setShowOffcanvas] = useState(false);
 
@@ -94,7 +96,7 @@ function ProductGrid() {
 
     return (
         <>
-            <section className="Z_product_section mx-0 mx-lg-5 my-3">
+            <section className={`Z_product_section mx-0 mx-lg-5 my-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <Row className="Z_topbar_wrapper">
                     {/* Search input for larger screens */}
                     <Col xl={3} lg={12}  className="mb-3 mb-lg-0 d-none d-xl-block">
@@ -113,7 +115,7 @@ function ProductGrid() {
                         </div>
                     </Col>
 
-                    <Col xl={9} lg={12}   className="d-flex justify-content-between align-items-center" style={{ background: '#fff', padding: '10px 12px', borderRadius: '8px' }}>
+                    <Col xl={9} lg={12}   className="d_show_result d-flex justify-content-between align-items-center" style={{ background: '#fff', padding: '10px 12px', borderRadius: '8px' }}>
                         <div className="">
                             <span>Categories</span>
                             <span className="mx-2">›</span>

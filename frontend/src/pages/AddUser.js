@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import '../styles/x_app.css';
+import { useOutletContext } from 'react-router-dom';
 
 const AddUser = () => {
+    const { isDarkMode } = useOutletContext();
     const [userData, setUserData] = useState({
         firstName: '',
         lastName: '',
@@ -13,13 +15,18 @@ const AddUser = () => {
         city: '',
         state: '',
         country: '',
-        role: ''
+        role: '',
+        password: '',
+        confirmPassword: ''
     });
 
     const [userImage, setUserImage] = useState(null);
     const [error, setError] = useState('');
     const [isGenderOpen, setIsGenderOpen] = useState(false);
     const [isRoleOpen, setIsRoleOpen] = useState(false);
+     // Add these two new state variables for password visibility
+     const [showPassword, setShowPassword] = useState(false);
+     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
     const genderOptions = [
         { value: 'male', label: 'Male' },
@@ -80,7 +87,7 @@ const AddUser = () => {
     };
 
     return (
-        <div className="x_product_page_container">
+        <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
             <div className="x_add_product_container">
                 {/* Image Upload Section */}
                 <div className="x_upload_section">
@@ -297,6 +304,67 @@ const AddUser = () => {
                                                 ))}
                                             </div>
                                         )}
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="x_form_row">
+                                <div className="x_form_group">
+                                    <label>Password</label>
+                                    <div className="x_password_input_wrapper">
+                                        <input
+                                            type={showPassword ? "text" : "password"}
+                                            name="password"
+                                            placeholder="Enter Password"
+                                            value={userData.password}
+                                            onChange={handleInputChange}
+                                            className="x_input"
+                                        />
+                                        <div 
+                                            className="x_password_toggle"
+                                            onClick={() => setShowPassword(!showPassword)}
+                                        >
+                                            {showPassword ? (
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            ) : (
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                </svg>
+                                            )}
+                                        </div>
+                                    </div>
+                                </div>
+                                <div className="x_form_group">
+                                    <label>Confirm Password</label>
+                                    <div className="x_password_input_wrapper">
+                                        <input
+                                            type={showConfirmPassword ? "text" : "password"}
+                                            name="confirmPassword"
+                                            placeholder="Confirm Password"
+                                            value={userData.confirmPassword}
+                                            onChange={handleInputChange}
+                                            className="x_input"
+                                        />
+                                        <div 
+                                            className="x_password_toggle"
+                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+                                        >
+                                            {showConfirmPassword ? (
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
+                                                    <circle cx="12" cy="12" r="3"></circle>
+                                                </svg>
+                                            ) : (
+                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
+                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
+                                                    <line x1="1" y1="1" x2="23" y2="23"></line>
+                                                </svg>
+                                            )}
+                                        </div>
                                     </div>
                                 </div>
                             </div>

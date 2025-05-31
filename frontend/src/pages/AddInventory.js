@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import '../styles/x_app.css';
+import { useOutletContext } from 'react-router-dom';
 
 const AddInventory = () => {
     const [inventoryData, setInventoryData] = useState({
@@ -11,6 +12,8 @@ const AddInventory = () => {
     });
 
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
+    const { isDarkMode } = useOutletContext();
+
     const [isSubcategoryOpen, setIsSubcategoryOpen] = useState(false);
     const [isProductOpen, setIsProductOpen] = useState(false);
 
@@ -83,7 +86,7 @@ const AddInventory = () => {
     };
 
     return (
-        <div className="x_product_page_container">
+        <div className={`x_product_page_container ${isDarkMode ? 'd_dark' : 'd_light'}`}>
             <div className="x_add_product_container">
                 <div className="x_product_form">
                     <div className="x_product_info">

@@ -1,6 +1,7 @@
 .Z_product_section {
     background-color: #f9f7f7;
     padding: 20px;
+   
 }
 
 .Z_topbar_wrapper {
@@ -197,7 +198,7 @@
 
 .Z_apply_button {
     width: 100%;
-    background-color: #6A9C89;
+    background-color: var(--accent-color);
     color: #fff;
 
     border: none;
@@ -432,7 +433,7 @@
 }
 
 .Z_add_product_btn {
-    background: #6A9C89;
+    background: var(--accent-color);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -442,9 +443,9 @@
     transition: background-color 0.2s;
 }
 
-.Z_add_product_btn:hover {
-    background: #e65e2f;
-}
+/* .Z_add_product_btn:hover {
+    background: var(--accent-hover-color);
+} */
 
 .Z_time_filter {
     padding: 8px 12px;
@@ -687,8 +688,8 @@
 
 
 .Z_checkbox_input:checked + .Z_checkbox_label {
-    background: #6A9C89;
-    border-color: #6A9C89;
+    background: var(--accent-color);
+    border-color: var(--accent-color);
 }
 
 .Z_checkbox_input:checked+.Z_checkbox_label:after {
@@ -715,17 +716,17 @@
 }
 
 .form-check-input:hover {
-    border-color: #6A9C89;
+    border-color: var(--accent-color);
 }
 
 .form-check-input:checked {
-    background-color: #6A9C89;
-    border-color: #6A9C89;
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
 }
 
 .form-check-input:focus {
     box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
-    border-color: #6A9C89;
+    border-color: var(--accent-color);
 }
 
 /* Radio button specific styles */
@@ -759,8 +760,8 @@
 }
 
 .Z_filter_option .form-check-input:checked {
-    background-color: #6A9C89;
-    border-color: #6A9C89;
+    background-color: var(--accent-color);
+    border-color: var(--accent-color);
 }
 
 .Z_filter_option .form-check-label {
@@ -771,7 +772,7 @@
 }
 
 .Z_filter_option:hover .form-check-input {
-    border-color: #6A9C89;
+    border-color: var(--accent-color);
 }
 
 .Z_filter_option {
@@ -967,7 +968,7 @@
 }
 
 .Z_add_product_btn {
-    background: #6A9C89;
+    background: var(--accent-color);
     color: white;
     border: none;
     padding: 8px 16px;
@@ -977,9 +978,9 @@
     transition: background-color 0.2s;
 }
 
-.Z_add_product_btn:hover {
-    background: #e65e2f;
-}
+/* .Z_add_product_btn:hover {
+    background: var(--accent-hover-color);
+} */
 
 .Z_time_filter {
     padding: 8px 12px;
@@ -1033,7 +1034,12 @@
     border-collapse: separate;
     border-spacing: 0 8px;
     margin-bottom: 0;
+    overflow-x: scroll;
+    text-wrap: nowrap;
+
 }
+
+
 
 /* Update responsive styles */
 @media (max-width: 992px) {
@@ -1062,6 +1068,9 @@
 
     .Z_action_buttons {
         justify-content: flex-start;
+    }
+    .Z_product_section {
+        padding: 5px;
     }
 }
 
@@ -1233,8 +1242,8 @@
 
 
 .Z_checkbox_input:checked + .Z_checkbox_label {
-    background: #6A9C89;
-    border-color: #6A9C89;
+    background: var(--accent-color);
+    border-color: var(--accent-color);
 }
 
 .Z_checkbox_input:checked+.Z_checkbox_label:after {
@@ -1312,7 +1321,7 @@
 }
 
 .Z_progress_icon {
-    background-color: #6A9C89;
+    background-color: var(--accent-color);
 }
 
 @media (max-width: 1200px) {
@@ -1401,7 +1410,7 @@
 }
 
 .Z_customer_name {
-    color: #6A9C89;
+    color: var(--accent-color);
     font-weight: 500;
 }
 
@@ -1427,25 +1436,34 @@
     font-size: 0.85rem;
 }
 
+.Z_payment_status.completed,
 .Z_payment_status.paid {
     background: #e8f5e9;
     color: #4caf50;
 }
 
+.Z_payment_status.failed,
 .Z_payment_status.unpaid {
     background: #fbe9e7;
     color: #f44336;
 }
 
+.Z_payment_status.pending,
 .Z_payment_status.refund {
     background: #ede7f6;
     color: #673ab7;
+}
+
+.Z_payment_status.processing {
+    background: #fff3e0;
+    color: #ff9800;
 }
 
 .Z_order_status {
     padding: 4px 12px;
     border-radius: 4px;
     font-size: 0.85rem;
+
 }
 
 .Z_order_status.completed {
@@ -1463,7 +1481,7 @@
     color: #2196f3;
 }
 
-.Z_order_status.canceled {
+.Z_order_status.cancel {
     background: #fbe9e7;
     color: #f44336;
 }
@@ -1523,9 +1541,9 @@
 }
 
 .Z_page_btn.active {
-    background: #6A9C89;
+    background: var(--accent-color);
     color: white;
-    border-color: #6A9C89;
+    border-color: var(--accent-color);
 }
 
 .Z_page_btn:hover:not(.active):not(:disabled) {
@@ -1593,4 +1611,426 @@
     display: flex;
     align-items: center;
     gap: 12px;
+}
+
+/* StockAlert.js */
+
+.Z_order_status.critical {
+    background: #fbe9e7;
+    color: #f44336;
+}
+
+.Z_order_status.warning {
+    background: #fff3e0;
+    color: #ff9800;
+}
+
+
+/* ListCoupons.js */
+/* ... existing code ... */
+
+.Z_coupon_code {
+    background: #f8f9fa;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 0.9rem;
+    color: #495057;
+}
+
+.Z_coupon_status {
+    padding: 4px 12px;
+    border-radius: 4px;
+    font-size: 0.85rem;
+    font-weight: 500;
+    width: fit-content;
+}
+
+.Z_coupon_status.active {
+    background-color: #e8f5e9;
+    color: #2e7d32;
+}
+
+.Z_coupon_status.inactive {
+    background-color: #ffebee;
+    color: #c62828;
+}
+
+/* ... existing code ... */
+
+@media screen and (min-width:1400px) {
+    .Z_product_section {
+        width: 86vw;
+    }
+}
+@media screen and (min-width:1200px) {
+    .Z_product_section {
+        width: 78vw;
+    }
+}
+@media screen and (min-width:768px) {
+    .Z_product_section {
+        width: 75vw;
+    }
+}
+@media screen and (max-width:767px) {
+    .Z_product_section {
+        width: 86vw;
+    }
+    .Z_product_table {
+        font-size: 12px;
+    }
+}
+/* FAQs.js */
+/* FAQ Styles */
+/* Light mode */
+/* .Z_faq_section {
+    padding: 40px 20px;
+    background-image: url('https://images.unsplash.com/photo-1655841439659-0afc60676b70?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    min-height: 300px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+}
+
+.Z_faq_section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(255, 255, 255, 0.9);
+    z-index: 1;
+}
+
+*/
+
+/* Dark mode */
+.Z_faq_section {
+    padding: 30px 20px;
+    background-image: url('https://images.unsplash.com/photo-1655841439659-0afc60676b70?q=80&w=2070&auto=format&fit=crop&ixlib=rb-4.1.0&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    max-height: 230px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: relative;
+    border-radius: 20px;
+}
+
+.Z_faq_section::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.6);
+    z-index: 1;
+    border-radius: 20px;
+}
+
+.Z_faq_header {
+    position: relative;
+    z-index: 2;
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.Z_faq_header h1 {
+    font-size: 2.5rem;
+    font-weight: 600;
+    color: #c1c1c1;
+    margin-bottom: 16px;
+}
+
+.Z_faq_header p {
+    font-size: 1rem;
+    color: #c1c1c1;
+    margin-bottom: 32px;
+    line-height: 1.6;
+}
+
+.Z_faq_search {
+    max-width: 600px;
+    margin: 0 auto;
+    position: relative;
+}
+
+.Z_faq_search .Z_search_input {
+    height: 50px;
+    padding-left: 20px;
+    font-size: 1rem;
+    border: 1px solid #e0e0e0;
+    border-right: none;
+    border-radius: 8px 0 0 8px;
+    background: white;
+}
+
+.Z_faq_search .Z_search_icon {
+    background: white;
+    border: 1px solid #e0e0e0;
+    border-left: none;
+    border-radius: 0 8px 8px 0;
+    padding: 0 20px;
+    color: #666;
+}
+
+@media (max-width: 768px) {
+    .Z_faq_header h1 {
+        font-size: 2rem;
+    }
+
+    .Z_faq_header p {
+        font-size: 0.9rem;
+    }
+
+    .Z_faq_search {
+        max-width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .Z_faq_header h1 {
+        font-size: 27px;
+    }
+
+    .Z_faq_section {
+        padding: 20px 10px;
+    }
+}
+
+/* FAQ Content Styles */
+.Z_faq_content {
+    width: 100%;
+    max-width: 1200px;
+    margin: 40px auto;
+    padding: 0 20px;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    position: relative;
+    z-index: 2;
+}
+
+.Z_faq_category_header {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    margin-bottom: 25px;
+}
+
+.Z_faq_section_wrapper {
+    margin-bottom: 30px;
+}
+
+.Z_faq_category_title {
+    font-size: 1.5rem;
+    color: #c1c1c1;
+    margin: 0;
+    white-space: nowrap;
+}
+
+.Z_faq_accordion {
+    background: transparent;
+}
+
+.Z_faq_category_line {
+    height: 2px;
+    background: linear-gradient(to right, #6A9C89, transparent);
+    flex-grow: 1;
+}
+
+.Z_faq_item {
+    margin-bottom: 15px;
+    border: none;
+    background: rgba(255, 255, 255, 0.8);
+    border-radius: 8px;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.Z_faq_item:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+}
+
+.Z_faq_header {
+    padding: 0;
+}
+
+.Z_faq_header .accordion-button::after {
+    display: none !important;
+}
+
+.Z_faq_header button {
+    padding: 16px 20px;
+    background: transparent;
+    color: #333;
+    font-weight: 500;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.Z_faq_header .accordion-button:focus {
+    box-shadow: none !important;
+    border-color: transparent !important;
+}
+
+.Z_faq_header .accordion-button:not(.collapsed) {
+    color: #6A9C89 !important;
+    background-color: rgba(106, 156, 137, 0.1) !important;
+}
+
+.Z_faq_header .accordion-button:hover {
+    background-color: rgba(106, 156, 137, 0.05);
+}
+
+.Z_faq_header .accordion-button:active {
+    color: #6A9C89 !important;
+    background-color: rgba(106, 156, 137, 0.1) !important;
+}
+
+.Z_faq_header .accordion-button:not(.collapsed) .Z_faq_arrow {
+    color: #6A9C89;
+    transform: rotate(180deg);
+}
+
+.Z_faq_body {
+    padding: 0 20px 16px;
+    color: #666;
+    line-height: 1.6;
+}
+
+.Z_faq_question {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+}
+
+.Z_faq_question_number {
+    background: #6A9C89;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+/* .Z_faq_header button {
+    padding: 20px;
+    background: transparent;
+    color: #333;
+    font-weight: 500;
+    width: 100%;
+    text-align: left;
+    position: relative;
+    border: none;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 15px;
+} */
+
+.Z_faq_arrow {
+    font-size: 1.2rem;
+    transition: transform 0.3s ease;
+    color: #6A9C89;
+}
+
+.accordion-button:not(.collapsed) .Z_faq_arrow {
+    transform: rotate(180deg);
+}
+
+.Z_faq_question {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex: 1;
+}
+
+.Z_faq_question_number {
+    background: #6A9C89;
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.accordion-button:not(.collapsed) .Z_faq_arrow {
+    transform: rotate(180deg);
+}
+
+.Z_faq_body {
+    padding: 0 20px 20px 65px;
+    color: #666;
+    line-height: 1.6;
+}
+
+@media (max-width: 992px) {
+    .Z_faq_content {
+        grid-template-columns: 1fr;
+    }
+}
+
+@media (max-width: 768px) {
+    .Z_faq_content {
+        padding: 0 15px;
+    }
+
+    .Z_faq_buttons {
+        flex-direction: column;
+    }
+
+    .Z_faq_email_btn,
+    .Z_faq_tweet_btn {
+        width: 100%;
+    }
+}
+
+@media (max-width: 576px) {
+    .Z_faq_category_title {
+        font-size: 1.25rem;
+    }
+
+    .Z_faq_header button {
+        padding: 12px 16px;
+        font-size: 0.9rem;
+    }
+
+    .Z_faq_body {
+        padding: 0 16px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+@media (max-width: 425px) {
+    .Z_faq_section {
+        max-height: 275px;
+    }
+
+    .Z_faq_header p {
+        margin-bottom: 17px;
+    }
+
+    .Z_faq_search .Z_search_input {
+        height: 40px;
+    }
 }

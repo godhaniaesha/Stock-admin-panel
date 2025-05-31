@@ -12,6 +12,8 @@ const session = require('express-session');
 const router = require('./router/api/a1');
 const connectDB = require('./db/mongoDB');
 
+app.use("/KAssets", express.static(path.join(__dirname, "KAssets")));
+
 // Session middleware configuration
 app.use(session({
     secret: 'sdh@hehf',

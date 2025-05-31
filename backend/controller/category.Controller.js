@@ -4,6 +4,8 @@ const {Category} = require('../model');
 const createCategory = async (req, res) => {
     try {
         const { title, description } = req.body;
+        console.log(req.body);
+        
         let image = '';
         if (req.file) {
             image = req.file.path; // If using multer for file upload

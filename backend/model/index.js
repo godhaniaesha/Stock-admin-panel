@@ -8,3 +8,4 @@ module.exports.Cart = require('./cart.model');
 module.exports.Wishlist = require('./wishlist.model');
 module.exports.Order = require('./order.model');
 module.exports.Payment = require('./payment.model');
+module.exports.Register = require('./Register.model');

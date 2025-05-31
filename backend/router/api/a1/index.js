@@ -3,6 +3,7 @@ const express = require("express");
 const router = express.Router();
 
 const user = require("./user");
+<<<<<<< HEAD
 const category = require('./category');
 const subcategory = require('./subcategory');
 const inventory = require('./inventory');
@@ -32,3 +33,16 @@ router.use("/payment", payment);
 
 
 module.exports = router;
+=======
+const register = require("./Register");
+const forgotPassword = require("./forgotPassword.route");
+
+
+router.use("/user", user);
+router.use("/register", register);
+router.use("/forgotPassword", forgotPassword);
+
+
+
+module.exports = router
+>>>>>>> 818acf246a083e8358a82becc48e3fe98e883725

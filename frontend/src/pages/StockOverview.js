@@ -3,11 +3,16 @@ import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import '../styles/Z_styles.css';
+<<<<<<< HEAD
 import { useOutletContext } from 'react-router-dom';
 
 const StockOverview = () => {
   const { isDarkMode } = useOutletContext();
 
+=======
+
+const StockOverview = () => {
+>>>>>>> 818acf246a083e8358a82becc48e3fe98e883725
   const products = [
     {
       id: 1,
@@ -52,7 +57,11 @@ const StockOverview = () => {
   ];
 
   return (
+<<<<<<< HEAD
     <section className={`Z_product_section w-100 ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-5 my-3`}>
+=======
+    <section className='Z_product_section mx-0 mx-lg-5 my-3'>
+>>>>>>> 818acf246a083e8358a82becc48e3fe98e883725
       <div className="Z_table_wrapper">
         <div className="Z_table_header">
           <h4>Stock Overview</h4>
@@ -66,7 +75,11 @@ const StockOverview = () => {
           </div>
         </div>
         <div className="Z_table_scroll_container">
+<<<<<<< HEAD
           <Table className="Z_product_table p-1">
+=======
+          <Table className="Z_product_table">
+>>>>>>> 818acf246a083e8358a82becc48e3fe98e883725
             <thead>
               <tr>
                 <th>Product Image</th>

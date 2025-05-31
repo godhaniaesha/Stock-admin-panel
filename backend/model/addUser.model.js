@@ -25,28 +25,22 @@ const userSchema = mongoose.Schema({
     gender: {
         type: String,
         enum: ['male', 'female', 'other'],
-        required: true
     },
     address: {
         type: String,
-        required: true
     },
     city: {
         type: String,
-        required: true
     },
     state: {
         type: String,
-        required: true
     },
     country: {
         type: String,
-        required: true
     },
     role: {
         type: String,
         enum: ['admin', 'manager', 'staff'],
-        required: true
     },
     password: {
         type: String,

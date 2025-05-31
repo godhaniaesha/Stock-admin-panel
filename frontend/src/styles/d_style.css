@@ -333,7 +333,7 @@
 
 .db_profile_header {
   padding: 2rem;
-  background: linear-gradient(to right, var(--accent-color), #ff7676);
+  background: linear-gradient(to right, var(--accent-color), #282f36);
   color: white;
 }
 

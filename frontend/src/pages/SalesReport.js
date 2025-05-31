@@ -214,7 +214,11 @@ export default function SalesReport() {
         </div>
       </div>
       <section className=' m-0'>
+<<<<<<< HEAD
         <div className="Z_table_wrapper ">
+=======
+        <div className="Z_table_wrapper">
+>>>>>>> 818acf246a083e8358a82becc48e3fe98e883725
           <div className="Z_table_header">
             <h4>All Subcategory List</h4>
             <div className="Z_table_actions">
@@ -227,7 +231,11 @@ export default function SalesReport() {
             </div>
           </div>
           <div className="Z_table_scroll_container">
+<<<<<<< HEAD
             <Table className="Z_product_table p-1">
+=======
+            <Table className="Z_product_table">
+>>>>>>> 818acf246a083e8358a82becc48e3fe98e883725
               <thead>
                 <tr>
                   <th>

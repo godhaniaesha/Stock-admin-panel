@@ -1,4 +1,5 @@
-const {User}= require('../model');
+const { User } = require('../model');
+const bcrypt = require('bcrypt');
 
 // Create new user
 const createUser = async (req, res) => {
@@ -72,6 +73,7 @@ const getAllUsers = async (req, res) => {
             success: true,
             data: users
         });
+        console.log("users", users)
     } catch (error) {
         res.status(500).json({
             success: false,
@@ -112,7 +114,6 @@ const updateUser = async (req, res) => {
             const salt = await bcrypt.genSalt(10);
             updates.password = await bcrypt.hash(updates.password, salt);
         }
-        
         const user = await User.findByIdAndUpdate(
             req.params.id,
             updates,

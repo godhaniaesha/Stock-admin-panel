@@ -725,7 +725,11 @@
 }
 
 .form-check-input:focus {
+<<<<<<< HEAD
     box-shadow: 0 0 0 0.25rem #6a9c8940;
+=======
+    box-shadow: 0 0 0 0.25rem rgba(255, 107, 53, 0.25);
+>>>>>>> 818acf246a083e8358a82becc48e3fe98e883725
     border-color: var(--accent-color);
 }
 

@@ -1,5 +1,5 @@
     import React from 'react';
-    import { Minus, Plus, Trash2, Heart, Code } from 'lucide-react';
+    import { MinusIcon, Plus, Trash2, Heart, Code } from 'lucide-react';
     import '../styles/cart.css';
 import { useOutletContext } from 'react-router-dom';
 
@@ -63,7 +63,7 @@ import { useOutletContext } from 'react-router-dom';
                       
                       <div className="d_item_actions">
                         <div className="d_quantity_control">
-                          <button><Minus size={16} /></button>
+                          <button><MinusIcon size={16} /></button>
                           <span>1</span>
                           <button><Plus size={16} /></button>
                         </div>

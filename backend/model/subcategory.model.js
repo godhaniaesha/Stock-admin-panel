@@ -12,7 +12,7 @@ const SubcategorySchema = new mongoose.Schema({
         ref: 'Category',
         required: true
     },
-    imageUrl: String
+    image: String
 }, { timestamps: true });
 
 

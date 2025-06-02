@@ -5,6 +5,10 @@ import { Provider } from 'react-redux';
 import { configureStore } from '@reduxjs/toolkit';
 import { rootReducer } from './redux/reducers';
 
+// ✅ Toastify imports
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
+
 const store = configureStore({
   reducer: rootReducer,
   middleware: (getDefaultMiddleware) =>
@@ -23,6 +27,7 @@ function App() {
             <Route path="/*" element={<UserRoutes />} />
           </Routes>
           {/* <Footer /> */}
+          <ToastContainer position="top-right" autoClose={3000} />
         </div>
       </Router>
     </Provider>

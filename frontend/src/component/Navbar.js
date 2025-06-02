@@ -1,6 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Navbar, Container, Nav, Dropdown } from 'react-bootstrap';
 import { FaBars, FaUserCircle, FaBell, FaCog, FaSignOutAlt, FaMoon, FaSun } from 'react-icons/fa';
+import { useDispatch } from 'react-redux';
+import { useNavigate } from 'react-router-dom';
+import { logoutUser } from '../redux/slice/auth.slice';
 
 const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -19,6 +22,13 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
     };
   }, []);
 
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+
+  const handleLogout = () => {
+    dispatch(logoutUser());
+    navigate('/login'); // or your desired route
+  };
   return (
     <Navbar 
       style={{
@@ -220,7 +230,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
                 />
                 <button 
                   className="custom-dropdown-item"
-                  onClick={() => console.log('Logout clicked')}
+                  onClick={handleLogout}
                   style={{
                     display: 'flex',
                     alignItems: 'center',

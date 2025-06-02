@@ -6,7 +6,7 @@ const BASE_URL = 'http://localhost:2221/api/a1';
 
 export const registerUser = createAsyncThunk('auth/register', async (userData, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${BASE_URL}/register`, {
+    const response = await fetch(`${BASE_URL}/register/`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(userData)
@@ -32,6 +32,9 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
     if (!response.ok || !data.success) {
       throw new Error(data.message || 'Login failed');
     }
+    console.log(data,"data");
+    localStorage.setItem("user",data.finduser)
+    localStorage.setItem("token",data.accessToken)
     return data;
   } catch (err) {
     return rejectWithValue(err.message || 'An unknown error occurred during login.');
@@ -131,6 +134,7 @@ export const logoutUser = createAsyncThunk('auth/logout', async (userId, { rejec
       throw new Error(data.message || 'Logout failed');
     }
     localStorage.removeItem('token');
+    localStorage.removeItem('user');
     return data;
   } catch (err) {
     return rejectWithValue(err.message || 'An unknown error occurred during logout.');

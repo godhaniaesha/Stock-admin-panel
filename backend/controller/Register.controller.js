@@ -111,14 +111,14 @@ const login = async (req, res) => {
             return res.status(400).json({ success: false, message: "Invalid password, please try again" });
         }
 
-        const { accessToken, refreshToken } = await generateTokens(finduser._id);
+        const { assesToken, refreshToken } = await generateTokens(finduser._id);
         const userDetails = await Register.findOne({ email }).select("-password -refreshToken");
         console.log("userDetails", userDetails);
 
         return res.status(200)
-            .cookie("accessToken", accessToken, { httpOnly: true, secure: true })
+            .cookie("accessToken", assesToken, { httpOnly: true, secure: true })
             .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
-            .json({ success: true, data: userDetails, message: "Login successful" });
+            .json({ success: true,finduser:finduser, data: userDetails, accessToken: assesToken, message: "Login successful" }); // Added accessToken to the response body
 
     } catch (error) {
         return res.status(500).json({ success: false, message: "Login failed: " + error.message });

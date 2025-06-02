@@ -27,7 +27,6 @@ const RegisterSchema = new mongoose.Schema({
     },
     role: {
         type: String
-
     },
     refreshToken: {
         type: String

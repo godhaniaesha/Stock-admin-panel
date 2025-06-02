@@ -24,6 +24,61 @@ export const fetchCategories = createAsyncThunk(
   }
 );
 
+// Create async thunk for updating a category
+export const updateCategory = createAsyncThunk(
+  'category/update',
+  async ({ id, formData }, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      console.log("Sending update request with data:", formData);
+      
+      const response = await fetch(`http://localhost:2221/api/a1/category/${id}`, {
+        method: 'PUT',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+        },
+        body: formData
+      });
+
+      const data = await response.json();
+      console.log("Update response:", data);
+      
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Failed to update category');
+      }
+      return data;
+    } catch (error) {
+      console.error("Update error:", error);
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
+// Create async thunk for deleting a category
+export const deleteCategory = createAsyncThunk(
+  'category/delete',
+  async (id, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await fetch(`http://localhost:2221/api/a1/category/${id}`, {
+        method: 'DELETE',
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || data.message || 'Failed to delete category');
+      }
+      return id; // Return the deleted category's ID
+    } catch (error) {
+      return rejectWithValue(error.message);
+    }
+  }
+);
+
 const categorySlice = createSlice({
   name: 'category',
   initialState: {
@@ -47,6 +102,33 @@ const categorySlice = createSlice({
         state.categories = action.payload;
       })
       .addCase(fetchCategories.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(updateCategory.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(updateCategory.fulfilled, (state, action) => {
+        state.isLoading = false;
+        const index = state.categories.findIndex(cat => cat._id === action.payload._id);
+        if (index !== -1) {
+          state.categories[index] = action.payload;
+        }
+      })
+      .addCase(updateCategory.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload;
+      })
+      .addCase(deleteCategory.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(deleteCategory.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.categories = state.categories.filter(cat => cat._id !== action.payload);
+      })
+      .addCase(deleteCategory.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
       });

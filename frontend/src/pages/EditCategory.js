@@ -1,16 +1,33 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/x_app.css';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useLocation, useNavigate } from 'react-router-dom';
+import { useDispatch } from 'react-redux';
+import { updateCategory } from '../redux/slice/category.slice';
 
 const EditCategory = () => {
     const { isDarkMode } = useOutletContext();
+    const location = useLocation();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
     const [categoryData, setCategoryData] = useState({
         title: '',
-        description: ''
+        description: '',
+        _id: ''
     });
 
     const [categoryImage, setCategoryImage] = useState(null);
     const [error, setError] = useState('');
+    const [isSubmitting, setIsSubmitting] = useState(false);
+
+    useEffect(() => {
+        if (location.state?.categoryData) {
+            const { title, description, image, _id } = location.state.categoryData;
+            setCategoryData({ title, description, _id });
+            if (image) {
+                setCategoryImage(`http://localhost:2221/${image}`);
+            }
+        }
+    }, [location.state]);
 
     const validateAndHandleFile = (file) => {
         setError('');
@@ -34,6 +51,7 @@ const EditCategory = () => {
 
         const imageUrl = URL.createObjectURL(file);
         setCategoryImage(imageUrl);
+        setCategoryData(prev => ({ ...prev, image: file }));
     };
 
     const handleInputChange = (e) => {
@@ -44,9 +62,40 @@ const EditCategory = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Add your submit logic here
+        setError('');
+        setIsSubmitting(true);
+
+        try {
+            if (!categoryData.title?.trim()) {
+                throw new Error('Title is required');
+            }
+            if (!categoryData.description?.trim()) {
+                throw new Error('Description is required');
+            }
+
+            const formData = new FormData();
+            formData.append('title', categoryData.title.trim());
+            formData.append('description', categoryData.description.trim());
+            
+            if (categoryData.image instanceof File) {
+                formData.append('image', categoryData.image);
+            }
+
+            const result = await dispatch(updateCategory({
+                id: categoryData._id,
+                formData
+            })).unwrap();
+
+            if (result) {
+                navigate('/categories');
+            }
+        } catch (err) {
+            setError(err.message || 'Failed to update category');
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     return (
@@ -73,6 +122,13 @@ const EditCategory = () => {
                                 accept=".png, .jpg, .jpeg"
                             />
                             <div className="x_upload_content">
+                                {categoryImage && (
+                                    <img 
+                                        src={categoryImage} 
+                                        alt="Category" 
+                                        style={{ maxWidth: '100%', maxHeight: '200px', marginBottom: '10px' }} 
+                                    />
+                                )}
                                 <div className="x_upload_icon">
                                     <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent-color)">
                                         <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
@@ -122,8 +178,21 @@ const EditCategory = () => {
                 </div>
 
                 <div className="x_btn_wrapper mt-3">
-                    <button type="submit" className="x_btn x_btn_create" onClick={handleSubmit}>Save Changes</button>
-                    <button type="button" className="x_btn x_btn_cancel">Cancel</button>
+                    <button 
+                        type="submit" 
+                        className="x_btn x_btn_create" 
+                        onClick={handleSubmit}
+                        disabled={isSubmitting}
+                    >
+                        {isSubmitting ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button 
+                        type="button" 
+                        className="x_btn x_btn_cancel"
+                        onClick={() => navigate('/categories')}
+                    >
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>

@@ -1,9 +1,17 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/x_app.css';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCategories } from '../redux/slice/category.slice';
+import { createSubcategory } from '../redux/slice/subCategory.slice';
 
 const AddSubcategory = () => {
     const { isDarkMode } = useOutletContext();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { categories, isLoading: categoriesLoading } = useSelector((state) => state.category);
+    const { isLoading: subcategoryLoading, error: subcategoryError } = useSelector((state) => state.subcategory);
+    
     const [subcategoryData, setsubcategoryData] = useState({
         subcategoryTitle: '',
         description: '',
@@ -14,14 +22,12 @@ const AddSubcategory = () => {
     const [error, setError] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
-    const categoryOptions = [
-        { value: 'clothing', label: 'Clothing' },
-        { value: 'shoes', label: 'Shoes' },
-        { value: 'accessories', label: 'Accessories' }
-    ];
+    useEffect(() => {
+        dispatch(fetchCategories());
+    }, [dispatch]);
 
-    const handleCategorySelect = (value) => {
-        setsubcategoryData(prev => ({ ...prev, category: value }));
+    const handleCategorySelect = (categoryId) => {
+        setsubcategoryData(prev => ({ ...prev, category: categoryId }));
         setIsCategoryOpen(false);
     };
 
@@ -57,9 +63,35 @@ const AddSubcategory = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        // Add your submit logic here
+        setError('');
+
+        if (!subcategoryData.subcategoryTitle || !subcategoryData.category) {
+            setError('Subcategory title and category are required');
+            return;
+        }
+
+        try {
+            const formData = new FormData();
+            formData.append('subcategoryTitle', subcategoryData.subcategoryTitle);
+            formData.append('description', subcategoryData.description);
+            formData.append('category', subcategoryData.category);
+
+            const fileInput = document.getElementById('fileInput');
+            if (fileInput.files[0]) {
+                formData.append('image', fileInput.files[0]);
+            }
+
+            await dispatch(createSubcategory(formData)).unwrap();
+            navigate('/subcategories');
+        } catch (error) {
+            setError(error.message || 'Failed to create subcategory');
+        }
+    };
+
+    const handleCancel = () => {
+        navigate('/subcategories');
     };
 
     return (
@@ -86,14 +118,24 @@ const AddSubcategory = () => {
                                 accept=".png, .jpg, .jpeg"
                             />
                             <div className="x_upload_content">
-                                <div className="x_upload_icon">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent-color)">
-                                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
-                                    </svg>
-                                </div>
-                                <p className="x_upload_text">Drop your images here, or <span className="x_browse_text">click to browse</span></p>
-                                <p className="x_upload_hint">Maximum file size: 5MB. Allowed formats: PNG, JPG, JPEG</p>
-                                {error && <p className="x_error_message">{error}</p>}
+                                {productImage ? (
+                                    <img 
+                                        src={productImage} 
+                                        alt="Preview" 
+                                        className="x_preview_image"
+                                    />
+                                ) : (
+                                    <>
+                                        <div className="x_upload_icon">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent-color)">
+                                                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                                            </svg>
+                                        </div>
+                                        <p className="x_upload_text">Drop your images here, or <span className="x_browse_text">click to browse</span></p>
+                                        <p className="x_upload_hint">Maximum file size: 5MB. Allowed formats: PNG, JPG, JPEG</p>
+                                    </>
+                                )}
+                                {(error || subcategoryError) && <p className="x_error_message">{error || subcategoryError}</p>}
                             </div>
                         </div>
                     </div>
@@ -112,7 +154,10 @@ const AddSubcategory = () => {
                                             className="x_dropdown_header"
                                             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                                         >
-                                            <span>{subcategoryData.category || 'Choose a category'}</span>
+                                            <span>
+                                                {categoriesLoading ? 'Loading categories...' : 
+                                                 categories.find(cat => cat._id === subcategoryData.category)?.title || 'Choose a category'}
+                                            </span>
                                             <svg
                                                 className={`x_dropdown_arrow ${isCategoryOpen ? 'open' : ''}`}
                                                 width="10"
@@ -122,15 +167,15 @@ const AddSubcategory = () => {
                                                 <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" fill="none" />
                                             </svg>
                                         </div>
-                                        {isCategoryOpen && (
+                                        {isCategoryOpen && !categoriesLoading && (
                                             <div className="x_dropdown_options">
-                                                {categoryOptions.map((option) => (
+                                                {categories.map((category) => (
                                                     <div
-                                                        key={option.value}
+                                                        key={category._id}
                                                         className="x_dropdown_option"
-                                                        onClick={() => handleCategorySelect(option.value)}
+                                                        onClick={() => handleCategorySelect(category._id)}
                                                     >
-                                                        {option.label}
+                                                        {category.title}
                                                     </div>
                                                 ))}
                                             </div>
@@ -167,8 +212,21 @@ const AddSubcategory = () => {
                 </div>
 
                 <div className="x_btn_wrapper mt-3">
-                    <button type="submit" className="x_btn x_btn_create" onClick={handleSubmit}>Create Subcategory</button>
-                    <button type="button" className="x_btn x_btn_cancel">Cancel</button>
+                    <button 
+                        type="submit" 
+                        className="x_btn x_btn_create" 
+                        onClick={handleSubmit}
+                        disabled={categoriesLoading || subcategoryLoading}
+                    >
+                        {subcategoryLoading ? 'Creating...' : 'Create Subcategory'}
+                    </button>
+                    <button 
+                        type="button" 
+                        className="x_btn x_btn_cancel"
+                        onClick={handleCancel}
+                    >
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>

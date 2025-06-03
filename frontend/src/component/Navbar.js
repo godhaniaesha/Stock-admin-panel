@@ -131,7 +131,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
                 <button 
                   className="custom-dropdown-item"
                   onClick={() => {
-                    setShowProfile(true);
+                    navigate('/profile')
                     setIsDropdownOpen(false);
                   }}
                   style={{

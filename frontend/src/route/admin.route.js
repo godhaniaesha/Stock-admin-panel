@@ -50,6 +50,7 @@ function UserRoutes() {
             <Route path="/" element={<Main />}>
                 {/* Stock Management */}
                 <Route index element={<Dashboard />} />
+                <Route path="profile" element={<Profile />} />
                 <Route path="stock" element={<StockOverview />} />
                 <Route path="stock/add" element={<AddInventory />} />
                 <Route path="stock/adjust" element={<StockAdjustments />} />

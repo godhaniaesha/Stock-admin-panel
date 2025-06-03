@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useNavigate } from 'react-router-dom'; // Import useNavigate for redirection
+import { Link, useNavigate } from 'react-router-dom';
 import { User, Mail, Lock, Eye, EyeOff, Phone } from 'lucide-react';
-import { useDispatch, useSelector } from 'react-redux'; // Import useDispatch and useSelector
+import { useDispatch, useSelector } from 'react-redux';
 import '../../styles/auth.css';
 import { clearAuthState, registerUser } from '../../redux/slice/auth.slice';
 import { toast } from 'react-toastify';
@@ -17,57 +17,78 @@ const Register = () => {
   });
 
   const dispatch = useDispatch();
-  const navigate = useNavigate(); // Initialize useNavigate
-  const { loading, error, success, message } = useSelector((state) => state.auth); // Access auth state
+  const navigate = useNavigate();
+  const [db_submitted, setDbSubmitted] = useState(false);
+  const { loading, error, success, message } = useSelector((state) => state.auth);
 
-  // Handle form field changes
   const handleChange = (e) => {
     setFormData({ ...formData, [e.target.name]: e.target.value });
   };
 
-  // Handle registration submission
+  const validateForm = () => {
+    const errors = {};
+
+    if (!formData.username) {
+      errors.username = 'Full name is required';
+    }
+
+    if (!formData.email) {
+      errors.email = 'Email is required';
+    } else if (!/\S+@\S+\.\S+/.test(formData.email)) {
+      errors.email = 'Invalid email format';
+    }
+
+    if (!formData.phone) {
+      errors.phone = 'Phone number is required';
+    }
+
+    if (!formData.password) {
+      errors.password = 'Password is required';
+    } else if (formData.password.length < 6) {
+      errors.password = 'Password must be at least 6 characters';
+    }
+
+    if (Object.keys(errors).length > 0) {
+      Object.values(errors).forEach(err => toast.error(err));
+      return false;
+    }
+
+    return true;
+  };
+
   const handleSubmit = (e) => {
     e.preventDefault();
 
-    // Basic validation (add more robust validation as needed)
     if (formData.password !== formData.confirmPassword) {
-      alert("Passwords do not match!");
+      toast.error("Passwords do not match!");
       return;
     }
 
-    dispatch(registerUser({
-      username: formData.username,
-      email: formData.email,
-      phone: formData.phone,
-      password: formData.password
-    }));
+    if (validateForm()) {
+      setDbSubmitted(true);
+      dispatch(registerUser({
+        username: formData.username,
+        email: formData.email,
+        phone: formData.phone,
+        password: formData.password
+      }));
+    }
   };
 
-  // Effect to handle redirection or clear state after registration attempt
-  // useEffect(() => {
-  //   if (success) {
-  //     alert(message); // Or use a toast notification
-  //     dispatch(clearAuthState()); // Clear success state after displaying message
-  //     navigate('/login'); // Redirect to login page on successful registration
-  //   }
-  //   if (error) {
-  //     alert(message || error); // Display error message
-  //     dispatch(clearAuthState()); // Clear error state after displaying message
-  //   }
-  // }, [success, error, message, navigate, dispatch]);
   useEffect(() => {
-    if (success) {
-      toast.success(message || "Registration successful!");
-      dispatch(clearAuthState());
-      navigate('/login');
+    if (db_submitted) {
+      if (success) {
+        toast.success(message || "Registration successful!");
+        dispatch(clearAuthState());
+        navigate('/'); // ✅ Redirect to homepage
+      } else if (error && message) {
+        toast.error(message || "Registration failed.");
+        dispatch(clearAuthState());
+        setDbSubmitted(false); // reset submission flag
+      }
     }
-
-    if (error) {
-      toast.error(message || error || "Registration failed.");
-      dispatch(clearAuthState());
-    }
-  }, [success, error, message, navigate, dispatch]);
-
+  }, [success, error, message, navigate, dispatch, db_submitted]);
+  
 
   return (
     <div className="d_auth_container" data-theme="dark">
@@ -85,11 +106,11 @@ const Register = () => {
               <User size={18} />
               <input
                 type="text"
-                name="username" // Add name attribute
+                name="username"
                 placeholder="Enter your full name"
                 value={formData.username}
                 onChange={handleChange}
-                required // Add HTML5 validation
+                required
               />
             </div>
           </div>
@@ -100,7 +121,7 @@ const Register = () => {
               <Mail size={18} />
               <input
                 type="email"
-                name="email" // Add name attribute
+                name="email"
                 placeholder="Enter your email"
                 value={formData.email}
                 onChange={handleChange}
@@ -115,7 +136,7 @@ const Register = () => {
               <Phone size={18} />
               <input
                 type="tel"
-                name="phone" // Add name attribute
+                name="phone"
                 placeholder="Enter your phone number"
                 value={formData.phone}
                 onChange={handleChange}
@@ -130,7 +151,7 @@ const Register = () => {
               <Lock size={18} />
               <input
                 type={showPassword ? 'text' : 'password'}
-                name="password" // Add name attribute
+                name="password"
                 placeholder="Create a password"
                 value={formData.password}
                 onChange={handleChange}
@@ -152,7 +173,7 @@ const Register = () => {
               <Lock size={18} />
               <input
                 type={showPassword ? 'text' : 'password'}
-                name="confirmPassword" // Add name attribute
+                name="confirmPassword"
                 placeholder="Confirm your password"
                 value={formData.confirmPassword}
                 onChange={handleChange}
@@ -166,10 +187,9 @@ const Register = () => {
           </button>
         </form>
 
-        {/* Display messages based on Redux state */}
         {loading && <p>Loading...</p>}
-        {error && <p className="error-message">{message || error}</p>}
-        {success && <p className="success-message">{message}</p>}
+        {/* {error && <p className="error-message">{message || error}</p>} */}
+        {/* {success && <p className="success-message">{message}</p>} */}
 
         <div className="d_auth_footer">
           <p>Already have an account? <Link to="/login">Sign In</Link></p>

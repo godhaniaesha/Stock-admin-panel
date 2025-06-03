@@ -1,15 +1,34 @@
 import React, { useState } from 'react';
-import { Link } from 'react-router-dom';
-import { Mail } from 'lucide-react';
+import { Link, useNavigate } from 'react-router-dom';
+import { Phone } from 'lucide-react';
+import { useDispatch, useSelector } from 'react-redux';
+import { forgotPassword, clearAuthState } from '../../redux/slice/auth.slice';
 import '../../styles/auth.css';
+import { toast } from 'react-toastify';
 
 const ForgotPassword = () => {
-  const [email, setEmail] = useState('');
+  const [phone, setPhone] = useState('');
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { loading, error, success, message } = useSelector((state) => state.auth);
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle forgot password logic
+    if (phone) {
+      dispatch(forgotPassword(phone));
+    }
   };
+
+  React.useEffect(() => {
+    if (success) {
+      toast.success(message || "OTP sent successfully!");
+      navigate('/verify-otp'); // Navigate to VerifyOTP page
+      dispatch(clearAuthState());
+    } else if (error) {
+      toast.error(message || error || "Failed to send OTP.");
+      dispatch(clearAuthState());
+    }
+  }, [success, error, message, dispatch, navigate]);
 
   return (
     <div className="d_auth_container" data-theme="dark">
@@ -22,26 +41,26 @@ const ForgotPassword = () => {
         
         <form onSubmit={handleSubmit} className="d_auth_form">
           <div className="d_input_group">
-            <label>Email Address</label>
+            <label>Phone Number</label>
             <div className="d_input_wrapper">
-              <Mail size={18} />
+              <Phone size={18} />
               <input
-                type="email"
-                placeholder="Enter your email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
+                type="tel"
+                placeholder="Enter your phone number"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
               />
             </div>
           </div>
 
-          <button type="submit" className="d_auth_button">Send Reset Link</button>
+          <button type="submit" className="d_auth_button" disabled={loading}>
+            {loading ? 'Sending OTP...' : 'Send OTP'}
+          </button>
         </form>
 
-        <div className="d_auth_footer">
           <p>Remember your password? <Link to="/login">Back to Login</Link></p>
         </div>
       </div>
-    </div>
   );
 };
 

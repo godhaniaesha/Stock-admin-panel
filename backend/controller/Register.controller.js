@@ -83,6 +83,7 @@ const RegisterUser = async (req, res) => {
             .cookie("assesToken", assesToken, { httpOnly: true, secure: true })
             .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
             .json({
+                accessToken:assesToken,
                 success: true,
                 data: data,
                 message: "User created successfully",

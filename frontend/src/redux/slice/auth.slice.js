@@ -12,6 +12,9 @@ export const registerUser = createAsyncThunk('auth/register', async (userData, {
       body: JSON.stringify(userData)
     });
     const data = await response.json();
+    console.log(data,"data");
+    localStorage.setItem('token',data.accessToken)
+    localStorage.setItem('user',data.data._id)
     if (!response.ok || !data.success) {
       throw new Error(data.message || 'Registration failed');
     }
@@ -33,7 +36,7 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
       throw new Error(data.message || 'Login failed');
     }
     console.log(data,"data");
-    localStorage.setItem("user",data.finduser)
+    localStorage.setItem("user",data.finduser._id)
     localStorage.setItem("token",data.accessToken)
     return data;
   } catch (err) {
@@ -60,8 +63,9 @@ export const forgotPassword = createAsyncThunk('auth/forgotPassword', async (pho
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone })
-    });
+    });    
     const data = await response.json();
+    localStorage.setItem('forgot-phone',phone)
     if (!response.ok || !data.success) {
       throw new Error(data.message || 'Failed to send OTP');
     }
@@ -78,7 +82,9 @@ export const verifyOtp = createAsyncThunk('auth/verifyOtp', async ({ phone, otp 
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone, otp })
     });
+    console.log(phone,otp,'verify-otp');
     const data = await response.json();
+    localStorage.setItem('storedOtp',otp)
     if (!response.ok || !data.success) {
       throw new Error(data.message || 'OTP verification failed');
     }
@@ -95,7 +101,9 @@ export const resendOtp = createAsyncThunk('auth/resendOtp', async (phone, { reje
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone })
     });
+
     const data = await response.json();
+    
     if (!response.ok || !data.success) {
       throw new Error(data.message || 'Failed to resend OTP');
     }
@@ -112,6 +120,7 @@ export const resetPassword = createAsyncThunk('auth/resetPassword', async ({ pho
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ phone, otp, newPassword })
     });
+    console.log(phone,otp,newPassword,'verify-otp');
     const data = await response.json();
     if (!response.ok || !data.success) {
       throw new Error(data.message || 'Password reset failed');

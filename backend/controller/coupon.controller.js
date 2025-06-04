@@ -4,6 +4,7 @@ const { Coupon } = require('../model');
 const createCoupon = async (req, res) => {
     try {
         const { title, status, startDate, endDate, discountPercentage } = req.body;
+        // console.log(req.body,"coupon");
         
         // Check if coupon with same title already exists
         const existingCoupon = await Coupon.findOne({ title: title });

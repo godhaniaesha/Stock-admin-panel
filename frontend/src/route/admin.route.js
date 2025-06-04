@@ -1,5 +1,6 @@
 import React from 'react';
-import { Routes, Route } from 'react-router-dom';
+import { Route, Routes } from 'react-router-dom';
+import PrivateRoute from './PrivateRoute'; // adjust path as needed
 import Main from '../component/Main';
 import AddProduct from '../pages/AddProduct';
 import EditProduct from '../pages/EditProduct';
@@ -43,80 +44,66 @@ import SubcategoryList from '../component/SubcategoryList';
 import PaymentList from '../component/PaymentList';
 import FAQs from '../component/FAQs';
 import TeamsNDConditions from '../component/TeamsNDConditions';
-
+import ProductDetails from '../component/ProductDetails';
 function UserRoutes() {
     return (
         <Routes>
-            <Route path="/" element={<Main />}>
-                {/* Stock Management */}
-                <Route index element={<Dashboard />} />
-                <Route path="profile" element={<Profile />} />
-                <Route path="stock" element={<StockOverview />} />
-                <Route path="stock/add" element={<AddInventory />} />
-                <Route path="stock/adjust" element={<StockAdjustments />} />
-                <Route path="stock/alerts" element={<StockAlert />} />
-
-                {/* Categories */}
-                <Route path="categories" element={<CategoryList />} />
-                <Route path="categories/add" element={<AddCategory />} />
-                <Route path="categories/edit" element={<EditCategory />} />
-
-                {/* Subcategories */}
-                <Route path="subcategories" element={<SubcategoryList />} />
-                <Route path="subcategories/add" element={<AddSubcategory />} />
-                <Route path="subcategories/edit" element={<EditSubcategory />} />
-                {/* Products */}
-                <Route path="products" element={<ProductGrid />} />
-                <Route path="products/add" element={<AddProduct />} />
-                <Route path="products/edit" element={<EditProduct />} />
-                <Route path="products/view" element={<ProductList />} />
-
-                {/* Coupons */}
-                <Route path="coupons" element={<ListCoupons />} />
-                <Route path="coupons/add" element={<AddCoupon />} />
-                <Route path="coupons/edit" element={<EditCoupon />} />
-
-                {/* Orders */}
-                <Route path="orders" element={<OrderList />} />
-                <Route path="cart" element={<CartList />} />
-                <Route path="wishlist" element={<Wishlist />} />
-                <Route path="checkout" element={<CheckoutPage />} />
-
-                {/* Users */}
-                <Route path="users" element={<UserList />} />
-                <Route path="user-roles" element={<UserRoles />} />
-                <Route path="add-user" element={<AddUser />} />
-                <Route path="edit-user" element={<EditUser />} />
-
-                
-                {/* Reports */}
-                <Route path="sales-report" element={<SalesReport />} />
-                <Route path="inventory-report" element={<InventoryReport />} />
-
-                {/* Payment */}
-                <Route path="paymentList" element={< PaymentList />} />
-
-
-                {/* Settings */}
-                <Route path="settings" element={<Settings />} />
-
-
-                {/* Calendar */}
-                <Route path="Calendar" element={<Calendar />} />
-                <Route path="FAQs" element={<FAQs />} />
-                <Route path="tearmsconditions" element={<TeamsNDConditions />} />
-
-            </Route>
-
-            {/* Auth Routes - These should remain outside of Main layout */}
+            {/* Auth Routes - Keep public */}
             <Route path="/login" element={<Login />} />
             <Route path="/register" element={<Register />} />
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-otp" element={<VerifyOTP />} />
             <Route path="/change-password" element={<ChangePassword />} />
-            <Route path="/profile" element={<Profile />} />
+
+            {/* Protected Routes */}
+            <Route element={<PrivateRoute />}>
+                <Route path="/" element={<Main />}>
+                    <Route index element={<Dashboard />} />
+                    <Route path="profile" element={<Profile />} />
+                    <Route path="stock" element={<StockOverview />} />
+                    <Route path="stock/add" element={<AddInventory />} />
+                    <Route path="stock/adjust" element={<StockAdjustments />} />
+                    <Route path="stock/alerts" element={<StockAlert />} />
+                    
+                    <Route path="categories" element={<CategoryList />} />
+                    <Route path="categories/add" element={<AddCategory />} />
+                    <Route path="categories/edit" element={<EditCategory />} />
+
+                    <Route path="subcategories" element={<SubcategoryList />} />
+                    <Route path="subcategories/add" element={<AddSubcategory />} />
+                    <Route path="subcategories/edit" element={<EditSubcategory />} />
+
+                    <Route path="products" element={<ProductGrid />} />
+                    <Route path="products/details" element={<ProductDetails />} />
+                    <Route path="products/add" element={<AddProduct />} />
+                    <Route path="products/edit" element={<EditProduct />} />
+                    <Route path="products/view" element={<ProductList />} />
+
+                    <Route path="coupons" element={<ListCoupons />} />
+                    <Route path="coupons/add" element={<AddCoupon />} />
+                    <Route path="coupons/edit/:id" element={<EditCoupon />} />
+
+                    <Route path="orders" element={<OrderList />} />
+                    <Route path="cart" element={<CartList />} />
+                    <Route path="wishlist" element={<Wishlist />} />
+                    <Route path="checkout" element={<CheckoutPage />} />
+
+                    <Route path="users" element={<UserList />} />
+                    <Route path="user-roles" element={<UserRoles />} />
+                    <Route path="add-user" element={<AddUser />} />
+                    <Route path="edit-user" element={<EditUser />} />
+
+                    <Route path="sales-report" element={<SalesReport />} />
+                    <Route path="inventory-report" element={<InventoryReport />} />
+
+                    <Route path="paymentList" element={<PaymentList />} />
+                    <Route path="settings" element={<Settings />} />
+                    <Route path="Calendar" element={<Calendar />} />
+                    <Route path="FAQs" element={<FAQs />} />
+                    <Route path="tearmsconditions" element={<TeamsNDConditions />} />
+                </Route>
+            </Route>
         </Routes>
     );
 }
-
 export default UserRoutes;

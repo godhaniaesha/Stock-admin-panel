@@ -26,7 +26,8 @@ const RegisterSchema = new mongoose.Schema({
         default: false
     },
     role: {
-        type: String
+        type: String,
+        enum: ['admin', 'seller', 'staff','user'],
     },
     refreshToken: {
         type: String

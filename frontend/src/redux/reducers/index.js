@@ -4,13 +4,15 @@ import categoryReducer from '../slice/category.slice';
 import authReducer from '../slice/auth.slice';
 import subcategoryReducer from '../slice/subCategory.slice';
 import productReducer from '../slice/product.slice';
+import couponReducer from '../slice/coupon.slice';
 
 export const rootReducer = combineReducers({
     addCategory: addCategoryReducer,
     category: categoryReducer,
     auth: authReducer,
     subcategory: subcategoryReducer,
-    product: productReducer
+    product: productReducer,
+    coupon:couponReducer
 });
 
 export default rootReducer;

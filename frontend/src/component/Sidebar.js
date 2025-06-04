@@ -97,7 +97,7 @@ const Sidebar = ({ show, isDarkMode }) => {
       submenu: [
         { title: 'Coupon List', path: '/coupons', icon: <FaList size={14} /> },
         { title: 'Add Coupon', path: '/coupons/add', icon: <FaPlus size={14} /> },
-        { title: 'Edit Coupon', path: '/coupons/edit', icon: <FaEdit size={14} /> }
+        // { title: 'Edit Coupon', path: '/coupons/edit', icon: <FaEdit size={14} /> }
       ]
     },
     {

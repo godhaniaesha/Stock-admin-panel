@@ -1,84 +1,112 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/Z_styles.css';
-import { Table } from 'react-bootstrap';
+import { Table, Modal } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProducts, deleteProduct } from '../redux/slice/product.slice';
+import { fetchCategories } from '../redux/slice/category.slice';
 
-function ProductList(props) {
+function ProductList() {
     const { isDarkMode } = useOutletContext();
-    const products = [
-        {
-            id: 1,
-            image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
-            name: "Classic White Sneakers",
-            size: "US 7, 8, 9, 10",
-            price: "$95.00",
-            stock: {
-                left: 324,
-                sold: 178
-            },
-            category: "Footwear",
-            rating: 4.7,
-            reviews: 89
-        },
-        {
-            id: 2,
-            image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3",
-            name: "Leather Crossbody Bag",
-            size: "Standard",
-            price: "$149.99",
-            stock: {
-                left: 156,
-                sold: 243
-            },
-            category: "Accessories",
-            rating: 4.8,
-            reviews: 167
-        },
-        {
-            id: 3,
-            image: "https://images.unsplash.com/photo-1578932750294-f5075e85f44a",
-            name: "Denim Jacket",
-            size: "S, M, L, XL",
-            price: "$89.99",
-            stock: {
-                left: 428,
-                sold: 312
-            },
-            category: "Fashion",
-            rating: 4.5,
-            reviews: 234
-        },
-        {
-            id: 4,
-            image: "https://images.unsplash.com/photo-1596755094514-f87e34085b2c",
-            name: "Summer Floral Dress",
-            size: "XS, S, M, L",
-            price: "$65.00",
-            stock: {
-                left: 245,
-                sold: 189
-            },
-            category: "Fashion",
-            rating: 4.6,
-            reviews: 145
-        },
-        {
-            id: 5,
-            image: "https://images.unsplash.com/photo-1523293182086-7651a899d37f",
-            name: "Smart Watch Pro",
-            size: "One Size",
-            price: "$299.99",
-            stock: {
-                left: 89,
-                sold: 411
-            },
-            category: "Electronics",
-            rating: 4.9,
-            reviews: 328
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    
+    // Get product state
+    const productState = useSelector((state) => state.product || {});
+    const { products = [], isLoading: productsLoading = false, error: productError = null } = productState;
+    
+    // Get category state
+    const categoryState = useSelector((state) => state.category || {});
+    const { categories = [], isLoading: categoriesLoading = false } = categoryState;
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [productToDelete, setProductToDelete] = useState(null);
+    const [timeFilter, setTimeFilter] = useState('thisMonth');
+
+    useEffect(() => {
+        // Fetch products and categories when the component mounts
+        dispatch(fetchProducts());
+        dispatch(fetchCategories());
+    }, [dispatch]);
+
+    const handleAddProduct = () => {
+        navigate('/products/add');
+    };
+
+    const handleEdit = (product) => {
+        navigate('/products/edit', { state: { productData: product } });
+    };
+
+    const handleView = (product) => {
+        navigate('/products/view', { state: { productData: product } });
+    };
+
+    const handleDeleteClick = (product) => {
+        setProductToDelete(product);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteConfirm = async () => {
+        if (productToDelete) {
+            try {
+                await dispatch(deleteProduct(productToDelete._id)).unwrap();
+                setShowDeleteModal(false);
+                setProductToDelete(null);
+            } catch (error) {
+                console.error('Failed to delete product:', error);
+            }
         }
-    ];
+    };
+
+    const handleDeleteCancel = () => {
+        setShowDeleteModal(false);
+        setProductToDelete(null);
+    };
+
+    const handleTimeFilterChange = (e) => {
+        setTimeFilter(e.target.value);
+    };
+
+    const filterProductsByTime = (products) => {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        return products.filter(product => {
+            const productDate = new Date(product.createdAt);
+            const productMonth = productDate.getMonth();
+            const productYear = productDate.getFullYear();
+
+            switch (timeFilter) {
+                case 'thisMonth':
+                    return productMonth === currentMonth && productYear === currentYear;
+                case 'lastMonth':
+                    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+                    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+                    return productMonth === lastMonth && productYear === lastMonthYear;
+                case 'last3Months':
+                    const threeMonthsAgo = new Date(now);
+                    threeMonthsAgo.setMonth(now.getMonth() - 3);
+                    return productDate >= threeMonthsAgo;
+                default:
+                    return true;
+            }
+        });
+    };
+
+    const filteredProducts = filterProductsByTime(products);
+
+    // Show loading state if either products or categories are loading
+    if (productsLoading || categoriesLoading) {
+        return <div>Loading products and categories...</div>;
+    }
+
+    // Show error state if there's a product error
+    if (productError) {
+        return <div>Error loading products: {productError}</div>;
+    }
 
     return (
         <>
@@ -87,11 +115,15 @@ function ProductList(props) {
                     <div className="Z_table_header">
                         <h4>All Product List</h4>
                         <div className="Z_table_actions">
-                            <button className="Z_add_product_btn">Add Product</button>
-                            <select className="Z_time_filter">
-                                <option>This Month</option>
-                                <option>Last Month</option>
-                                <option>Last 3 Months</option>
+                            <button className="Z_add_product_btn" onClick={handleAddProduct}>Add Product</button>
+                            <select 
+                                className="Z_time_filter" 
+                                value={timeFilter}
+                                onChange={handleTimeFilterChange}
+                            >
+                                <option value="thisMonth">This Month</option>
+                                <option value="lastMonth">Last Month</option>
+                                <option value="last3Months">Last 3 Months</option>
                             </select>
                         </div>
                     </div>
@@ -114,67 +146,115 @@ function ProductList(props) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {products.map((product) => (
-                                    <tr key={product.id}>
-                                        <td>
-                                            <div className="Z_custom_checkbox">
-                                                <input 
-                                                    type="checkbox" 
-                                                    id={`checkbox-${product.id}`} 
-                                                    className="Z_checkbox_input" 
-                                                />
-                                                <label 
-                                                    htmlFor={`checkbox-${product.id}`} 
-                                                    className="Z_checkbox_label"
-                                                ></label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="Z_product_info_cell">
-                                                <img src={product.image} alt={product.name} className="Z_table_product_img" />
-                                                <div>
-                                                    <div className="Z_table_product_name">{product.name}</div>
-                                                    <div className="Z_table_product_size">Size: {product.size}</div>
+                                {filteredProducts.map((product) => {
+                                    // Find the category for the current product
+                                    const productCategory = categories.find(category => category._id === product.categoryId);
+                                    const categoryTitle = productCategory ? productCategory.title : 'N/A';
+
+                                    return (
+                                        <tr key={product._id}>
+                                            <td>
+                                                <div className="Z_custom_checkbox">
+                                                    <input 
+                                                        type="checkbox" 
+                                                        id={`checkbox-${product._id}`}
+                                                        className="Z_checkbox_input" 
+                                                    />
+                                                    <label 
+                                                        htmlFor={`checkbox-${product._id}`} 
+                                                        className="Z_checkbox_label"
+                                                    ></label>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td>{product.price}</td>
-                                        <td>
-                                            <div className="Z_stock_info">
-                                                <div>{product.stock.left} Items Left</div>
-                                                <div className="Z_stock_sold">{product.stock.sold} Sold</div>
-                                            </div>
-                                        </td>
-                                        <td>{product.category}</td>
-                                        <td>
-                                            <div className="Z_rating_cell">
-                                                <div className="Z_rating_wrapper">
-                                                    <span className="Z_rating_star">★</span>
-                                                    <span className="Z_rating_value">{product.rating}</span>
-                                                    <span className="Z_review_count">{product.reviews} Review</span>
+                                            </td>
+                                            <td>
+                                                <div className="Z_product_info_cell">
+                                                    <img 
+                                                        src={product.images && product.images[0] ? `http://localhost:2221/${product.images[0]}` : 'placeholder.jpg'} // Added check for images array and placeholder
+                                                        alt={product.productName} 
+                                                        className="Z_table_product_img" 
+                                                    />
+                                                    <div>
+                                                        <div className="Z_table_product_name">{product.productName}</div>
+                                                        <div className="Z_table_product_size">Size: {product.weight}</div>
+                                                    </div>
                                                 </div>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="Z_action_buttons">
-                                                <button className="Z_action_btn Z_view_btn">
-                                                    <TbEye size={22}/>
-                                                </button>
-                                                <button className="Z_action_btn Z_edit_btn">
-                                                    <TbEdit size={22}/>
-                                                </button>
-                                                <button className="Z_action_btn Z_delete_btn">
-                                                    <RiDeleteBin6Line size={22}/>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                ))}
+                                            </td>
+                                            <td>${product.price}</td>
+                                            <td>
+                                                <div className="Z_stock_info">
+                                                    <div>{product.stock} Items Left</div>
+                                                    <div className="Z_stock_sold">Low Stock: {product.lowStockThreshold}</div>
+                                                </div>
+                                            </td>
+                                            <td>{categoryTitle}</td> {/* Display the category title */}
+                                            <td>
+                                                <div className="Z_rating_cell">
+                                                    <div className="Z_rating_wrapper">
+                                                        <span className="Z_rating_star">★</span>
+                                                        <span className="Z_rating_value">4.5</span>
+                                                        <span className="Z_review_count">(0 Reviews)</span>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="Z_action_buttons">
+                                                    <button 
+                                                        className="Z_action_btn Z_view_btn"
+                                                        onClick={() => handleView(product)}
+                                                    >
+                                                        <TbEye size={22}/>
+                                                    </button>
+                                                    <button 
+                                                        className="Z_action_btn Z_edit_btn"
+                                                        onClick={() => handleEdit(product)}
+                                                    >
+                                                        <TbEdit size={22}/>
+                                                    </button>
+                                                    <button 
+                                                        className="Z_action_btn Z_delete_btn"
+                                                        onClick={() => handleDeleteClick(product)}
+                                                    >
+                                                        <RiDeleteBin6Line size={22}/>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    );
+                                })}
                             </tbody>
                         </Table>
                     </div>
                 </div>
             </section>
+
+            {/* Delete Confirmation Modal */}
+            <Modal
+                show={showDeleteModal}
+                onHide={handleDeleteCancel}
+                centered
+                className={`${isDarkMode ? 'd_dark' : 'd_light'}`}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Delete Product</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete the product "{productToDelete?.productName}"?
+                </Modal.Body>
+                <Modal.Footer>
+                    <button
+                        className="Z_btn Z_btn_cancel"
+                        onClick={handleDeleteCancel}
+                    >
+                        Cancel
+                    </button>
+                    <button
+                        className="Z_btn Z_btn_delete"
+                        onClick={handleDeleteConfirm}
+                    >
+                        Delete
+                    </button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 }

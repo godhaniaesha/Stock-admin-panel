@@ -16,6 +16,8 @@ function SubcategoryList() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [subcategoryToDelete, setSubcategoryToDelete] = useState(null);
     const [timeFilter, setTimeFilter] = useState('thisMonth');
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 9;
 
     useEffect(() => {
         dispatch(fetchSubcategories());
@@ -82,6 +84,43 @@ function SubcategoryList() {
         });
     };
 
+    const filteredSubcategories = filterSubcategoriesByTime(subcategories);
+
+    const totalPages = Math.ceil(filteredSubcategories.length / itemsPerPage);
+    const startIndex = (currentPage - 1) * itemsPerPage;
+    const endIndex = startIndex + itemsPerPage;
+    const currentSubcategories = filteredSubcategories.slice(startIndex, endIndex);
+
+    const handlePageChange = (pageNumber) => {
+        setCurrentPage(pageNumber);
+    };
+
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        const maxVisiblePages = 3;
+        
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            if (currentPage <= 2) {
+                for (let i = 1; i <= maxVisiblePages; i++) {
+                    pageNumbers.push(i);
+                }
+            } else if (currentPage >= totalPages - 1) {
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    pageNumbers.push(i);
+                }
+            } else {
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                    pageNumbers.push(i);
+                }
+            }
+        }
+        return pageNumbers;
+    };
+
     if (isLoading) {
         return <div>Loading subcategories...</div>;
     }
@@ -89,8 +128,6 @@ function SubcategoryList() {
     if (error) {
         return <div>Error: {error}</div>;
     }
-
-    const filteredSubcategories = filterSubcategoriesByTime(subcategories);
 
     return (
         <>
@@ -129,7 +166,7 @@ function SubcategoryList() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredSubcategories.map((subcategory) => (
+                                {currentSubcategories.map((subcategory) => (
                                     <tr key={subcategory._id}>
                                         <td>
                                             <div className="Z_custom_checkbox">
@@ -192,13 +229,27 @@ function SubcategoryList() {
                         </Table>
                     </div>
                     <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
-                        <button className="Z_page_btn" disabled>
+                        <button 
+                            className="Z_page_btn" 
+                            disabled={currentPage === 1}
+                            onClick={() => handlePageChange(currentPage - 1)}
+                        >
                             <FaAngleLeft />
                         </button>
-                        <button className="Z_page_btn active">1</button>
-                        <button className="Z_page_btn">2</button>
-                        <button className="Z_page_btn">3</button>
-                        <button className="Z_page_btn">
+                        {getPageNumbers().map((pageNum) => (
+                            <button 
+                                key={pageNum}
+                                className={`Z_page_btn ${currentPage === pageNum ? 'active' : ''}`}
+                                onClick={() => handlePageChange(pageNum)}
+                            >
+                                {pageNum}
+                            </button>
+                        ))}
+                        <button 
+                            className="Z_page_btn"
+                            disabled={currentPage === totalPages}
+                            onClick={() => handlePageChange(currentPage + 1)}
+                        >
                             <FaAngleRight />
                         </button>
                     </div>

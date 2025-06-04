@@ -208,7 +208,10 @@
     cursor: pointer;
     transition: background-color 0.2s;
 }
-
+.d_dark .d_delete_model{
+    background-color: var(--dark-bg) !important;
+    color: var(--light-bg);
+}
 
 /* Responsive styles */
 @media (max-width: 992px) {

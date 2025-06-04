@@ -13,6 +13,7 @@ import { RiCoupon3Fill } from "react-icons/ri";
 import { BsFillGrid1X2Fill } from "react-icons/bs";
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/admin.css';  
+import { TbListDetails } from 'react-icons/tb';
 
 const Sidebar = ({ show, isDarkMode }) => {
   const location = useLocation();
@@ -85,6 +86,7 @@ const Sidebar = ({ show, isDarkMode }) => {
       submenu: [
         { title: 'Product Grid', path: '/products', icon: <BsFillGrid1X2Fill size={16} />, notifications: 5 },
         { title: 'Add Product', path: '/products/add', icon: <FaPlus size={16} /> },
+        { title: 'Product Details', path: '/products/details', icon: <TbListDetails size={16} /> },
         { title: 'Edit Product', path: '/products/edit', icon: <FaEdit size={16} /> },
         { title: 'View Product', path: '/products/view', icon: <FaEye size={16} /> }
       ]

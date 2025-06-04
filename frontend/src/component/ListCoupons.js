@@ -1,79 +1,172 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/Z_styles.css';
-import { Table } from 'react-bootstrap';
-import { TbEdit, TbEye } from 'react-icons/tb';
+import { Table, Modal } from 'react-bootstrap';
+import { TbEdit } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { FaCircleCheck, FaCircleXmark } from 'react-icons/fa6';
 import { BsCheckAll } from "react-icons/bs";
 import { AiOutlineClose } from "react-icons/ai";
 import { useOutletContext } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchCoupons, deleteCoupon } from '../redux/slice/coupon.slice';
+import { useNavigate } from 'react-router-dom';
+import { toast } from 'react-toastify';
 
-function ListCoupons(props) {
+function ListCoupons() {
     const { isDarkMode } = useOutletContext();
-    const coupons = [
-        {
-            id: 1,
-            image: "https://images.unsplash.com/photo-1612599316791-451087c7fe15",
-            name: "Summer Special",
-            category: "Seasonal",
-            discount: "20%",
-            code: "SUMMER20",
-            startDate: "2024-05-01",
-            endDate: "2024-06-30",
-            status: "Active"
-        },
-        {
-            id: 2,
-            image: "https://images.unsplash.com/photo-1561715276-a2d087060f1d",
-            name: "Welcome Discount",
-            category: "New Users",
-            discount: "15%",
-            code: "WELCOME15",
-            startDate: "2024-04-01",
-            endDate: "2024-12-31",
-            status: "Active"
-        },
-        {
-            id: 3,
-            image: "https://images.unsplash.com/photo-1607082349566-187342175e2f",
-            name: "Flash Sale",
-            category: "Limited Time",
-            discount: "30%",
-            code: "FLASH30",
-            startDate: "2024-04-15",
-            endDate: "2024-04-20",
-            status: "Inactive"
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+
+    const { coupons = [], isLoading = false, error = null } = useSelector(state => state.coupon || {});
+
+    const [showDeleteModal, setShowDeleteModal] = useState(false);
+    const [couponToDelete, setCouponToDelete] = useState(null);
+    const [selectedCoupons, setSelectedCoupons] = useState([]);
+    const [selectAll, setSelectAll] = useState(false);
+    const [deleteMultiple, setDeleteMultiple] = useState(false);
+
+    const [selectedTimeFilter, setSelectedTimeFilter] = useState('All');
+    const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
+
+    useEffect(() => {
+        dispatch(fetchCoupons());
+    }, [dispatch]);
+
+    const formatDate = (dateString) => {
+        if (!dateString) return '';
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    };
+
+    const handleDeleteClick = (coupon) => {
+        setDeleteMultiple(false);
+        setCouponToDelete(coupon);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteSelectedClick = () => {
+        if (selectedCoupons.length === 0) return;
+        setDeleteMultiple(true);
+        setShowDeleteModal(true);
+    };
+
+    const handleDeleteCancel = () => {
+        setCouponToDelete(null);
+        setShowDeleteModal(false);
+        setDeleteMultiple(false);
+    };
+
+    const handleDeleteConfirm = async () => {
+        try {
+            if (deleteMultiple) {
+                for (let id of selectedCoupons) {
+                    await dispatch(deleteCoupon(id)).unwrap();
+                }
+                toast.success(`Deleted ${selectedCoupons.length} coupons successfully!`);
+                setSelectedCoupons([]);
+            } else if (couponToDelete) {
+                await dispatch(deleteCoupon(couponToDelete._id)).unwrap();
+                toast.success(`Coupon "${couponToDelete.title || couponToDelete.code}" deleted successfully!`);
+            }
+        } catch (err) {
+            toast.error(`Delete failed: ${err.message || 'Unknown error'}`);
+        } finally {
+            setShowDeleteModal(false);
+            setCouponToDelete(null);
+            setDeleteMultiple(false);
+            setSelectAll(false);
         }
-    ];
+    };
+
+    const getFilteredCoupons = () => {
+        let filtered = [...coupons];
+        const now = new Date();
+
+        if (selectedStatusFilter !== 'All') {
+            filtered = filtered.filter(coupon =>
+                coupon.status?.toLowerCase() === selectedStatusFilter.toLowerCase()
+            );
+        }
+
+        if (selectedTimeFilter === 'This Month') {
+            filtered = filtered.filter(coupon => {
+                const d = new Date(coupon.createdAt);
+                return d.getMonth() === now.getMonth() && d.getFullYear() === now.getFullYear();
+            });
+        } else if (selectedTimeFilter === 'Last Month') {
+            const lastMonth = new Date(now.getFullYear(), now.getMonth() - 1, 1);
+            filtered = filtered.filter(coupon => {
+                const d = new Date(coupon.createdAt);
+                return d.getMonth() === lastMonth.getMonth() && d.getFullYear() === lastMonth.getFullYear();
+            });
+        } else if (selectedTimeFilter === 'Last 3 Months') {
+            const threeMonthsAgo = new Date(now.getFullYear(), now.getMonth() - 3, 1);
+            filtered = filtered.filter(coupon => {
+                const d = new Date(coupon.createdAt);
+                return d >= threeMonthsAgo && d <= now;
+            });
+        }
+
+        return filtered;
+    };
+
+    const handleCheckboxChange = (id) => {
+        setSelectedCoupons(prev =>
+            prev.includes(id) ? prev.filter(item => item !== id) : [...prev, id]
+        );
+    };
+
+    const handleSelectAll = () => {
+        setSelectAll(prev => {
+            const newValue = !prev;
+            if (newValue) {
+                setSelectedCoupons(getFilteredCoupons().map(c => c._id));
+            } else {
+                setSelectedCoupons([]);
+            }
+            return newValue;
+        });
+    };
+
+    const displayedCoupons = getFilteredCoupons();
 
     return (
-        <>
-            <section className={`Z_product_section mx-0 mx-lg-5 my-3 w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
-                <div className="Z_table_wrapper">
-                    <div className="Z_table_header">
-                        <h4>All Coupons List</h4>
-                        <div className="Z_table_actions">
-                            <button className="Z_add_product_btn">Add Coupon</button>
-                            <select className="Z_time_filter">
-                                <option>This Month</option>
-                                <option>Last Month</option>
-                                <option>Last 3 Months</option>
-                            </select>
-                        </div>
+        <section className={`Z_product_section mx-0 mx-lg-5 my-3 w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+            <div className="Z_table_wrapper">
+                <div className="Z_table_header">
+                    <h4>All Coupons List</h4>
+                    <div className="Z_table_actions">
+                        <button className="Z_add_product_btn" onClick={() => navigate('/coupons/add')}>Add Coupon</button>
+                        <button className="Z_add_product_btn" onClick={handleDeleteSelectedClick}>Delete Selected</button>
+                        <select
+                            className="Z_time_filter"
+                            value={selectedStatusFilter}
+                            onChange={(e) => setSelectedStatusFilter(e.target.value)}
+                        >
+                            <option value="All">All Status</option>
+                            <option value="Active">Active</option>
+                            <option value="Inactive">Inactive</option>
+                        </select>
                     </div>
-                    <div className="Z_table_scroll_container">
+                </div>
+                <div className="Z_table_scroll_container">
+                    {isLoading ? (
+                        <p>Loading coupons...</p>
+                    ) : error ? (
+                        <p className="text-danger">Error: {error}</p>
+                    ) : displayedCoupons.length === 0 ? (
+                        <p>No coupons found matching your criteria.</p>
+                    ) : (
                         <Table className="Z_product_table p-1">
                             <thead>
                                 <tr>
                                     <th>
                                         <div className="Z_custom_checkbox">
-                                            <input type="checkbox" id="selectAll" className="Z_checkbox_input" />
+                                            <input type="checkbox" id="selectAll" className="Z_checkbox_input" checked={selectAll} onChange={handleSelectAll} />
                                             <label htmlFor="selectAll" className="Z_checkbox_label"></label>
                                         </div>
                                     </th>
-                                    <th>Coupon Details</th>
-                                    <th>Discount</th>
                                     <th>Code</th>
+                                    <th>Discount</th>
                                     <th>Start Date</th>
                                     <th>End Date</th>
                                     <th>Status</th>
@@ -81,56 +174,47 @@ function ListCoupons(props) {
                                 </tr>
                             </thead>
                             <tbody>
-                                {coupons.map((coupon) => (
-                                    <tr key={coupon.id}>
+                                {displayedCoupons.map((coupon) => (
+                                    <tr key={coupon._id}>
                                         <td>
                                             <div className="Z_custom_checkbox">
-                                                <input 
-                                                    type="checkbox" 
-                                                    id={`checkbox-${coupon.id}`} 
-                                                    className="Z_checkbox_input" 
+                                                <input
+                                                    type="checkbox"
+                                                    id={`checkbox-${coupon._id}`}
+                                                    className="Z_checkbox_input"
+                                                    checked={selectedCoupons.includes(coupon._id)}
+                                                    onChange={() => handleCheckboxChange(coupon._id)}
                                                 />
-                                                <label 
-                                                    htmlFor={`checkbox-${coupon.id}`} 
-                                                    className="Z_checkbox_label"
-                                                ></label>
+                                                <label htmlFor={`checkbox-${coupon._id}`} className="Z_checkbox_label"></label>
                                             </div>
                                         </td>
+                                        <td><span className="Z_coupon_code">{coupon.title || 'N/A'}</span></td>
+                                        <td>{coupon.discountPercentage ? `${coupon.discountPercentage}%` : (coupon.discountValue ? `$${coupon.discountValue}` : 'N/A')}</td>
+                                        <td>{formatDate(coupon.startDate)}</td>
+                                        <td>{formatDate(coupon.endDate)}</td>
                                         <td>
-                                            <div className="Z_product_info_cell">
-                                                <img src={coupon.image} alt={coupon.name} className="Z_table_product_img" />
-                                                <div>
-                                                    <div className="Z_table_product_name">{coupon.name}</div>
-                                                    <div className="Z_table_product_size">{coupon.category}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>{coupon.discount}</td>
-                                        <td><span className="Z_coupon_code">{coupon.code}</span></td>
-                                        <td>{coupon.startDate}</td>
-                                        <td>{coupon.endDate}</td>
-                                        <td>
-                                            <div >
-                                                <span className={`Z_coupon_status d-flex align-items-center ${coupon.status.toLowerCase()}`}>
-                                                {coupon.status === 'Active' ? (
+                                            <span className={`Z_coupon_status d-flex align-items-center ${coupon.status?.toLowerCase() || 'inactive'}`}>
+                                                {coupon.status?.toLowerCase() === 'active' ? (
                                                     <BsCheckAll className="me-1" size={14} />
                                                 ) : (
                                                     <AiOutlineClose className="me-1" size={14} />
                                                 )}
-                                                {coupon.status}
-                                                </span>
-                                            </div>
+                                                {coupon.status || 'N/A'}
+                                            </span>
                                         </td>
                                         <td>
                                             <div className="Z_action_buttons">
-                                                <button className="Z_action_btn Z_view_btn">
-                                                    <TbEye size={22}/>
+                                                <button
+                                                    className="Z_action_btn Z_edit_btn"
+                                                    onClick={() => navigate(`/coupons/edit/${coupon._id}`)}
+                                                >
+                                                    <TbEdit size={22} />
                                                 </button>
-                                                <button className="Z_action_btn Z_edit_btn">
-                                                    <TbEdit size={22}/>
-                                                </button>
-                                                <button className="Z_action_btn Z_delete_btn">
-                                                    <RiDeleteBin6Line size={22}/>
+                                                <button
+                                                    className="Z_action_btn Z_delete_btn"
+                                                    onClick={() => handleDeleteClick(coupon)}
+                                                >
+                                                    <RiDeleteBin6Line size={22} />
                                                 </button>
                                             </div>
                                         </td>
@@ -138,10 +222,38 @@ function ListCoupons(props) {
                                 ))}
                             </tbody>
                         </Table>
-                    </div>
+                    )}
                 </div>
-            </section>
-        </>
+            </div>
+
+            <Modal
+                show={showDeleteModal}
+                onHide={handleDeleteCancel}
+                centered
+                className='d_delete_model'
+            >
+                <Modal.Header closeButton className={isDarkMode ? 'dark-modal-header' : ''}>
+                    <Modal.Title>Delete Confirmation</Modal.Title>
+                </Modal.Header>
+                <Modal.Body className={isDarkMode ? 'dark-modal-body' : ''}>
+                    {deleteMultiple ? (
+                        <>
+                            Are you sure you want to delete <strong>{selectedCoupons.length}</strong> selected coupons?
+                        </>
+                    ) : (
+                        <>
+                            Are you sure you want to delete the coupon "<strong>{couponToDelete?.title || couponToDelete?.code || 'N/A'}</strong>"?
+                        </>
+                    )}
+                </Modal.Body>
+                <Modal.Footer className={isDarkMode ? 'dark-modal-footer' : ''}>
+                    <button className="Z_btn Z_btn_cancel" onClick={handleDeleteCancel} disabled={isLoading}>Cancel</button>
+                    <button className="Z_btn Z_btn_delete" onClick={handleDeleteConfirm} disabled={isLoading}>
+                        {isLoading ? 'Deleting...' : 'Delete'}
+                    </button>
+                </Modal.Footer>
+            </Modal>
+        </section>
     );
 }
 

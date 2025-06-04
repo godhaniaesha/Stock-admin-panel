@@ -1,4 +1,7 @@
- const {Product} = require('../model');
+const {Product} = require('../model');
+const Category = require('../model/category.model');
+const Subcategory = require('../model/subcategory.model');
+const Users = require('../model/Register.model');
 
 // Create a new product
 const createProduct = async (req, res) => {
@@ -43,7 +46,23 @@ const createProduct = async (req, res) => {
 // Get all products
 const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find().sort({ createdAt: -1 });
+        const products = await Product.find()
+            .populate({
+                path: 'categoryId',
+                model: 'Category',
+                select: 'title description image'
+            })
+            .populate({
+                path: 'subcategoryId',
+                model: 'Subcategory',
+                select: 'subcategoryTitle description image'
+            })
+            .populate({
+                path: 'sellerId',
+                model: 'usersaa',
+                select: 'username email phone role'
+            })
+            .sort({ createdAt: -1 });
 
         res.status(200).json({
             success: true,

@@ -33,7 +33,7 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
       throw new Error(data.message || 'Login failed');
     }
     console.log(data,"data");
-    localStorage.setItem("user",data.finduser)
+    localStorage.setItem("user",data.finduser._id)
     localStorage.setItem("token",data.accessToken)
     return data;
   } catch (err) {

@@ -22,11 +22,6 @@ const productSchema = new Schema({
     required: true,
     trim: true
   },
-  brand: {
-    type: Schema.Types.ObjectId,
-    ref: 'brand',
-    required: true
-  },
   weight: {
     type: String,
     trim: true
@@ -44,7 +39,6 @@ const productSchema = new Schema({
   sku: {
     type: String,
     unique: true,
-    required: true,
     trim: true
   },
   stock: {

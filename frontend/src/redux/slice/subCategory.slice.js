@@ -71,6 +71,30 @@ export const deleteSubcategory = createAsyncThunk(
     }
 );
 
+// Update subcategory
+export const updateSubcategory = createAsyncThunk(
+    'subcategory/update',
+    async ({ id, formData }, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch(`http://localhost:2221/api/a1/subcategory/updateSubcategory/${id}`, {
+                method: 'PUT',
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                body: formData
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to update subcategory');
+            }
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
+
 const subcategorySlice = createSlice({
     name: 'subcategory',
     initialState: {
@@ -123,6 +147,22 @@ const subcategorySlice = createSlice({
                 );
             })
             .addCase(deleteSubcategory.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+            // Update subcategory
+            .addCase(updateSubcategory.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(updateSubcategory.fulfilled, (state, action) => {
+                state.isLoading = false;
+                const index = state.subcategories.findIndex(sub => sub._id === action.payload._id);
+                if (index !== -1) {
+                    state.subcategories[index] = action.payload;
+                }
+            })
+            .addCase(updateSubcategory.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             });

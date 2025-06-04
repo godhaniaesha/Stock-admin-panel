@@ -4,6 +4,8 @@
 const createProduct = async (req, res) => {
     try {
         const productData = req.body;
+        console.log(req.body);
+        
 
         const existingSku = await Product.findOne({ sku: productData.sku });
         if (existingSku) {

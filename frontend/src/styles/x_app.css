@@ -824,7 +824,7 @@
 }
 
 .x_preview_img {
-    max-width: 100%;
+    max-width: 20%;
     max-height: 100%;
     object-fit: contain;
 }

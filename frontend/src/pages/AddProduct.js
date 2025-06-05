@@ -404,7 +404,7 @@ const AddProduct = () => {
                                 </div>
                             </div>
 
-                            <div className="x_form_row">
+                            {/* <div className="x_form_row">
                                 <div className="x_size_section x_form_group">
                                     <label>Size:</label>
                                     <div className="x_size_buttons">
@@ -422,7 +422,7 @@ const AddProduct = () => {
                                         ))}
                                     </div>
                                 </div>
-                            </div>
+                            </div> */}
 
                             <div className="x_form_row">
                                 <div className="x_form_group x_full_width">

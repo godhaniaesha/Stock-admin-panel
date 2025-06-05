@@ -34,7 +34,7 @@ export const fetchProducts = createAsyncThunk(
                     'Content-Type': 'application/json'
                 }
             });
-            console.log(response.data,"response.data");
+            console.log(response.data,"fetch product");
             return response.data;
             
         } catch (error) {

@@ -76,7 +76,7 @@ function UserRoutes() {
                     <Route path="products" element={<ProductGrid />} />
                     <Route path="products/details" element={<ProductDetails />} />
                     <Route path="products/add" element={<AddProduct />} />
-                    <Route path="products/edit" element={<EditProduct />} />
+                    <Route path="products/edit/:id" element={<EditProduct />} />
                     <Route path="products/view" element={<ProductList />} />
 
                     <Route path="coupons" element={<ListCoupons />} />

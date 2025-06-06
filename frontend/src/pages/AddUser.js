@@ -1,10 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/x_app.css';
-import { useOutletContext } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { useOutletContext, useNavigate } from 'react-router-dom';
+import { db_createUser } from '../redux/slice/userSlice';
 
 const AddUser = () => {
     const { isDarkMode } = useOutletContext();
-    const [userData, setUserData] = useState({
+    const dispatch = useDispatch();
+    const navigate = useNavigate();
+    const { isLoading = false, isSuccess = false, error: apiError } = useSelector((state) => state.user || {});
+
+    const initialUserData = {
         firstName: '',
         lastName: '',
         email: '',
@@ -17,79 +23,180 @@ const AddUser = () => {
         country: '',
         role: '',
         password: '',
-        confirmPassword: ''
-    });
+        confirmPassword: '',
+        profileImage:''
+    };
 
+    const [userData, setUserData] = useState(initialUserData);
     const [userImage, setUserImage] = useState(null);
+    const [previewImage, setPreviewImage] = useState(null);
     const [error, setError] = useState('');
+    const [showPassword, setShowPassword] = useState(false);
+    const [showConfirmPassword, setShowConfirmPassword] = useState(false);
     const [isGenderOpen, setIsGenderOpen] = useState(false);
     const [isRoleOpen, setIsRoleOpen] = useState(false);
-     // Add these two new state variables for password visibility
-     const [showPassword, setShowPassword] = useState(false);
-     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
-    const genderOptions = [
-        { value: 'male', label: 'Male' },
-        { value: 'female', label: 'Female' },
-        { value: 'other', label: 'Other' }
-    ];
+    const genderOptions = ['male', 'female', 'other'];
+    const roleOptions = ['admin', 'seller', 'staff', 'user'];
 
-    const roleOptions = [
-        { value: 'admin', label: 'Admin' },
-        { value: 'manager', label: 'Manager' },
-        { value: 'staff', label: 'Staff' }
-    ];
+    // Handle successful user creation
+    useEffect(() => {
+        if (isSuccess) {
+            // Reset form
+            resetForm();
+            // Redirect to users page
+            navigate('/users');
+        }
+    }, [isSuccess, navigate]);
+
+    // Display API errors
+    useEffect(() => {
+        if (apiError) {
+            setError(typeof apiError === 'string' ? apiError : 'An error occurred while creating user');
+        }
+    }, [apiError]);
+
+    const resetForm = () => {
+        setUserData(initialUserData);
+        setUserImage(null);
+        setPreviewImage(null);
+        setError('');
+        setShowPassword(false);
+        setShowConfirmPassword(false);
+        setIsGenderOpen(false);
+        setIsRoleOpen(false);
+        
+        // Clear file input
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput) {
+            fileInput.value = '';
+        }
+        
+        // Clean up preview image URL to prevent memory leaks
+        if (previewImage) {
+            URL.revokeObjectURL(previewImage);
+        }
+    };
+
+    const handleInputChange = (e) => {
+        const { name, value } = e.target;
+        setUserData((prev) => ({ ...prev, [name]: value }));
+        
+        // Clear error when user starts typing
+        if (error) {
+            setError('');
+        }
+    };
 
     const handleGenderSelect = (value) => {
-        setUserData(prev => ({ ...prev, gender: value }));
+        setUserData((prev) => ({ ...prev, gender: value }));
         setIsGenderOpen(false);
     };
 
     const handleRoleSelect = (value) => {
-        setUserData(prev => ({ ...prev, role: value }));
+        setUserData((prev) => ({ ...prev, role: value }));
         setIsRoleOpen(false);
     };
 
     const validateAndHandleFile = (file) => {
         setError('');
-
-        if (!file) {
-            setError('Please select a file');
-            return;
-        }
+        if (!file) return setError('Please select a file');
 
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (!validTypes.includes(file.type)) {
-            setError('Invalid file type. Only PNG, JPG and JPEG are allowed');
-            return;
+            return setError('Only PNG, JPG, JPEG are allowed');
         }
 
-        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+        const maxSize = 5 * 1024 * 1024;
         if (file.size > maxSize) {
-            setError('File size exceeds 5MB limit');
+            return setError('Image size must be under 5MB');
+        }
+
+        // Clean up previous preview image URL
+        if (previewImage) {
+            URL.revokeObjectURL(previewImage);
+        }
+
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setUserImage(reader.result);
+        };
+        reader.readAsDataURL(file);
+        setPreviewImage(URL.createObjectURL(file));
+    };
+
+    const validateForm = () => {
+        const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'password', 'confirmPassword'];
+        
+        for (let field of requiredFields) {
+            if (!userData[field].trim()) {
+                setError(`${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} is required`);
+                return false;
+            }
+        }
+
+        if (userData.password !== userData.confirmPassword) {
+            setError("Passwords do not match");
+            return false;
+        }
+
+        if (userData.password.length < 6) {
+            setError("Password must be at least 6 characters long");
+            return false;
+        }
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(userData.email)) {
+            setError("Please enter a valid email address");
+            return false;
+        }
+
+        return true;
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+
+        if (!validateForm()) {
             return;
         }
 
-        const imageUrl = URL.createObjectURL(file);
-        setUserImage(imageUrl);
+        const payload = {
+            ...userData,
+            profileImage: userImage
+        };
+
+        console.log(payload, "payload");
+        
+        try {
+            await dispatch(db_createUser(payload)).unwrap();
+            // Reset form after successful creation
+            navigate("/users")
+            resetForm();
+            // Optional: Show success message
+            setError(''); // Clear any existing errors
+        } catch (error) {
+            // Handle error case
+            setError(error?.message || 'Failed to create user. Please try again.');
+        }
     };
 
-    const handleInputChange = (e) => {
-        const { name, value } = e.target;
-        setUserData(prev => ({
-            ...prev,
-            [name]: value
-        }));
+    const handleCancel = () => {
+        if (window.confirm('Are you sure you want to cancel? All unsaved changes will be lost.')) {
+            navigate('/users');
+        }
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
+    const handleReset = () => {
+        if (window.confirm('Are you sure you want to reset the form? All data will be cleared.')) {
+            resetForm();
+        }
     };
 
     return (
         <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
             <div className="x_add_product_container">
-                {/* Image Upload Section */}
+                {/* Upload Image Section */}
                 <div className="x_upload_section">
                     <h2 className="x_product_title">Add User Photo</h2>
                     <div className="x_upload_container x_form_p">
@@ -107,274 +214,246 @@ const AddUser = () => {
                                 id="fileInput"
                                 className="x_hidden_input"
                                 onChange={(e) => validateAndHandleFile(e.target.files[0])}
-                                accept=".png, .jpg, .jpeg"
+                                accept=".png,.jpg,.jpeg"
                             />
                             <div className="x_upload_content">
-                                <div className="x_upload_icon">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent-green)">
-                                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
-                                    </svg>
-                                </div>
-                                <p className="x_upload_text">Drop your image here, or <span className="x_browse_text">click to browse</span></p>
-                                <p className="x_upload_hint">Maximum file size: 5MB. Allowed formats: PNG, JPG, JPEG</p>
-                                {error && <p className="x_error_message">{error}</p>}
+                                {previewImage && <img src={previewImage} alt="Preview" className="x_preview_image" />}
+                                {!previewImage && (
+                                    <>
+                                        <div className="x_upload_icon">📁</div>
+                                        <p className="x_upload_text">Drop your image here, or <span className="x_browse_text">click to browse</span></p>
+                                        <p className="x_upload_hint">Max size: 5MB. PNG/JPG/JPEG only.</p>
+                                    </>
+                                )}
                             </div>
                         </div>
+                        {previewImage && (
+                            <button 
+                                type="button" 
+                                className="x_btn x_btn_secondary mt-2" 
+                                onClick={() => {
+                                    URL.revokeObjectURL(previewImage);
+                                    setPreviewImage(null);
+                                    setUserImage(null);
+                                    document.getElementById('fileInput').value = '';
+                                }}
+                            >
+                                Remove Image
+                            </button>
+                        )}
                     </div>
                 </div>
 
-                {/* User Information Form */}
+                {/* User Info Form */}
                 <div className="x_product_form">
                     <div className="x_product_info">
                         <h2 className="x_product_title">User Information</h2>
-
-                        <div className='x_form_p'>
-                            <div className="x_form_row">
-                                <div className="x_form_group">
-                                    <label>First Name</label>
-                                    <input
-                                        type="text"
-                                        name="firstName"
-                                        placeholder="First Name"
-                                        value={userData.firstName}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
-                                </div>
-                                <div className="x_form_group">
-                                    <label>Last Name</label>
-                                    <input
-                                        type="text"
-                                        name="lastName"
-                                        placeholder="Last Name"
-                                        value={userData.lastName}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="x_form_row">
-                                <div className="x_form_group">
-                                    <label>Email</label>
-                                    <input
-                                        type="email"
-                                        name="email"
-                                        placeholder="Email Address"
-                                        value={userData.email}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
-                                </div>
-                                <div className="x_form_group">
-                                    <label>Phone</label>
-                                    <input
-                                        type="tel"
-                                        name="phone"
-                                        placeholder="Phone Number"
-                                        value={userData.phone}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="x_form_row">
-                                <div className="x_form_group">
-                                    <label>Birthdate</label>
-                                    <input
-                                        type="date"
-                                        name="birthdate"
-                                        value={userData.birthdate}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
-                                </div>
-                                <div className="x_form_group">
-                                    <label>Gender</label>
-                                    <div className="x_custom_dropdown">
-                                        <div
-                                            className="x_dropdown_header"
-                                            onClick={() => setIsGenderOpen(!isGenderOpen)}
-                                        >
-                                            <span>{userData.gender || 'Select Gender'}</span>
-                                            <svg
-                                                className={`x_dropdown_arrow ${isGenderOpen ? 'open' : ''}`}
-                                                width="10"
-                                                height="6"
-                                                viewBox="0 0 10 6"
-                                            >
-                                                <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                                            </svg>
-                                        </div>
-                                        {isGenderOpen && (
-                                            <div className="x_dropdown_options">
-                                                {genderOptions.map((option) => (
-                                                    <div
-                                                        key={option.value}
-                                                        className="x_dropdown_option"
-                                                        onClick={() => handleGenderSelect(option.value)}
-                                                    >
-                                                        {option.label}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="x_form_row">
-                                <div className="x_form_group x_full_width">
-                                    <label>Address</label>
-                                    <textarea
-                                        name="address"
-                                        placeholder="Full Address"
-                                        value={userData.address}
-                                        onChange={handleInputChange}
-                                        className="x_textarea"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="x_form_row">
-                                <div className="x_form_group">
-                                    <label>City</label>
-                                    <input
-                                        type="text"
-                                        name="city"
-                                        placeholder="City"
-                                        value={userData.city}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
-                                </div>
-                                <div className="x_form_group">
-                                    <label>State</label>
-                                    <input
-                                        type="text"
-                                        name="state"
-                                        placeholder="State"
-                                        value={userData.state}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
-                                </div>
-                            </div>
-
-                            <div className="x_form_row">
-                                <div className="x_form_group">
-                                    <label>Country</label>
-                                    <input
-                                        type="text"
-                                        name="country"
-                                        placeholder="Country"
-                                        value={userData.country}
-                                        onChange={handleInputChange}
-                                        className="x_input"
-                                    />
-                                </div>
-                                <div className="x_form_group">
-                                    <label>Role</label>
-                                    <div className="x_custom_dropdown">
-                                        <div
-                                            className="x_dropdown_header"
-                                            onClick={() => setIsRoleOpen(!isRoleOpen)}
-                                        >
-                                            <span>{userData.role || 'Select Role'}</span>
-                                            <svg
-                                                className={`x_dropdown_arrow ${isRoleOpen ? 'open' : ''}`}
-                                                width="10"
-                                                height="6"
-                                                viewBox="0 0 10 6"
-                                            >
-                                                <path d="M1 1L5 5L9 1" stroke="currentColor" strokeWidth="1.5" fill="none" />
-                                            </svg>
-                                        </div>
-                                        {isRoleOpen && (
-                                            <div className="x_dropdown_options">
-                                                {roleOptions.map((option) => (
-                                                    <div
-                                                        key={option.value}
-                                                        className="x_dropdown_option"
-                                                        onClick={() => handleRoleSelect(option.value)}
-                                                    >
-                                                        {option.label}
-                                                    </div>
-                                                ))}
-                                            </div>
-                                        )}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="x_form_row">
-                                <div className="x_form_group">
-                                    <label>Password</label>
-                                    <div className="x_password_input_wrapper">
-                                        <input
-                                            type={showPassword ? "text" : "password"}
-                                            name="password"
-                                            placeholder="Enter Password"
-                                            value={userData.password}
-                                            onChange={handleInputChange}
+                        <form onSubmit={handleSubmit}>
+                            <div className='x_form_p'>
+                                {/* Row 1 */}
+                                <div className="x_form_row">
+                                    <div className="x_form_group">
+                                        <label>First Name <span className="text-danger">*</span></label>
+                                        <input 
+                                            name="firstName" 
+                                            value={userData.firstName} 
+                                            onChange={handleInputChange} 
                                             className="x_input"
+                                            required
                                         />
-                                        <div 
-                                            className="x_password_toggle"
-                                            onClick={() => setShowPassword(!showPassword)}
-                                        >
-                                            {showPassword ? (
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                    <circle cx="12" cy="12" r="3"></circle>
-                                                </svg>
-                                            ) : (
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                                                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                                                </svg>
+                                    </div>
+                                    <div className="x_form_group">
+                                        <label>Last Name <span className="text-danger">*</span></label>
+                                        <input 
+                                            name="lastName" 
+                                            value={userData.lastName} 
+                                            onChange={handleInputChange} 
+                                            className="x_input"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                {/* Row 2 */}
+                                <div className="x_form_row">
+                                    <div className="x_form_group">
+                                        <label>Email <span className="text-danger">*</span></label>
+                                        <input 
+                                            name="email" 
+                                            type="email" 
+                                            value={userData.email} 
+                                            onChange={handleInputChange} 
+                                            className="x_input"
+                                            required
+                                        />
+                                    </div>
+                                    <div className="x_form_group">
+                                        <label>Phone <span className="text-danger">*</span></label>
+                                        <input 
+                                            name="phone" 
+                                            type="tel" 
+                                            value={userData.phone} 
+                                            onChange={handleInputChange} 
+                                            className="x_input"
+                                            required
+                                        />
+                                    </div>
+                                </div>
+                                {/* Row 3 */}
+                                <div className="x_form_row">
+                                    <div className="x_form_group">
+                                        <label>Birthdate</label>
+                                        <input 
+                                            name="birthdate" 
+                                            type="date" 
+                                            value={userData.birthdate} 
+                                            onChange={handleInputChange} 
+                                            className="x_input" 
+                                        />
+                                    </div>
+                                    <div className="x_form_group">
+                                        <label>Gender</label>
+                                        <div className="x_custom_dropdown">
+                                            <div className="x_dropdown_header" onClick={() => setIsGenderOpen(!isGenderOpen)}>
+                                                <span>{userData.gender || "Select Gender"}</span>
+                                            </div>
+                                            {isGenderOpen && (
+                                                <div className="x_dropdown_options">
+                                                    {genderOptions.map((g) => (
+                                                        <div key={g} className="x_dropdown_option" onClick={() => handleGenderSelect(g)}>
+                                                            {g}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             )}
                                         </div>
                                     </div>
                                 </div>
-                                <div className="x_form_group">
-                                    <label>Confirm Password</label>
-                                    <div className="x_password_input_wrapper">
-                                        <input
-                                            type={showConfirmPassword ? "text" : "password"}
-                                            name="confirmPassword"
-                                            placeholder="Confirm Password"
-                                            value={userData.confirmPassword}
-                                            onChange={handleInputChange}
-                                            className="x_input"
+                                {/* Row 4 */}
+                                <div className="x_form_row">
+                                    <div className="x_form_group x_full_width">
+                                        <label>Address</label>
+                                        <textarea 
+                                            name="address" 
+                                            value={userData.address} 
+                                            onChange={handleInputChange} 
+                                            className="x_textarea" 
                                         />
-                                        <div 
-                                            className="x_password_toggle"
-                                            onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                                        >
-                                            {showConfirmPassword ? (
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                    <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"></path>
-                                                    <circle cx="12" cy="12" r="3"></circle>
-                                                </svg>
-                                            ) : (
-                                                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor">
-                                                    <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"></path>
-                                                    <line x1="1" y1="1" x2="23" y2="23"></line>
-                                                </svg>
+                                    </div>
+                                </div>
+                                {/* Row 5 */}
+                                <div className="x_form_row">
+                                    <div className="x_form_group">
+                                        <label>City</label>
+                                        <input 
+                                            name="city" 
+                                            value={userData.city} 
+                                            onChange={handleInputChange} 
+                                            className="x_input" 
+                                        />
+                                    </div>
+                                    <div className="x_form_group">
+                                        <label>State</label>
+                                        <input 
+                                            name="state" 
+                                            value={userData.state} 
+                                            onChange={handleInputChange} 
+                                            className="x_input" 
+                                        />
+                                    </div>
+                                </div>
+                                {/* Row 6 */}
+                                <div className="x_form_row">
+                                    <div className="x_form_group">
+                                        <label>Country</label>
+                                        <input 
+                                            name="country" 
+                                            value={userData.country} 
+                                            onChange={handleInputChange} 
+                                            className="x_input" 
+                                        />
+                                    </div>
+                                    <div className="x_form_group">
+                                        <label>Role</label>
+                                        <div className="x_custom_dropdown">
+                                            <div className="x_dropdown_header" onClick={() => setIsRoleOpen(!isRoleOpen)}>
+                                                <span>{userData.role || "Select Role"}</span>
+                                            </div>
+                                            {isRoleOpen && (
+                                                <div className="x_dropdown_options">
+                                                    {roleOptions.map((r) => (
+                                                        <div key={r} className="x_dropdown_option" onClick={() => handleRoleSelect(r)}>
+                                                            {r}
+                                                        </div>
+                                                    ))}
+                                                </div>
                                             )}
                                         </div>
                                     </div>
                                 </div>
+                                {/* Row 7 */}
+                                <div className="x_form_row">
+                                    <div className="x_form_group">
+                                        <label>Password <span className="text-danger">*</span></label>
+                                        <div className="x_password_input_wrapper">
+                                            <input
+                                                type={showPassword ? "text" : "password"}
+                                                name="password"
+                                                value={userData.password}
+                                                onChange={handleInputChange}
+                                                className="x_input"
+                                                required
+                                                minLength="6"
+                                            />
+                                            <div onClick={() => setShowPassword(!showPassword)} className="x_password_toggle">👁</div>
+                                        </div>
+                                    </div>
+                                    <div className="x_form_group">
+                                        <label>Confirm Password <span className="text-danger">*</span></label>
+                                        <div className="x_password_input_wrapper">
+                                            <input
+                                                type={showConfirmPassword ? "text" : "password"}
+                                                name="confirmPassword"
+                                                value={userData.confirmPassword}
+                                                onChange={handleInputChange}
+                                                className="x_input"
+                                                required
+                                            />
+                                            <div onClick={() => setShowConfirmPassword(!showConfirmPassword)} className="x_password_toggle">👁</div>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                {error && <p className="x_error_message">{error}</p>}
                             </div>
-                        </div>
+                        </form>
                     </div>
                 </div>
 
+                {/* Buttons */}
                 <div className="x_btn_wrapper mt-3">
-                    <button type="submit" className="x_btn x_btn_create">Create User</button>
-                    <button type="button" className="x_btn x_btn_cancel">Cancel</button>
+                    <button 
+                        className="x_btn x_btn_create" 
+                        onClick={handleSubmit} 
+                        disabled={isLoading}
+                    >
+                        {isLoading ? "Creating..." : "Create User"}
+                    </button>
+                    <button 
+                        type="button" 
+                        className="x_btn x_btn_secondary mr-2" 
+                        onClick={handleReset}
+                        disabled={isLoading}
+                    >
+                        Reset Form
+                    </button>
+                    <button 
+                        type="button" 
+                        className="x_btn x_btn_cancel" 
+                        onClick={handleCancel}
+                        disabled={isLoading}
+                    >
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>

@@ -27,3 +27,9 @@ input:focus-visible,.nav-item:focus-visible{
   outline: none !important;
 }
 
+.form-control:focus,.form-select:focus {
+    background-color: var(--bs-body-bg);
+    border-color: #8794a7 !important; 
+    outline: 0;
+    box-shadow: 0 0 0 .25rem rgba(13, 109, 253, 0) !important;
+}

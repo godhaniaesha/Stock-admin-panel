@@ -5,6 +5,7 @@ import authReducer from '../slice/auth.slice';
 import subcategoryReducer from '../slice/subCategory.slice';
 import productReducer from '../slice/product.slice';
 import couponReducer from '../slice/coupon.slice';
+import userReducer from '../slice/userSlice';
 
 export const rootReducer = combineReducers({
     addCategory: addCategoryReducer,
@@ -12,7 +13,8 @@ export const rootReducer = combineReducers({
     auth: authReducer,
     subcategory: subcategoryReducer,
     product: productReducer,
-    coupon:couponReducer
+    coupon:couponReducer,
+    user:userReducer
 });
 
 export default rootReducer;

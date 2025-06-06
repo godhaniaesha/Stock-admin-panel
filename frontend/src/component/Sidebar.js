@@ -14,6 +14,7 @@ import { BsFillGrid1X2Fill } from "react-icons/bs";
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/admin.css';  
 import { TbListDetails } from 'react-icons/tb';
+import { BiDetail } from 'react-icons/bi';
 
 const Sidebar = ({ show, isDarkMode }) => {
   const location = useLocation();
@@ -115,8 +116,9 @@ const Sidebar = ({ show, isDarkMode }) => {
       icon: <FaUsers size={18} />,
       submenu: [
         { title: 'User List', path: '/users', icon: <FaUsers size={16} /> },
-        { title: 'User Roles', path: '/user-roles', icon: <FaUserCog size={16} /> },
-        { title: 'Add User', path: '/add-user', icon: <FaUserPlus size={16} /> }
+        // { title: 'User Roles', path: '/user-roles', icon: <FaUserCog size={16} /> },
+        { title: 'Add User', path: '/add-user', icon: <FaUserPlus size={16} /> },
+        { title: 'User Detail', path: '/userdetail', icon: <BiDetail size={16} /> }
       ]
     },
  

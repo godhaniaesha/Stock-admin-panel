@@ -1,8 +1,26 @@
-const {Wishlist} = require('../model');
+const { Wishlist } = require('../model');
+const mongoose = require('mongoose');
 
 const addToWishlist = async (req, res) => {
   try {
     const { userId, productId } = req.body;
+    console.log(userId, productId, "userId, productId");
+
+    // Validate if userId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID format'
+      });
+    }
+
+    // Validate if productId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(productId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid product ID format'
+      });
+    }
 
     const existing = await Wishlist.findOne({ userId, productId });
     if (existing) {
@@ -21,17 +39,55 @@ const addToWishlist = async (req, res) => {
 const getWishlist = async (req, res) => {
   try {
     const { userId } = req.params;
-    const items = await Wishlist.find({ userId }).populate('productId');
 
+    // Validate if userId is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(userId)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid user ID format'
+      });
+    }
+
+    const items = await Wishlist.find({ userId }).populate('productId');
     res.status(200).json({ success: true, data: items });
   } catch (error) {
     res.status(500).json({ success: false, message: 'Error retrieving wishlist', error: error.message });
   }
 };
 
+const getAllWishlists = async (req, res) => {
+  try {
+    const items = await Wishlist.find()
+      .populate('productId')
+      .populate('userId', 'name email') // Assuming you want to include user details
+      .sort({ createdAt: -1 }); // Sort by newest first
+
+    res.status(200).json({
+      success: true,
+      data: items,
+      count: items.length
+    });
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: 'Error retrieving all wishlists',
+      error: error.message
+    });
+  }
+};
+
 const removeFromWishlist = async (req, res) => {
   try {
     const { id } = req.params;
+
+    // Validate if id is a valid ObjectId
+    if (!mongoose.Types.ObjectId.isValid(id)) {
+      return res.status(400).json({
+        success: false,
+        message: 'Invalid wishlist item ID format'
+      });
+    }
+
     const removed = await Wishlist.findByIdAndDelete(id);
 
     if (!removed) {
@@ -47,5 +103,6 @@ const removeFromWishlist = async (req, res) => {
 module.exports = {
   addToWishlist,
   getWishlist,
-  removeFromWishlist
+  removeFromWishlist,
+  getAllWishlists
 };

@@ -7,6 +7,9 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts } from '../redux/slice/product.slice';
 import { fetchCategories } from '../redux/slice/category.slice';
+import { fetchSubcategories } from '../redux/slice/subCategory.slice';
+import { addToWishlist } from '../redux/slice/wishlist.slice';
+import { addToCart } from '../redux/slice/cart.slice';
 
 function ProductGrid() {
     const { isDarkMode } = useOutletContext();
@@ -18,14 +21,20 @@ function ProductGrid() {
     const [selectedSubcategories, setSelectedSubcategories] = useState([]);
     const [selectedPriceRange, setSelectedPriceRange] = useState('');
     const [selectedRating, setSelectedRating] = useState('');
+    const [searchQuery, setSearchQuery] = useState('');
 
     const { products, isLoading, error } = useSelector((state) => state.product);
     const { categories, isLoading: categoriesLoading } = useSelector((state) => state.category);
+    const { subcategories, isLoading: subcategoriesLoading } = useSelector((state) => state.subcategory);
+    const { wishlistItems } = useSelector((state) => state.wishlist);
+    const { user } = useSelector((state) => state.auth);
+    console.log(subcategories,"subcategories");
     console.log(categories,"categories");
 
     useEffect(() => {
         dispatch(fetchProducts());
         dispatch(fetchCategories());
+        dispatch(fetchSubcategories());
     }, [dispatch]);
 
     const toggleFilter = (filterName) => {
@@ -74,6 +83,18 @@ function ProductGrid() {
         navigate('/products/add');
     };
 
+    const handleResetFilters = () => {
+        setSelectedCategories([]);
+        setSelectedSubcategories([]);
+        setSelectedPriceRange('');
+        setSelectedRating('');
+        dispatch(fetchProducts());
+    };
+
+    const handleSearch = (e) => {
+        setSearchQuery(e.target.value);
+    };
+
     const filterProductsByPrice = (products) => {
         if (!selectedPriceRange) return products;
 
@@ -102,16 +123,46 @@ function ProductGrid() {
     const filteredProducts = filterProductsByRating(
         filterProductsByPrice(
             products.filter(product => {
+                // Search filter
+                const searchMatch = product.productName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.description?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.categoryId?.title?.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                    product.subcategoryId?.title?.toLowerCase().includes(searchQuery.toLowerCase());
+
+                // Category and subcategory filters
                 const categoryMatch = selectedCategories.length === 0 || 
                     selectedCategories.includes(product.categoryId._id);
                 const subcategoryMatch = selectedSubcategories.length === 0 || 
                     selectedSubcategories.includes(product.subcategoryId._id);
-                return categoryMatch && subcategoryMatch;
+
+                return searchMatch && categoryMatch && subcategoryMatch;
             })
         )
     );
 
-    if (isLoading || categoriesLoading) {
+    const handleWishlistToggle = (product) => {
+        const userId = localStorage.getItem('user');
+        console.log(userId, "userId");
+        if (!userId) {
+            return;
+        }
+        dispatch(addToWishlist({ userId, productId: product._id }));
+    };
+
+    const handleAddToCart = (product) => {
+        const userId = localStorage.getItem('user');
+        if (!userId) {
+            alert('Please login to add items to cart');
+            return;
+        }
+        dispatch(addToCart({ 
+            userId: userId, 
+            productId: product._id, 
+            quantity: 1 
+        }));
+    };
+
+    if (isLoading || categoriesLoading || subcategoriesLoading) {
         return <div className="text-center p-5">Loading...</div>;
     }
 
@@ -129,8 +180,10 @@ function ProductGrid() {
                             <div className='Z_input_grp'>
                                 <InputGroup>
                                     <Form.Control
-                                        placeholder="Search..."
+                                        placeholder="Search products..."
                                         className="Z_search_input"
+                                        value={searchQuery}
+                                        onChange={handleSearch}
                                     />
                                     <InputGroup.Text className="Z_search_icon">
                                         <BiSearchAlt size={20} />
@@ -211,18 +264,21 @@ function ProductGrid() {
                                         checked={selectedSubcategories.length === 0}
                                         onChange={() => setSelectedSubcategories([])}
                                     />
-                                    {categories && categories.map((category) => (
-                                        category.subcategories && category.subcategories.map((subcategory) => (
+                                    {subcategories && subcategories
+                                        .filter(subcategory => 
+                                            selectedCategories.length === 0 || 
+                                            selectedCategories.includes(subcategory.category._id)
+                                        )
+                                        .map((subcategory) => (
                                             <Form.Check
                                                 key={subcategory._id}
                                                 type="checkbox"
-                                                label={subcategory.title}
+                                                label={`${subcategory.category.title} - ${subcategory.subcategoryTitle}`}
                                                 className="Z_filter_option"
                                                 checked={selectedSubcategories.includes(subcategory._id)}
                                                 onChange={() => handleSubcategoryChange(subcategory._id)}
                                             />
-                                        ))
-                                    ))}
+                                        ))}
                                 </div>
                             </div>
 
@@ -316,9 +372,14 @@ function ProductGrid() {
                                 </div>
                             </div>
 
-                            <button className="Z_apply_button" onClick={handleApplyFilters}>
-                                Apply
-                            </button>
+                            <div className="d-flex gap-2">
+                                {/* <button className="Z_apply_button" onClick={handleApplyFilters}>
+                                    Apply
+                                </button> */}
+                                <button className="Z_apply_button" onClick={handleResetFilters}>
+                                    Reset
+                                </button>
+                            </div>
                         </div>
                     </Col>
 
@@ -335,8 +396,10 @@ function ProductGrid() {
                             <div className='Z_input_grp mb-4'>
                                 <InputGroup>
                                     <Form.Control
-                                        placeholder="Search..."
+                                        placeholder="Search products..."
                                         className="Z_search_input"
+                                        value={searchQuery}
+                                        onChange={handleSearch}
                                     />
                                     <InputGroup.Text className="Z_search_icon">
                                         <BiSearchAlt size={20} />
@@ -391,18 +454,21 @@ function ProductGrid() {
                                             checked={selectedSubcategories.length === 0}
                                             onChange={() => setSelectedSubcategories([])}
                                         />
-                                        {categories && categories.map((category) => (
-                                            category.subcategories && category.subcategories.map((subcategory) => (
+                                        {subcategories && subcategories
+                                            .filter(subcategory => 
+                                                selectedCategories.length === 0 || 
+                                                selectedCategories.includes(subcategory.category._id)
+                                            )
+                                            .map((subcategory) => (
                                                 <Form.Check
                                                     key={subcategory._id}
                                                     type="checkbox"
-                                                    label={subcategory.title}
+                                                    label={`${subcategory.category.title} - ${subcategory.subcategoryTitle}`}
                                                     className="Z_filter_option"
                                                     checked={selectedSubcategories.includes(subcategory._id)}
                                                     onChange={() => handleSubcategoryChange(subcategory._id)}
                                                 />
-                                            ))
-                                        ))}
+                                            ))}
                                     </div>
                                 </div>
 
@@ -496,9 +562,14 @@ function ProductGrid() {
                                     </div>
                                 </div>
 
-                                <button className="Z_apply_button" onClick={handleApplyFilters}>
-                                    Apply
-                                </button>
+                                <div className="d-flex gap-2">
+                                    <button className="Z_apply_button" onClick={handleApplyFilters}>
+                                        Apply
+                                    </button>
+                                    <button className="Z_reset_button" onClick={handleResetFilters}>
+                                        Reset
+                                    </button>
+                                </div>
                             </div>
                         </Offcanvas.Body>
                     </Offcanvas>
@@ -535,10 +606,16 @@ function ProductGrid() {
                                                 <span className="Z_rating_count">({product.reviews || 0} Reviews)</span>
                                             </div>
                                             <div className="Z_card_actions">
-                                                <Button className="Z_add_to_cart_btn">
+                                                <Button 
+                                                    className="Z_add_to_cart_btn"
+                                                    onClick={() => handleAddToCart(product)}
+                                                >
                                                     Add To Cart
                                                 </Button>
-                                                <button className="Z_card_wishlist_btn">
+                                                <button 
+                                                    className={`Z_card_wishlist_btn ${wishlistItems?.some(item => item.productId._id === product._id) ? 'active' : ''}`}
+                                                    onClick={() => handleWishlistToggle(product)}
+                                                >
                                                     <FaHeart />
                                                 </button>
                                             </div>

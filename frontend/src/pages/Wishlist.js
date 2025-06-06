@@ -1,56 +1,32 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 import '../styles/Z_styles.css';
 import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { useOutletContext } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllWishlists, removeFromWishlist } from '../redux/slice/wishlist.slice';
 
 function Wishlist() {
     const { isDarkMode } = useOutletContext();
-    const wishlistItems = [
-        {
-            id: 1,
-            image: "https://images.unsplash.com/photo-1521572163474-6864f9cf17ab",
-            name: "Classic White Sneakers",
-            size: "US 7",
-            price: "$95.00",
-            stock: {
-                left: 324,
-                sold: 178
-            },
-            category: "Footwear",
-            rating: 4.7,
-            reviews: 89
-        },
-        {
-            id: 2,
-            image: "https://images.unsplash.com/photo-1584917865442-de89df76afd3",
-            name: "Leather Crossbody Bag",
-            size: "Standard",
-            price: "$149.99",
-            stock: {
-                left: 156,
-                sold: 243
-            },
-            category: "Accessories",
-            rating: 4.8,
-            reviews: 167
-        },
-        {
-            id: 3,
-            image: "https://images.unsplash.com/photo-1578932750294-f5075e85f44a",
-            name: "Denim Jacket",
-            size: "M",
-            price: "$89.99",
-            stock: {
-                left: 428,
-                sold: 312
-            },
-            category: "Fashion",
-            rating: 4.5,
-            reviews: 234
-        }
-    ];
+    const dispatch = useDispatch();
+    const { items: wishlistItems, loading, error } = useSelector((state) => state.wishlist);
+
+    useEffect(() => {
+        dispatch(getAllWishlists());
+    }, [dispatch]);
+
+    const handleDelete = (id) => {
+        dispatch(removeFromWishlist(id));
+    };
+
+    if (loading) {
+        return <div className="text-center p-5">Loading...</div>;
+    }
+
+    if (error) {
+        return <div className="text-center p-5 text-danger">Error: {error}</div>;
+    }
 
     return (
         <>
@@ -85,44 +61,44 @@ function Wishlist() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {wishlistItems.map((item) => (
-                                    <tr key={item.id}>
+                                {wishlistItems?.map((item) => (
+                                    <tr key={item._id}>
                                         <td>
                                             <div className="Z_custom_checkbox">
                                                 <input 
                                                     type="checkbox" 
-                                                    id={`checkbox-${item.id}`} 
+                                                    id={`checkbox-${item._id}`} 
                                                     className="Z_checkbox_input" 
                                                 />
                                                 <label 
-                                                    htmlFor={`checkbox-${item.id}`} 
+                                                    htmlFor={`checkbox-${item._id}`} 
                                                     className="Z_checkbox_label"
                                                 ></label>
                                             </div>
                                         </td>
                                         <td>
                                             <div className="Z_product_info_cell">
-                                                <img src={item.image} alt={item.name} className="Z_table_product_img" />
+                                                <img src={item.productId?.images?.[0] || 'https://via.placeholder.com/400x400'} alt={item.productId?.productName} className="Z_table_product_img" />
                                                 <div>
-                                                    <div className="Z_table_product_name">{item.name}</div>
-                                                    <div className="Z_table_product_size">Size: {item.size}</div>
+                                                    <div className="Z_table_product_name">{item.productId?.productName}</div>
+                                                    <div className="Z_table_product_size">Size: {item.productId?.size || 'Standard'}</div>
                                                 </div>
                                             </div>
                                         </td>
-                                        <td>{item.price}</td>
+                                        <td>${item.productId?.price}</td>
                                         <td>
                                             <div className="Z_stock_info">
-                                                <div>{item.stock.left} Items Left</div>
-                                                <div className="Z_stock_sold">{item.stock.sold} Sold</div>
+                                                <div>{item.productId?.stock || 0} Items Left</div>
+                                                <div className="Z_stock_sold">{item.productId?.sold || 0} Sold</div>
                                             </div>
                                         </td>
-                                        <td>{item.category}</td>
+                                        <td>{item.productId?.categoryId?.title || 'No Category'}</td>
                                         <td>
                                             <div className="Z_rating_cell">
                                                 <div className="Z_rating_wrapper">
                                                     <span className="Z_rating_star">★</span>
-                                                    <span className="Z_rating_value">{item.rating}</span>
-                                                    <span className="Z_review_count">{item.reviews} Review</span>
+                                                    <span className="Z_rating_value">{item.productId?.rating || 0}</span>
+                                                    <span className="Z_review_count">{item.productId?.reviews || 0} Review</span>
                                                 </div>
                                             </div>
                                         </td>
@@ -134,7 +110,10 @@ function Wishlist() {
                                                 <button className="Z_action_btn Z_edit_btn">
                                                     <TbEdit size={22}/>
                                                 </button>
-                                                <button className="Z_action_btn Z_delete_btn">
+                                                <button 
+                                                    className="Z_action_btn Z_delete_btn"
+                                                    onClick={() => handleDelete(item._id)}
+                                                >
                                                     <RiDeleteBin6Line size={22}/>
                                                 </button>
                                             </div>

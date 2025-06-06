@@ -45,6 +45,7 @@ import PaymentList from '../component/PaymentList';
 import FAQs from '../component/FAQs';
 import TeamsNDConditions from '../component/TeamsNDConditions';
 import ProductDetails from '../component/ProductDetails';
+import UserDetail from '../pages/UserDetail';
 function UserRoutes() {
     return (
         <Routes>
@@ -92,6 +93,7 @@ function UserRoutes() {
                     <Route path="user-roles" element={<UserRoles />} />
                     <Route path="add-user" element={<AddUser />} />
                     <Route path="edit-user" element={<EditUser />} />
+                    <Route path="userdetail" element={<UserDetail />} />
 
                     <Route path="sales-report" element={<SalesReport />} />
                     <Route path="inventory-report" element={<InventoryReport />} />

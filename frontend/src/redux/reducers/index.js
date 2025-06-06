@@ -7,7 +7,7 @@ import productReducer from '../slice/product.slice';
 import couponReducer from '../slice/coupon.slice';
 import wishlistReducer from '../slice/wishlist.slice';
 import cartReducer from '../slice/cart.slice';
-
+import userReducer from '../slice/userSlice';
 
 export const rootReducer = combineReducers({
     addCategory: addCategoryReducer,
@@ -17,7 +17,8 @@ export const rootReducer = combineReducers({
     product: productReducer,
     coupon:couponReducer,
     wishlist:wishlistReducer,
-    cart:cartReducer
+    cart:cartReducer,
+    user:userReducer
 });
 
 export default rootReducer;

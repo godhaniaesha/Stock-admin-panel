@@ -46,6 +46,9 @@ import FAQs from '../component/FAQs';
 import TeamsNDConditions from '../component/TeamsNDConditions';
 import ProductDetails from '../component/ProductDetails';
 import UserDetail from '../pages/UserDetail';
+import Seller from '../component/auth/Seller';
+import SellergstVerify from '../component/auth/SellergstVerify';
+
 function UserRoutes() {
     return (
         <Routes>
@@ -55,6 +58,12 @@ function UserRoutes() {
             <Route path="/forgot-password" element={<ForgotPassword />} />
             <Route path="/verify-otp" element={<VerifyOTP />} />
             <Route path="/change-password" element={<ChangePassword />} />
+
+            <Route path="/SellerGST" element={<Seller />} />
+            <Route path="/sellerGST-verify" element={<SellergstVerify />} />
+
+
+
 
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>

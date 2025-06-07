@@ -112,17 +112,12 @@ const AddUser = () => {
             return setError('Image size must be under 5MB');
         }
 
-        // Clean up previous preview image URL
-        if (previewImage) {
-            URL.revokeObjectURL(previewImage);
-        }
-
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setUserImage(reader.result);
-        };
-        reader.readAsDataURL(file);
-        setPreviewImage(URL.createObjectURL(file));
+        // Store the file object directly
+        setUserImage(file);
+        
+        // Create preview URL for display
+        const previewUrl = URL.createObjectURL(file);
+        setPreviewImage(previewUrl);
     };
 
     const validateForm = () => {
@@ -156,28 +151,28 @@ const AddUser = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        if (!validateForm()) return;
 
-        if (!validateForm()) {
-            return;
-        }
-
-        const payload = {
-            ...userData,
-            profileImage: userImage
-        };
-
-        console.log(payload, "payload");
-        
         try {
-            await dispatch(db_createUser(payload)).unwrap();
-            // Reset form after successful creation
-            navigate("/users")
-            resetForm();
-            // Optional: Show success message
-            setError(''); // Clear any existing errors
+            const formData = new FormData();
+            
+            // Add all user data to formData
+            Object.keys(userData).forEach(key => {
+                formData.append(key, userData[key]);
+            });
+
+            // Add the image file if it exists
+            if (userImage) {
+                formData.append('profileImage', userImage);
+            }
+
+            const result = await dispatch(db_createUser(formData)).unwrap();
+            if (result) {
+                resetForm();
+                navigate('/users');
+            }
         } catch (error) {
-            // Handle error case
-            setError(error?.message || 'Failed to create user. Please try again.');
+            setError(error);
         }
     };
 

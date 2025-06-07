@@ -80,7 +80,7 @@ const Register = () => {
       if (success) {
         toast.success(message || "Registration successful!");
         dispatch(clearAuthState());
-        navigate('/'); // ✅ Redirect to homepage
+        navigate('/SellerGST'); // ✅ Redirect to GST number page
       } else if (error && message) {
         toast.error(message || "Registration failed.");
         dispatch(clearAuthState());
@@ -88,7 +88,7 @@ const Register = () => {
       }
     }
   }, [success, error, message, navigate, dispatch, db_submitted]);
-  
+
 
   return (
     <div className="d_auth_container" data-theme="dark">

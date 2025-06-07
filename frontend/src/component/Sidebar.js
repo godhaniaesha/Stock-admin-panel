@@ -68,7 +68,7 @@ const Sidebar = ({ show, isDarkMode }) => {
       submenu: [
         { title: 'Category List', path: '/categories', icon: <FaList size={14} /> },
         { title: 'Add Category', path: '/categories/add', icon: <FaPlus size={14} /> },
-        { title: 'Edit Category', path: '/categories/edit', icon: <FaEdit size={14} /> },
+        // { title: 'Edit Category', path: '/categories/edit', icon: <FaEdit size={14} /> },
       
       ]
     },
@@ -78,7 +78,7 @@ const Sidebar = ({ show, isDarkMode }) => {
       submenu: [
         { title: 'Subcategory List', path: '/subcategories', icon: <FaList size={14} /> },
         { title: 'Add Subcategory', path: '/subcategories/add', icon: <FaPlus size={14} /> },
-        { title: 'Edit Subcategory', path: '/subcategories/edit', icon: <FaEdit size={14} /> }
+        // { title: 'Edit Subcategory', path: '/subcategories/edit', icon: <FaEdit size={14} /> }
       ]
     },
     {
@@ -88,7 +88,7 @@ const Sidebar = ({ show, isDarkMode }) => {
         { title: 'Product Grid', path: '/products', icon: <BsFillGrid1X2Fill size={16} />, notifications: 5 },
         { title: 'Add Product', path: '/products/add', icon: <FaPlus size={16} /> },
         { title: 'Product Details', path: '/products/details', icon: <TbListDetails size={16} /> },
-        { title: 'Edit Product', path: '/products/edit', icon: <FaEdit size={16} /> },
+        // { title: 'Edit Product', path: '/products/edit', icon: <FaEdit size={16} /> },
         { title: 'View Product', path: '/products/view', icon: <FaEye size={16} /> }
       ]
     },
@@ -118,7 +118,7 @@ const Sidebar = ({ show, isDarkMode }) => {
         { title: 'User List', path: '/users', icon: <FaUsers size={16} /> },
         // { title: 'User Roles', path: '/user-roles', icon: <FaUserCog size={16} /> },
         { title: 'Add User', path: '/add-user', icon: <FaUserPlus size={16} /> },
-        { title: 'User Detail', path: '/userdetail', icon: <BiDetail size={16} /> }
+        // { title: 'User Detail', path: 'userdetail/:id', icon: <BiDetail size={16} /> }
       ]
     },
  

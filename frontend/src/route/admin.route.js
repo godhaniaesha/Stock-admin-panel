@@ -92,8 +92,8 @@ function UserRoutes() {
                     <Route path="users" element={<UserList />} />
                     <Route path="user-roles" element={<UserRoles />} />
                     <Route path="add-user" element={<AddUser />} />
-                    <Route path="edit-user" element={<EditUser />} />
-                    <Route path="userdetail" element={<UserDetail />} />
+                    <Route path="userdetail/:id" element={<UserDetail />} />
+                    <Route path="edit-user/:id" element={<EditUser />} />
 
                     <Route path="sales-report" element={<SalesReport />} />
                     <Route path="inventory-report" element={<InventoryReport />} />

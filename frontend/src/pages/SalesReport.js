@@ -36,8 +36,8 @@ export default function SalesReport() {
       {
         label: 'Sales',
         data: [3000, 3500, 2800, 4200, 5000, 4700, 4600],
-        borderColor: '#6A9C89',
-        backgroundColor: 'rgba(106, 156, 137, 0.2)',
+        borderColor: '#D3CEDF',
+        backgroundColor: 'rgba(222, 140, 230, 0.45)',
         tension: 0.4,
         fill: true,
         pointRadius: 0,
@@ -51,13 +51,13 @@ export default function SalesReport() {
       {
         label: 'Orders',
         data: [45, 50, 42, 60, 72, 68, 70],
-        backgroundColor: '#F2B705',
+        backgroundColor: '#a3c6c4',
         borderRadius: 6,
       },
       {
         label: 'Sales',
         data: [3000, 3500, 2800, 4200, 5000, 4700, 4600],
-        backgroundColor: '#6A9C89',
+        backgroundColor: '#D3CEDF',
         borderRadius: 6,
       },
     ],

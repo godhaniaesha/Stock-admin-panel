@@ -33,3 +33,19 @@ input:focus-visible,.nav-item:focus-visible{
     outline: 0;
     box-shadow: 0 0 0 .25rem rgba(13, 109, 253, 0) !important;
 }
+.btn-check:checked+.btn, .btn.active, .btn.show, .btn:first-child:active, :not(.btn-check)+.btn:active{
+  color: inherit !important;
+  background-color: inherit !important; 
+  border-color: inherit !important;
+
+}
+.btn:focus-visible {
+    color: inherit !important;
+    background-color: inherit !important;
+    border-color: inherit !important;
+    outline: 0;
+    box-shadow: inherit !important;
+}
+.btn:hover{
+  border: none !important;
+}

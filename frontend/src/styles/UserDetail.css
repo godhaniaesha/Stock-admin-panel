@@ -4,128 +4,92 @@
   --dark-text: #ccd1d6;
   --dark-text-secondary: #dadee2;
   --dark-border: rgba(255, 255, 255, 0.1);
-  --accent-color: #84a98c;
+  --accent-color: #6a998b;
   --accent-hover-color: #638679;
 
   --light-bg: #f3f3f3;
-  --light-card-bg: #fbf7f7;
+  --light-card-bg: #ffffff;
   --light-text: #282f36;
-  --light-text-secondary: #282f36;
-  --light-border: rgba(12, 12, 12, 0.034);
+  --light-text-secondary: #555;
+  --light-border: rgba(12, 12, 12, 0.05);
 }
 
-.d_dark.d_userdetail_wrapper {
+.d_user_detail_wrapper.dark {
   background-color: var(--dark-bg);
+  color: var(--dark-text);
 }
 
-.d_light.d_userdetail_wrapper {
+.d_user_detail_wrapper.light {
   background-color: var(--light-bg);
+  color: var(--light-text);
 }
 
-.d_userdetail_card {
-  border-radius: 20px;
-  transition: all 0.3s ease-in-out;
-  background-color: var(--light-card-bg);
-  border: 1px solid var(--light-border);
-}
-
-.d_dark .d_userdetail_card {
-  background-color: var(--dark-card-bg);
-  border: 1px solid var(--dark-border);
-}
-
-.d_userdetail_left {
-  background: linear-gradient(135deg, var(--accent-color), var(--accent-hover-color));
-  color: #fff;
+.d_user_card {
   border-radius: 16px;
+  background-color: var(--light-card-bg);
+  padding: 2rem;
 }
 
-.d_userdetail_image_wrapper {
-  border: 4px solid #fff;
-  padding: 6px;
-  width: 130px;
-  height: 130px;
-  border-radius: 50%;
-  box-shadow: 0 0 10px rgba(0,0,0,0.1);
+.d_user_detail_wrapper.dark .d_user_card {
+  background-color: var(--dark-card-bg);
 }
 
-.d_userdetail_image {
-  width: 100%;
-  height: 100%;
+.d_user_image {
+  width: 140px;
+  height: 140px;
   object-fit: cover;
-  border-radius: 50%;
+  border: 4px solid var(--accent-color);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.15);
 }
 
-.d_userdetail_name {
-  font-size: 1.5rem;
-  font-weight: 600;
+.d_user_name {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--accent-color);
 }
 
-.d_userdetail_role {
-  font-size: 0.85rem;
-  padding: 6px 12px;
-  border-radius: 30px;
-  background-color: rgba(255,255,255,0.2);
+.d_user_role_badge {
   display: inline-block;
-}
-
-.d_userdetail_section_title {
-  font-size: 1.4rem;
-  font-weight: 600;
-  margin-bottom: 1rem;
-  position: relative;
-}
-
-.d_userdetail_section_title::after {
-  content: '';
-  width: 50px;
-  height: 3px;
+  margin-top: 0.3rem;
+  padding: 0.3rem 0.75rem;
   background-color: var(--accent-color);
-  display: block;
-  margin-top: 5px;
+  color: #fff;
+  font-size: 0.85rem;
+  border-radius: 20px;
+  text-transform: uppercase;
 }
 
-.d_userdetail_info_grid {
+.d_user_details_list {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 1.2rem 2rem;
+  row-gap: 1rem;
+  column-gap: 2rem;
 }
 
-.d_userdetail_info_item {
-  display: flex;
-  flex-direction: column;
-}
-
-.d_userdetail_label {
-  font-size: 0.85rem;
+.d_user_details_list label {
+  display: block;
   font-weight: 600;
-  margin-bottom: 3px;
-  color: var(--light-text);
-  opacity: 0.8;
-}
-
-.d_userdetail_value {
-  font-size: 0.95rem;
-  font-weight: 500;
   color: var(--light-text-secondary);
+  margin-bottom: 0.25rem;
 }
 
-.d_dark .d_userdetail_label,
-.d_dark .d_userdetail_value {
+.d_user_detail_wrapper.dark .d_user_details_list label {
   color: var(--dark-text-secondary);
 }
 
-.d_userdetail_edit_btn {
-  background-color: var(--accent-color);
-  border: none;
-  padding: 10px 24px;
-  border-radius: 30px;
-  color: #fff;
-  font-weight: 500;
-  box-shadow: 0 4px 12px rgba(74, 144, 226, 0.25);
-  transition: background 0.3s ease;
+.d_user_details_list span {
+  display: block;
+  font-size: 0.95rem;
+  color: inherit;
 }
 
-.d_userdetail_edit_btn:hover {
-  background-color: var(--accent-hover-color);
+@media (max-width: 768px) {
+  .d_user_details_list {
+    grid-template-columns: 1fr;
+  }
+
+  .d_user_image {
+    width: 100px;
+    height: 100px;
+  }
 }

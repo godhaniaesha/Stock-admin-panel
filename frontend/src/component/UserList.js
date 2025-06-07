@@ -5,7 +5,7 @@ import { FaUsersViewfinder } from 'react-icons/fa6';
 import { LuClipboardList } from 'react-icons/lu';
 import { RiCustomerServiceLine, RiDeleteBin6Line } from 'react-icons/ri';
 import { TbEdit, TbEye, TbFileInvoice, TbSearch } from 'react-icons/tb';
-import { useOutletContext } from 'react-router-dom';
+import { useOutletContext, useNavigate } from 'react-router-dom'; // Ensure useNavigate is imported
 
 // Import your userSlice actions - adjust path as needed
 import {
@@ -17,6 +17,7 @@ import {
 function UserList() {
     const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
+    const navigate = useNavigate(); // Initialize useNavigate hook
 
     // Safe Redux state access with multiple fallback patterns
     const fullState = useSelector(state => state);
@@ -46,6 +47,7 @@ function UserList() {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [userToDelete, setUserToDelete] = useState(null);
     const [filteredUsers, setFilteredUsers] = useState([]);
+    const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
     // Check if Redux store is properly configured
     useEffect(() => {
@@ -140,13 +142,18 @@ function UserList() {
     };
 
     // Handle bulk delete
-    const handleBulkDelete = async () => {
+    const handleBulkDelete = () => {
+        setShowBulkDeleteModal(true);
+    };
+
+    const confirmBulkDelete = async () => {
         if (selectedUsers.length > 0 && dispatch && db_deleteUser) {
             try {
                 await Promise.all(
                     selectedUsers.map(userId => dispatch(db_deleteUser(userId)).unwrap())
                 );
                 setSelectedUsers([]);
+                setShowBulkDeleteModal(false);
             } catch (error) {
                 console.error('Bulk delete error:', error);
             }
@@ -173,7 +180,7 @@ function UserList() {
     };
 
     // Get user avatar or default
-  
+
 
     // Show error if Redux is not properly configured
     if (!fullState.user && !fullState.users && !fullState.userSlice) {
@@ -198,6 +205,14 @@ function UserList() {
             </div>
         );
     }
+    const handleViewUser = (userId) => {
+        navigate(`/userdetail/${userId}`);
+    };
+
+    // --- NEW: handleEditUser function ---
+    const handleEditUser = (userId) => {
+        navigate(`/edit-user/${userId}`);
+    };
 
     if (isLoading && users.length === 0) {
         return (
@@ -336,6 +351,7 @@ function UserList() {
                                 Delete Selected ({selectedUsers.length})
                             </Button>
                         )}
+
                     </div>
                 </div>
 
@@ -410,18 +426,14 @@ function UserList() {
                                                 <button
                                                     className="Z_action_btn Z_view_btn"
                                                     title="View User"
-                                                    onClick={() => {
-                                                        console.log('View user:', user._id || user.id);
-                                                    }}
+                                                    onClick={() => handleViewUser(user._id || user.id)}
                                                 >
                                                     <TbEye size={22} />
                                                 </button>
                                                 <button
                                                     className="Z_action_btn Z_edit_btn"
                                                     title="Edit User"
-                                                    onClick={() => {
-                                                        console.log('Edit user:', user._id || user.id);
-                                                    }}
+                                                    onClick={() => handleEditUser(user._id || user.id)} 
                                                 >
                                                     <TbEdit size={22} />
                                                 </button>
@@ -471,6 +483,30 @@ function UserList() {
                     </Button>
                 </Modal.Footer>
             </Modal>
+            <Modal show={showBulkDeleteModal} onHide={() => setShowBulkDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Bulk Delete</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete <strong>{selectedUsers.length}</strong> selected user(s)? This action cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowBulkDeleteModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={confirmBulkDelete} disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Spinner animation="border" size="sm" className="me-2" />
+                                Deleting...
+                            </>
+                        ) : (
+                            'Confirm Delete'
+                        )}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
         </section>
     );
 }

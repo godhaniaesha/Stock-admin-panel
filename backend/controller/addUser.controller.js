@@ -73,7 +73,7 @@ const getAllUsers = async (req, res) => {
             success: true,
             data: users
         });
-        console.log("users", users)
+        // console.log("users", users)
     } catch (error) {
         res.status(500).json({
             success: false,

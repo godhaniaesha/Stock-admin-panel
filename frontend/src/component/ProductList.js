@@ -12,11 +12,11 @@ function ProductList() {
     const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    
+
     // Get product state
     const productState = useSelector((state) => state.product || {});
     const { products = [], isLoading: productsLoading = false, error: productError = null } = productState;
-    
+
     // Get category state
     const categoryState = useSelector((state) => state.category || {});
     const { categories = [], isLoading: categoriesLoading = false } = categoryState;
@@ -116,8 +116,8 @@ function ProductList() {
                         <h4>All Product List</h4>
                         <div className="Z_table_actions">
                             <button className="Z_add_product_btn" onClick={handleAddProduct}>Add Product</button>
-                            <select 
-                                className="Z_time_filter" 
+                            <select
+                                className="Z_time_filter"
                                 value={timeFilter}
                                 onChange={handleTimeFilterChange}
                             >
@@ -155,23 +155,23 @@ function ProductList() {
                                         <tr key={product._id}>
                                             <td>
                                                 <div className="Z_custom_checkbox">
-                                                    <input 
-                                                        type="checkbox" 
+                                                    <input
+                                                        type="checkbox"
                                                         id={`checkbox-${product._id}`}
-                                                        className="Z_checkbox_input" 
+                                                        className="Z_checkbox_input"
                                                     />
-                                                    <label 
-                                                        htmlFor={`checkbox-${product._id}`} 
+                                                    <label
+                                                        htmlFor={`checkbox-${product._id}`}
                                                         className="Z_checkbox_label"
                                                     ></label>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div className="Z_product_info_cell">
-                                                    <img 
+                                                    <img
                                                         src={product.images && product.images[0] ? `http://localhost:2221/${product.images[0]}` : 'placeholder.jpg'} // Added check for images array and placeholder
-                                                        alt={product.productName} 
-                                                        className="Z_table_product_img" 
+                                                        alt={product.productName}
+                                                        className="Z_table_product_img"
                                                     />
                                                     <div>
                                                         <div className="Z_table_product_name">{product.productName}</div>
@@ -198,23 +198,23 @@ function ProductList() {
                                             </td>
                                             <td>
                                                 <div className="Z_action_buttons">
-                                                    <button 
+                                                    <button
                                                         className="Z_action_btn Z_view_btn"
                                                         onClick={() => handleView(product)}
                                                     >
-                                                        <TbEye size={22}/>
+                                                        <TbEye size={22} />
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         className="Z_action_btn Z_edit_btn"
                                                         onClick={() => handleEdit(product)}
                                                     >
-                                                        <TbEdit size={22}/>
+                                                        <TbEdit size={22} />
                                                     </button>
-                                                    <button 
+                                                    <button
                                                         className="Z_action_btn Z_delete_btn"
                                                         onClick={() => handleDeleteClick(product)}
                                                     >
-                                                        <RiDeleteBin6Line size={22}/>
+                                                        <RiDeleteBin6Line size={22} />
                                                     </button>
                                                 </div>
                                             </td>

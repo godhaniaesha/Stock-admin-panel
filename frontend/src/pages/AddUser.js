@@ -254,6 +254,7 @@ const AddUser = () => {
                                             value={userData.firstName} 
                                             onChange={handleInputChange} 
                                             className="x_input"
+                                            placeholder="Enter first name"
                                             required
                                         />
                                     </div>
@@ -264,6 +265,7 @@ const AddUser = () => {
                                             value={userData.lastName} 
                                             onChange={handleInputChange} 
                                             className="x_input"
+                                            placeholder="Enter last name"
                                             required
                                         />
                                     </div>
@@ -278,6 +280,7 @@ const AddUser = () => {
                                             value={userData.email} 
                                             onChange={handleInputChange} 
                                             className="x_input"
+                                            placeholder="Enter email address"
                                             required
                                         />
                                     </div>
@@ -289,6 +292,7 @@ const AddUser = () => {
                                             value={userData.phone} 
                                             onChange={handleInputChange} 
                                             className="x_input"
+                                            placeholder="Enter phone number"
                                             required
                                         />
                                     </div>
@@ -302,7 +306,7 @@ const AddUser = () => {
                                             type="date" 
                                             value={userData.birthdate} 
                                             onChange={handleInputChange} 
-                                            className="x_input" 
+                                            className="x_input"
                                         />
                                     </div>
                                     <div className="x_form_group">
@@ -331,7 +335,8 @@ const AddUser = () => {
                                             name="address" 
                                             value={userData.address} 
                                             onChange={handleInputChange} 
-                                            className="x_textarea" 
+                                            className="x_textarea"
+                                            placeholder="Enter full address"
                                         />
                                     </div>
                                 </div>
@@ -343,7 +348,8 @@ const AddUser = () => {
                                             name="city" 
                                             value={userData.city} 
                                             onChange={handleInputChange} 
-                                            className="x_input" 
+                                            className="x_input"
+                                            placeholder="Enter city"
                                         />
                                     </div>
                                     <div className="x_form_group">
@@ -352,7 +358,8 @@ const AddUser = () => {
                                             name="state" 
                                             value={userData.state} 
                                             onChange={handleInputChange} 
-                                            className="x_input" 
+                                            className="x_input"
+                                            placeholder="Enter state"
                                         />
                                     </div>
                                 </div>
@@ -364,7 +371,8 @@ const AddUser = () => {
                                             name="country" 
                                             value={userData.country} 
                                             onChange={handleInputChange} 
-                                            className="x_input" 
+                                            className="x_input"
+                                            placeholder="Enter country"
                                         />
                                     </div>
                                     <div className="x_form_group">
@@ -396,6 +404,7 @@ const AddUser = () => {
                                                 value={userData.password}
                                                 onChange={handleInputChange}
                                                 className="x_input"
+                                                placeholder="Enter password (min 6 characters)"
                                                 required
                                                 minLength="6"
                                             />
@@ -410,6 +419,7 @@ const AddUser = () => {
                                                 name="confirmPassword"
                                                 value={userData.confirmPassword}
                                                 onChange={handleInputChange}
+                                                placeholder='Enter confirm password'                                       
                                                 className="x_input"
                                                 required
                                             />

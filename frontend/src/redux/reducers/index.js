@@ -8,6 +8,8 @@ import couponReducer from '../slice/coupon.slice';
 import wishlistReducer from '../slice/wishlist.slice';
 import cartReducer from '../slice/cart.slice';
 import userReducer from '../slice/userSlice';
+import inventoryReducer from '../slice/inventory.Slice';
+
 
 export const rootReducer = combineReducers({
     addCategory: addCategoryReducer,
@@ -18,7 +20,8 @@ export const rootReducer = combineReducers({
     coupon:couponReducer,
     wishlist:wishlistReducer,
     cart:cartReducer,
-    user:userReducer
+    user:userReducer,
+    inventory:inventoryReducer,
 });
 
 export default rootReducer;

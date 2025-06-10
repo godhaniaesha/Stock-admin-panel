@@ -6,8 +6,6 @@ const path = require('path');
 const createCategory = async (req, res) => {
     try {
         const { title, description } = req.body;
-        console.log(req.body);
-        
         let image = '';
         if (req.file) {
             image = req.file.path; // If using multer for file upload
@@ -16,7 +14,16 @@ const createCategory = async (req, res) => {
         await category.save();
         res.status(201).json(category);
     } catch (err) {
-        res.status(500).json({ error: err.message });
+        // Improved error message
+        let message = 'Category creation failed.';
+        if (err.name === 'ValidationError') {
+            message = 'Validation Error: ' + Object.values(err.errors).map(e => e.message).join(', ');
+        } else if (err.code === 11000) {
+            message = 'Duplicate Error: Category with this title already exists.';
+        } else if (err.message) {
+            message = err.message;
+        }
+        res.status(500).json({ error: message, type: err.name || 'Error' });
     }
 };
 

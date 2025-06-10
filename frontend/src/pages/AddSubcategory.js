@@ -9,9 +9,11 @@ const AddSubcategory = () => {
     const { isDarkMode } = useOutletContext();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [formErrors, setFormErrors] = useState({});
+    const [fileError, setFileError] = useState('');
     const { categories, isLoading: categoriesLoading } = useSelector((state) => state.category);
     const { isLoading: subcategoryLoading, error: subcategoryError } = useSelector((state) => state.subcategory);
-    
+
     const [subcategoryData, setsubcategoryData] = useState({
         subcategoryTitle: '',
         description: '',
@@ -61,37 +63,66 @@ const AddSubcategory = () => {
             ...prev,
             [name]: value
         }));
+        if (formErrors[name]) {
+            setFormErrors(prev => ({
+                ...prev,
+                [name]: null
+            }));
+        }
     };
 
     const handleSubmit = async (e) => {
-        e.preventDefault();
-        setError('');
+    e.preventDefault();
+    setFormErrors({});
 
-        if (!subcategoryData.subcategoryTitle || !subcategoryData.category) {
-            setError('Subcategory title and category are required');
-            return;
+    if (!validateForm()) {
+        return;
+    }
+
+    try {
+        const formData = new FormData();
+        formData.append('subcategoryTitle', subcategoryData.subcategoryTitle);
+        formData.append('description', subcategoryData.description);
+        formData.append('category', subcategoryData.category);
+
+        const fileInput = document.getElementById('fileInput');
+        if (fileInput.files[0]) {
+            formData.append('image', fileInput.files[0]);
         }
 
-        try {
-            const formData = new FormData();
-            formData.append('subcategoryTitle', subcategoryData.subcategoryTitle);
-            formData.append('description', subcategoryData.description);
-            formData.append('category', subcategoryData.category);
+        await dispatch(createSubcategory(formData)).unwrap();
+        navigate('/subcategories');
+    } catch (error) {
+        // This will work for both fetch/axios errors
+        let errorMsg =
+            error?.response?.data?.error || // axios
+            error?.error ||                 // fetch or RTK Query
+            error?.message ||               // fallback
+            'Failed to create subcategory';
 
-            const fileInput = document.getElementById('fileInput');
-            if (fileInput.files[0]) {
-                formData.append('image', fileInput.files[0]);
-            }
-
-            await dispatch(createSubcategory(formData)).unwrap();
-            navigate('/subcategories');
-        } catch (error) {
-            setError(error.message || 'Failed to create subcategory');
-        }
-    };
+        setFormErrors(prev => ({
+            ...prev,
+            submit: errorMsg
+        }));
+    }
+};
 
     const handleCancel = () => {
         navigate('/subcategories');
+    };
+    const validateForm = () => {
+        const errors = {};
+        if (!subcategoryData.subcategoryTitle.trim()) {
+            errors.subcategoryTitle = 'Subcategory title is required';
+        }
+        if (!subcategoryData.category) {
+            errors.category = 'Category is required';
+        }
+        if (!productImage) {
+            errors.image = 'Subcategory image is required';
+        }
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
     return (
@@ -119,9 +150,9 @@ const AddSubcategory = () => {
                             />
                             <div className="x_upload_content">
                                 {productImage ? (
-                                    <img 
-                                        src={productImage} 
-                                        alt="Preview" 
+                                    <img
+                                        src={productImage}
+                                        alt="Preview"
                                         className="x_preview_image"
                                     />
                                 ) : (
@@ -135,7 +166,7 @@ const AddSubcategory = () => {
                                         <p className="x_upload_hint">Maximum file size: 5MB. Allowed formats: PNG, JPG, JPEG</p>
                                     </>
                                 )}
-                                {(error || subcategoryError) && <p className="x_error_message">{error || subcategoryError}</p>}
+                                 {(fileError || formErrors.image) && <p className="x_error_message">{fileError || formErrors.image}</p>}
                             </div>
                         </div>
                     </div>
@@ -155,8 +186,8 @@ const AddSubcategory = () => {
                                             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                                         >
                                             <span>
-                                                {categoriesLoading ? 'Loading categories...' : 
-                                                 categories.find(cat => cat._id === subcategoryData.category)?.title || 'Choose a category'}
+                                                {categoriesLoading ? 'Loading categories...' :
+                                                    categories.find(cat => cat._id === subcategoryData.category)?.title || 'Choose a category'}
                                             </span>
                                             <svg
                                                 className={`x_dropdown_arrow ${isCategoryOpen ? 'open' : ''}`}
@@ -190,8 +221,9 @@ const AddSubcategory = () => {
                                         placeholder="Enter Subcategory Title"
                                         value={subcategoryData.subcategoryTitle}
                                         onChange={handleInputChange}
-                                        className="x_input"
+                                        className={`x_input ${formErrors.subcategoryTitle ? 'x_input_error' : ''}`}
                                     />
+                                    {formErrors.subcategoryTitle && <p className="x_error_message">{formErrors.subcategoryTitle}</p>}
                                 </div>
                             </div>
 
@@ -210,18 +242,22 @@ const AddSubcategory = () => {
                         </div>
                     </div>
                 </div>
-
+                {formErrors.submit && (
+                    <div className="x_error_container">
+                        <p className="x_error_message">{formErrors.submit}</p>
+                    </div>
+                )}
                 <div className="x_btn_wrapper mt-3">
-                    <button 
-                        type="submit" 
-                        className="x_btn x_btn_create" 
+                    <button
+                        type="submit"
+                        className="x_btn x_btn_create"
                         onClick={handleSubmit}
                         disabled={categoriesLoading || subcategoryLoading}
                     >
                         {subcategoryLoading ? 'Creating...' : 'Create Subcategory'}
                     </button>
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         className="x_btn x_btn_cancel"
                         onClick={handleCancel}
                     >

@@ -1,18 +1,24 @@
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const InventorySchema = new mongoose.Schema({
     category: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Category',
         required: true
     },
     subcategory: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Subcategory',
         required: true
     },
+    sellerId: {
+        type: Schema.Types.ObjectId,
+        ref: 'seller',
+        required: true
+    },
     product: {
-        type: mongoose.Schema.Types.ObjectId,
+        type: Schema.Types.ObjectId,
         ref: 'Product',
         required: true
     },
@@ -27,5 +33,5 @@ const InventorySchema = new mongoose.Schema({
 }, { timestamps: true });
 
 
- const InventoryModel = mongoose.model('Inventory', InventorySchema);
- module.exports  = InventoryModel
+const InventoryModel = mongoose.model('Inventory', InventorySchema);
+module.exports = InventoryModel

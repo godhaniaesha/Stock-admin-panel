@@ -1,10 +1,11 @@
+const mongoose = require('mongoose');
 const {Inventory} = require('../model');
 
 // Create Inventory
 const createInventory = async (req, res) => {
     try {
-        const { category, subcategory, product, quantity, lowStockLimit } = req.body;
-        const inventory = new Inventory({ category, subcategory, product, quantity, lowStockLimit });
+        const { category, subcategory, sellerId, product, quantity, lowStockLimit } = req.body;
+        const inventory = new Inventory({ category, subcategory,sellerId, product, quantity, lowStockLimit });
         await inventory.save();
         res.status(201).json(inventory);
     } catch (err) {
@@ -35,8 +36,8 @@ const getInventory = async (req, res) => {
 // Update Inventory
 const updateInventory = async (req, res) => {
     try {
-        const { category, subcategory, product, quantity, lowStockLimit } = req.body;
-        const updateData = { category, subcategory, product, quantity, lowStockLimit };
+        const { category, subcategory,sellerId , product, quantity, lowStockLimit } = req.body;
+        const updateData = { category, subcategory,sellerId, product, quantity, lowStockLimit };
         const inventory = await Inventory.findByIdAndUpdate(req.params.id, updateData, { new: true });
         res.json(inventory);
     } catch (err) {
@@ -54,10 +55,66 @@ const deleteInventory = async (req, res) => {
     }
 };
 
+
+const getLowInventory = async (req, res) => {
+    try {
+        const lowInventory = await Inventory.aggregate([
+            {
+                $match: {
+                    $expr: { $lte: ['$quantity', '$lowStockLimit'] }
+                }
+            },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'category',
+                    foreignField: '_id',
+                    as: 'category'
+                }
+            },
+            { $unwind: { path: '$category', preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'subcategories',
+                    localField: 'subcategory',  
+                    foreignField: '_id',
+                    as: 'subcategory'
+                }
+            },
+            { $unwind: { path: '$subcategory', preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'product',
+                    foreignField: '_id',
+                    as: 'product'
+                }
+            },
+            { $unwind: { path: '$product', preserveNullAndEmptyArrays: true } },
+            {
+                $lookup: {
+                    from: 'sellers',
+                    localField: 'sellerId',
+                    foreignField: '_id',
+                    as: 'seller'
+                }
+            },
+            { $unwind: { path: '$seller', preserveNullAndEmptyArrays: true } }
+        ]);
+
+        res.status(200).json(lowInventory);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+};
+
+
+
 module.exports = {
     createInventory,
     getInventories,
     getInventory,
     updateInventory,
-    deleteInventory
+    deleteInventory,
+    getLowInventory
 }

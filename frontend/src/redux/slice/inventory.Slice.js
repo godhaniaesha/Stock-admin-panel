@@ -1,8 +1,8 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
+ 
 const API_URL = 'http://localhost:2221/api/a1/inventory';
-
+ 
 // Create product
 export const createInventory = createAsyncThunk(
     'inventory/create',
@@ -21,88 +21,90 @@ export const createInventory = createAsyncThunk(
         }
     }
 );
-
-// Get all products
-export const fetchProducts = createAsyncThunk(
-    'product/fetchAll',
+ 
+ 
+ 
+// GET ALL
+export const fetchInventories = createAsyncThunk(
+    'inventory/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/getProduct`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            console.log(response.data,"fetch product");
+            const response = await axios.get(`${API_URL}/`);
             return response.data;
-            
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch inventory');
         }
     }
 );
-
-// Get product by ID
-export const fetchProductById = createAsyncThunk(
-    'product/fetchById',
+ 
+// GET SINGLE
+export const fetchInventoryById = createAsyncThunk(
+    'inventory/fetchOne',
     async (id, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/product/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await axios.get(`${API_URL}/${id}`);
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to fetch product');
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch inventory');
         }
     }
 );
-
-// Update product
-export const updateProduct = createAsyncThunk(
-    'product/update',
-    async ({ id, productData }, { rejectWithValue }) => {
+ 
+// UPDATE
+export const updateInventory = createAsyncThunk(
+    'inventory/update',
+    async ({ id, updatedData }, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`${API_URL}/updateProduct/${id}`, productData, {
+            const response = await axios.put(`${API_URL}/update/${id}`, updatedData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
+                    'Content-Type': 'application/json',
+                },
             });
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to update product');
+            return rejectWithValue(error.response?.data?.message || 'Failed to update inventory');
         }
     }
 );
-
-// Delete product
-export const deleteProduct = createAsyncThunk(
-    'product/delete',
+ 
+// DELETE
+export const deleteInventory = createAsyncThunk(
+    'inventory/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.delete(`${API_URL}/deleteProduct/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            await axios.delete(`${API_URL}/delete/${id}`);
             return id;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to delete product');
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete inventory');
         }
     }
 );
 
+// ✅ Get Low Inventory Thunk
+export const getLowInventory = createAsyncThunk(
+    'inventory/getLow',
+    async (_, { rejectWithValue }) => {
+      try {
+        const token = localStorage.getItem('token');
+        const response = await axios.get(`${API_URL}/getlow`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+        return response.data;
+      } catch (error) {
+        return rejectWithValue(error.response?.data?.message || 'Failed to fetch low inventory');
+      }
+    }
+  );
+ 
 const productSlice = createSlice({
-    name: 'product',
+    name: 'inventory',
     initialState: {
-        products: [],
-        currentProduct: null,
+        inventory: [],
+        lowInventory: [],
         isLoading: false,
         error: null,
         success: false
@@ -128,7 +130,7 @@ const productSlice = createSlice({
             })
             .addCase(createInventory.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.Inventorys.unshift(action.payload.data);
+                state.inventory.unshift(action.payload.data);
                 state.success = true;
             })
             .addCase(createInventory.rejected, (state, action) => {
@@ -136,66 +138,81 @@ const productSlice = createSlice({
                 state.error = action.payload;
                 state.success = false;
             })
-            // Fetch all products
-            .addCase(fetchProducts.pending, (state) => {
+ 
+            // FETCH ALL
+            .addCase(fetchInventories.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(fetchProducts.fulfilled, (state, action) => {
+            .addCase(fetchInventories.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.products = action.payload.data;
+                state.inventory = action.payload;
             })
-            .addCase(fetchProducts.rejected, (state, action) => {
+            .addCase(fetchInventories.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             })
-            // Fetch product by ID
-            .addCase(fetchProductById.pending, (state) => {
+ 
+            // FETCH ONE
+            .addCase(fetchInventoryById.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(fetchProductById.fulfilled, (state, action) => {
+            .addCase(fetchInventoryById.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.currentProduct = action.payload.data;
+                state.singleInventory = action.payload;
             })
-            .addCase(fetchProductById.rejected, (state, action) => {
+            .addCase(fetchInventoryById.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             })
-            // Update product
-            .addCase(updateProduct.pending, (state) => {
+ 
+            // UPDATE
+            .addCase(updateInventory.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
-                state.success = false;
             })
-            .addCase(updateProduct.fulfilled, (state, action) => {
+            .addCase(updateInventory.fulfilled, (state, action) => {
                 state.isLoading = false;
-                const index = state.products.findIndex(p => p._id === action.payload.data._id);
-                if (index !== -1) {
-                    state.products[index] = action.payload.data;
-                }
+                state.inventory = state.inventory.map((item) =>
+                    item._id === action.payload._id ? action.payload : item
+                );
                 state.success = true;
             })
-            .addCase(updateProduct.rejected, (state, action) => {
+            .addCase(updateInventory.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-                state.success = false;
             })
-            // Delete product
-            .addCase(deleteProduct.pending, (state) => {
+ 
+            // DELETE
+            .addCase(deleteInventory.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
             })
-            .addCase(deleteProduct.fulfilled, (state, action) => {
+            .addCase(deleteInventory.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.products = state.products.filter(p => p._id !== action.payload);
+                state.inventory = state.inventory.filter((item) => item._id !== action.payload);
+                state.success = true;
             })
-            .addCase(deleteProduct.rejected, (state, action) => {
+            .addCase(deleteInventory.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-            });
+            })
+            
+            .addCase(getLowInventory.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+              })
+              .addCase(getLowInventory.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.lowInventory = action.payload; // store low inventory data separately
+              })
+              .addCase(getLowInventory.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+              });
     }
 });
-
+ 
 export const { clearProductError, clearProductSuccess, resetCurrentProduct } = productSlice.actions;
-export default productSlice.reducer; 
+export default productSlice.reducer;

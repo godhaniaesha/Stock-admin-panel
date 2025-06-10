@@ -23,16 +23,39 @@ const addToCart = async (req, res) => {
 };
 
 
+// const getCart = async (req, res) => {
+//     try {
+//         const { userId } = req.params;
+//         const items = await Cart.find({ userId }).populate('productId');
+
+//         res.status(200).json({ success: true, data: items });
+//     } catch (error) {
+//         res.status(500).json({ success: false, message: 'Error retrieving cart', error: error.message });
+//     }
+// };
+
 const getCart = async (req, res) => {
     try {
         const { userId } = req.params;
         const items = await Cart.find({ userId }).populate('productId');
 
-        res.status(200).json({ success: true, data: items });
+        const totalProducts = items.length; // 👈 count of unique products
+
+        res.status(200).json({
+            success: true,
+            data: items,
+            totalProducts // 👈 this is what you asked
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: 'Error retrieving cart', error: error.message });
+        res.status(500).json({
+            success: false,
+            message: 'Error retrieving cart',
+            error: error.message
+        });
     }
 };
+
+
 
 const updateCartItem = async (req, res) => {
     try {

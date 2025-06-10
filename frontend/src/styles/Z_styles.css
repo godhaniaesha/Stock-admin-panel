@@ -2139,3 +2139,15 @@
 .Z_reset_button:hover {
     background-color: #c82333;
 }
+
+.Z_header_icon {
+  color:var(--accent-color); /* Adjust color to fit your light background header */
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.Z_header_icon:hover,
+.Z_header_icon:focus {
+  color: var(--accent-hover-color); /* Or your desired hover color */
+  transform: scale(1.1);
+  outline: none; /* Remove default focus outline if you add custom focus styles */
+}

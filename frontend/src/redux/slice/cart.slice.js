@@ -54,7 +54,7 @@ const cartSlice = createSlice({
             state.totalAmount = 0;
         },
         calculateTotals: (state) => {
-            state.totalItems = state.items.reduce((total, item) => total + item.quantity, 0);
+            state.totalItems = state.items.length; // Count distinct items
             state.totalAmount = state.items.reduce((total, item) => {
                 return total + (item.productId?.price * item.quantity);
             }, 0);
@@ -77,6 +77,7 @@ const cartSlice = createSlice({
                 } else {
                     state.items.push(action.payload.data);
                 }
+                cartSlice.caseReducers.calculateTotals(state); // Recalculate totals
             })
             .addCase(addToCart.rejected, (state, action) => {
                 state.loading = false;
@@ -90,6 +91,15 @@ const cartSlice = createSlice({
             .addCase(getCart.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = action.payload.data;
+                // Explicitly use totalProducts from the API response for totalItems
+                // if it's provided in the payload.
+                if (typeof action.payload.totalProducts === 'number') {
+                    state.totalItems = action.payload.totalProducts;
+                }
+                // calculateTotals will still run to calculate totalAmount.
+                // It will also re-calculate totalItems based on state.items.length,
+                // which should be consistent with action.payload.totalProducts from your backend.
+                cartSlice.caseReducers.calculateTotals(state); 
             })
             .addCase(getCart.rejected, (state, action) => {
                 state.loading = false;
@@ -106,6 +116,7 @@ const cartSlice = createSlice({
                 if (index !== -1) {
                     state.items[index] = action.payload.data;
                 }
+                cartSlice.caseReducers.calculateTotals(state); // Recalculate totals
             })
             .addCase(updateCartItem.rejected, (state, action) => {
                 state.loading = false;
@@ -119,6 +130,7 @@ const cartSlice = createSlice({
             .addCase(removeFromCart.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = state.items.filter(item => item._id !== action.meta.arg);
+                cartSlice.caseReducers.calculateTotals(state); // Recalculate totals
             })
             .addCase(removeFromCart.rejected, (state, action) => {
                 state.loading = false;

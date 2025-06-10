@@ -1,4 +1,6 @@
 import React, { useState, useRef } from 'react';
+import { Container } from 'react-bootstrap';
+import Stepper from 'react-stepper-horizontal';
 import '../../styles/seller.css';
 
 function SellergstVerify() {
@@ -23,6 +25,13 @@ function SellergstVerify() {
     const [pincode, setPincode] = useState("");
     const [city, setCity] = useState("");
     const [state, setState] = useState("");
+    const [currentUser, setCurrentUser] = useState({ filledSteps: 0 });
+    const [gstDetails, setGstDetails] = useState({
+        gstNumber: "09AAACH7409R1ZZ",
+        panNumber: "BAJPC4350M",
+        businessType: "Wholesale Business, Retail Business",
+        businessAddress: "4517 Washington Ave. Manchester, Kentucky 39495"
+    });
 
     const handleOtpChange = (e, idx) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
@@ -43,19 +52,19 @@ function SellergstVerify() {
 
     const handleGstVerify = (e) => {
         e.preventDefault();
-        // Add GST verification logic here
         setShowGstVerification(false);
         setShowOtp(false);
         setShowBrandDetails(false);
         setShowBankDetails(false);
         setShowPickupAddress(false);
         setShowSubscription(false);
-        // Show the seller details form after verification
+        setCurrentUser(prev => ({ ...prev, filledSteps: 1 }));
     };
 
     const handleSubmit = (e) => {
         e.preventDefault();
         setShowBrandDetails(true);
+        setCurrentUser(prev => ({ ...prev, filledSteps: 2 }));
     };
 
     const handleResend = (e) => {
@@ -66,35 +75,60 @@ function SellergstVerify() {
     const handleBrandSubmit = (e) => {
         e.preventDefault();
         setShowBankDetails(true);
+        setCurrentUser(prev => ({ ...prev, filledSteps: 3 }));
     };
 
     const handleBankSubmit = (e) => {
         e.preventDefault();
         setShowPickupAddress(true);
+        setCurrentUser(prev => ({ ...prev, filledSteps: 4 }));
     };
 
     const handlePickupSubmit = (e) => {
         e.preventDefault();
         setShowSubscription(true);
+        setCurrentUser(prev => ({ ...prev, filledSteps: 5 }));
+    };
+
+    const handleGstDetailsChange = (e, field) => {
+        setGstDetails({
+            ...gstDetails,
+            [field]: e.target.value
+        });
     };
 
     return (
         <>
             <div className='d_auth_container'>
                 <section className="Z_container">
-                    <div className="Z_steps-bar">
-                        <div className="Z_step completed">✓<span>Account Creation</span></div>
-                        <div className="Z_line completed"></div>
-                        <div className="Z_step active"><div className="Z_circle"></div><span>Seller Details</span></div>
-                        <div className="Z_line"></div>
-                        <div className="Z_step"><div className="Z_circle"></div><span>Brand Details</span></div>
-                        <div className="Z_line"></div>
-                        <div className="Z_step"><div className="Z_circle"></div><span>Bank Details</span></div>
-                        <div className="Z_line"></div>
-                        <div className="Z_step"><div className="Z_circle"></div><span>Pickup Address</span></div>
-                        <div className="Z_line"></div>
-                        <div className="Z_step"><div className="Z_circle"></div><span>Verify & Submit</span></div>
-                    </div>
+                    {/* <Container>
+                        <div className="overflow-auto">
+                            <Stepper
+                                steps={[
+                                    { label: "Account Creation", title: "Account Creation" },
+                                    { label: "Seller Details", title: "Seller Details" },
+                                    { label: "Brand Details", title: "Brand Details" },
+                                    { label: "Bank Details", title: "Bank Details" },
+                                    { label: "Pickup Address", title: "Pickup Address" },
+                                    { label: "Verify & Submit", title: "Verify & Submit" },
+                                ]}
+                                className="k-steper"
+                                activeStep={currentUser?.filledSteps}
+                                connectorStateColors
+                                titleFontSize={14}
+                                circleFontSize={14}
+                                size={40}
+                                circleTop={0}
+                                titleBottom={10}
+                                activeTitleColor="#ffffff"
+                                activeColor="#84a98c"
+                                completeTitleColor="#ffffff"
+                                completeColor="#84a98c"
+                                defaultTitleColor="#666666"
+                                defaultColor="#666666"
+                            />
+                        </div>
+                    </Container> */}
 
                     {showGstVerification ? (
                         <div className="Z_card">
@@ -106,12 +140,15 @@ function SellergstVerify() {
                                     <div className="Z_input-verified">
                                         <input
                                             type="text"
-                                            placeholder="GST number"
+                                            placeholder="Enter GST number"
                                             value={gstNumber}
                                             onChange={(e) => setGstNumber(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
-                                    <button type="submit" className="Z_btn Z_verify-btn">Verify</button>
+                                    <div className='d-flex justify-content-center'>
+                                        <button type="submit" className="Z_btn Z_verify-btn">Verify</button>
+                                    </div>
                                 </div>
                             </form>
                         </div>
@@ -122,36 +159,61 @@ function SellergstVerify() {
                             <div className="Z_row">
                                 <label>GST Details</label>
                                 <div className="Z_input-verified">
-                                    <input type="text" value="09AAACH7409R1ZZ" disabled />
+                                    <input
+                                        type="text"
+                                        value={gstDetails.gstNumber}
+                                        onChange={(e) => handleGstDetailsChange(e, 'gstNumber')}
+                                        placeholder="Enter GST number"
+                                        className="Z_input"
+                                    />
                                 </div>
                             </div>
                             <div className="Z_row">
                                 <label>PAN Number</label>
                                 <div className="Z_input-verified">
-                                    <input type="text" value="BAJPC4350M" />
+                                    <input
+                                        type="text"
+                                        value={gstDetails.panNumber}
+                                        onChange={(e) => handleGstDetailsChange(e, 'panNumber')}
+                                        placeholder="Enter PAN number"
+                                        className="Z_input"
+                                    />
                                 </div>
                             </div>
                             <div className="Z_row">
                                 <label>Business Type</label>
                                 <div className="Z_input-verified">
-                                    <input type="text" value="Wholesale Business, Retail Business" />
+                                    <input
+                                        type="text"
+                                        value={gstDetails.businessType}
+                                        onChange={(e) => handleGstDetailsChange(e, 'businessType')}
+                                        placeholder="Enter business type"
+                                        className="Z_input"
+                                    />
                                 </div>
                             </div>
                             <div className="Z_row">
                                 <label>Registered Business Address</label>
                                 <div className="Z_input-verified">
-                                    <input type="text" value="4517 Washington Ave. Manchester, Kentucky 39495" />
+                                    <input
+                                        type="text"
+                                        value={gstDetails.businessAddress}
+                                        onChange={(e) => handleGstDetailsChange(e, 'businessAddress')}
+                                        placeholder="Enter business address"
+                                        className="Z_input"
+                                    />
                                 </div>
                             </div>
-                            <button className="Z_btn" onClick={() => setShowOtp(true)}>Verify OTP</button>
+                            <div className='d-flex justify-content-center'>
+                                <button className="Z_btn" onClick={() => setShowOtp(true)}>Verify OTP</button>
+                            </div>
                         </div>
                     ) : showOtp && !showBrandDetails && !showBankDetails && !showPickupAddress && !showSubscription ? (
                         <div className="otp-card Z_card">
                             <h2>Verify your GST</h2>
                             <p className="otp-subtext">We have sent a 6-digit verification code to</p>
                             <div className="otp-contact">
-                                <div>Mobile: XXXXXXX8526</div>
-                                {/* <div>Email: jaXXXXXXX@gmail.com</div> */}
+                                <div className='text-light'>Mobile: XXXXXXX8526</div>
                             </div>
                             <form className="otp-form" onSubmit={handleSubmit}>
                                 <div className="otp-inputs">
@@ -164,13 +226,15 @@ function SellergstVerify() {
                                             onChange={e => handleOtpChange(e, idx)}
                                             onKeyDown={e => handleOtpKeyDown(e, idx)}
                                             ref={el => (inputsRef.current[idx] = el)}
-                                            className="otp-input"
+                                            className="Z_input otp-input"
                                             inputMode="numeric"
                                             autoComplete="one-time-code"
                                         />
                                     ))}
                                 </div>
-                                <button className="otp-submit" type="submit">Submit</button>
+                                <div className='d-flex justify-content-center mb-3'>
+                                    <button className="Z_btn" type="submit">Submit</button>
+                                </div>
                             </form>
                             <div className="otp-resend">
                                 Didn't received code? <a href="#" onClick={handleResend}>Resend</a>
@@ -181,32 +245,36 @@ function SellergstVerify() {
                             <h2 className="brand-title">Brand Details</h2>
                             <p className="brand-subtext">Your store name will be visible to all buyers of FastKart</p>
                             <form className="brand-form" onSubmit={handleBrandSubmit}>
-                                <div className="brand-row">
+                                <div className="Z_row">
                                     <label htmlFor="storeName">Store Name</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="storeName"
                                             type="text"
-                                            placeholder="Store number"
+                                            placeholder="Enter store name"
                                             value={storeName}
                                             onChange={e => setStoreName(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                     <div className="brand-helper">E.g. Business Name, Trade Name, Etc.</div>
                                 </div>
-                                <div className="brand-row">
+                                <div className="Z_row">
                                     <label htmlFor="ownerName">Owner Name</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="ownerName"
                                             type="text"
-                                            placeholder="Owner name"
+                                            placeholder="Enter owner name"
                                             value={ownerName}
                                             onChange={e => setOwnerName(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                 </div>
-                                <button className="brand-submit" type="submit">Submit</button>
+                                <div className='d-flex justify-content-center'>
+                                    <button className="Z_btn" type="submit">Submit</button>
+                                </div>
                             </form>
                         </div>
                     ) : showBankDetails && !showPickupAddress && !showSubscription ? (
@@ -214,55 +282,61 @@ function SellergstVerify() {
                             <h2 className="bank-title">Bank Details</h2>
                             <p className="bank-subtext">Bank account should be in the name of<br />registered business name or trade name as per GSTIN.</p>
                             <form className="bank-form" onSubmit={handleBankSubmit}>
-                                <div className="bank-row">
+                                <div className="Z_row">
                                     <label htmlFor="bankName">Bank Name</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="bankName"
                                             type="text"
-                                            placeholder="Bank Name"
+                                            placeholder="Enter bank name"
                                             value={bankName}
                                             onChange={e => setBankName(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                 </div>
-                                <div className="bank-row">
+                                <div className="Z_row">
                                     <label htmlFor="accountNumber">Account Number</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="accountNumber"
                                             type="text"
-                                            placeholder="Account number"
+                                            placeholder="Enter account number"
                                             value={accountNumber}
                                             onChange={e => setAccountNumber(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                 </div>
-                                <div className="bank-row">
+                                <div className="Z_row">
                                     <label htmlFor="confirmAccountNumber">Confirm Account Number</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="confirmAccountNumber"
                                             type="text"
-                                            placeholder="Account number"
+                                            placeholder="Confirm account number"
                                             value={confirmAccountNumber}
                                             onChange={e => setConfirmAccountNumber(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                 </div>
-                                <div className="bank-row">
+                                <div className="Z_row">
                                     <label htmlFor="ifscCode">IFSC Code</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="ifscCode"
                                             type="text"
-                                            placeholder="IFSC Code"
+                                            placeholder="Enter IFSC code"
                                             value={ifscCode}
                                             onChange={e => setIfscCode(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                 </div>
-                                <button className="bank-submit" type="submit">Verify Bank Details</button>
+                                <div className='d-flex justify-content-center'>
+                                    <button className="Z_btn" type="submit">Verify Bank Details</button>
+                                </div>
                             </form>
                         </div>
                     ) : showPickupAddress && !showSubscription ? (
@@ -270,52 +344,56 @@ function SellergstVerify() {
                             <h2 className="pickup-title">Pickup Address</h2>
                             <p className="pickup-subtext">Products will be picked up from this location for delivery.</p>
                             <form className="pickup-form" onSubmit={handlePickupSubmit}>
-                                <div className="pickup-row">
+                                <div className="Z_row">
                                     <label htmlFor="roomNumber">Room/ Floor/ Building Number</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="roomNumber"
                                             type="text"
-                                            placeholder="Room/ Floor/ Building Number"
+                                            placeholder="Enter room/floor/building number"
                                             value={roomNumber}
                                             onChange={e => setRoomNumber(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                 </div>
-                                <div className="pickup-row">
+                                <div className="Z_row">
                                     <label htmlFor="street">Street/ Locality</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="street"
                                             type="text"
-                                            placeholder="Street/ Locality"
+                                            placeholder="Enter street/locality"
                                             value={street}
                                             onChange={e => setStreet(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                 </div>
-                                <div className="pickup-row">
+                                <div className="Z_row">
                                     <label htmlFor="landmark">Landmark</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="landmark"
                                             type="text"
-                                            placeholder="Landmark"
+                                            placeholder="Enter landmark"
                                             value={landmark}
                                             onChange={e => setLandmark(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                 </div>
-                                <div className="pickup-row pickup-row-flex">
+                                <div className="Z_row">
                                     <div className="pickup-col">
                                         <label htmlFor="pincode">Pincode</label>
                                         <div className="Z_input-verified">
                                             <input
                                                 id="pincode"
                                                 type="text"
-                                                placeholder="Pincode"
+                                                placeholder="Enter pincode"
                                                 value={pincode}
                                                 onChange={e => setPincode(e.target.value)}
+                                                className="Z_input"
                                             />
                                         </div>
                                     </div>
@@ -325,40 +403,36 @@ function SellergstVerify() {
                                             <input
                                                 id="city"
                                                 type="text"
-                                                placeholder="City"
+                                                placeholder="Enter city"
                                                 value={city}
                                                 onChange={e => setCity(e.target.value)}
+                                                className="Z_input"
                                             />
                                         </div>
                                     </div>
                                 </div>
-                                <div className="pickup-row">
+                                <div className="Z_row">
                                     <label htmlFor="state">State</label>
                                     <div className="Z_input-verified">
                                         <input
                                             id="state"
                                             type="text"
-                                            placeholder="State"
+                                            placeholder="Enter state"
                                             value={state}
                                             onChange={e => setState(e.target.value)}
+                                            className="Z_input"
                                         />
                                     </div>
                                 </div>
-                                <button className="pickup-submit" type="submit">Continue</button>
+                                <div className='d-flex justify-content-center'>
+                                    <button className="Z_btn" type="submit">Continue</button>
+                                </div>
                             </form>
                         </div>
                     ) : showSubscription ? (
-                        <div className=" Z_card">
+                        <div className="Z_card_wide">
                             <div className="subscription-card-dark">
                                 <h2 className="subscription-title-dark">Choose a plan</h2>
-                                <div className="subscription-toggle-row">   
-                                    <span className="toggle-label">Personal</span>
-                                    <label className="switch">
-                                        <input type="checkbox" />
-                                        <span className="slider"></span>
-                                    </label>
-                                    <span className="toggle-label">Business</span>
-                                </div>
                                 <div className="subscription-plans-dark">
                                     <div className="subscription-plan-dark">
                                         <h3>Gold</h3>

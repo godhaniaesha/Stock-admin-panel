@@ -345,7 +345,18 @@
   padding: 30px;
   border-radius: 8px;
   max-width: 500px;
-  margin: 0 auto;
+  margin: 40px auto;
+  background: rgba(255, 255, 255, 0.03);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+}
+
+.Z_card_wide {
+  padding: 30px;
+  border-radius: 8px;
+  max-width: 900px;
+  margin: 40px auto;
   background: rgba(255, 255, 255, 0.03);
   backdrop-filter: blur(10px);
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -356,23 +367,22 @@
   font-size: 20px;
   color: #c1c1c1;
   margin-bottom: 5px;
+  text-align: center;
 }
 
 .Z_subtext {
   font-size: 14px;
   color: #c1c1c1;
   margin-bottom: 20px;
-}
-
-.Z_row {
-  margin-bottom: 15px;
+  text-align: center;
 }
 
 .Z_row label {
-  font-weight: bold;
   display: block;
-  margin-bottom: 5px;
-  color: #c1c1c1;
+  margin-bottom: 8px;
+  color: #fff;
+  font-size: 0.9rem;
+  font-weight: 500;
 }
 
 .Z_row p {
@@ -381,17 +391,30 @@
 }
 
 .Z_input-verified {
-  display: flex;
-  align-items: center;
-  gap: 10px;
+  position: relative;
+  width: 100%;
+  margin-bottom: 13px;
 }
 
-.Z_input-verified input {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  flex: 1;
-  background-color: #f9f9f9;
+.Z_input {
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.03);
+  color: #fff;
+  font-size: 1rem;
+  transition: all 0.3s ease;
+}
+
+.Z_input:focus {
+  border-color: #84a98c;
+  background: rgba(255, 255, 255, 0.05);
+  outline: none;
+}
+
+.Z_input::placeholder {
+  color: rgba(255, 255, 255, 0.5);
 }
 
 .Z_verified {
@@ -402,18 +425,20 @@
 
 .Z_btn {
   width: 100%;
-  padding: 10px;
+  padding: 12px;
   background: #84a98c;
-  color: white;
+  color: #fff;
   border: none;
-  border-radius: 6px;
-  font-weight: bold;
-  margin-top: 20px;
+  border-radius: 8px;
+  font-size: 1rem;
+  font-weight: 500;
   cursor: pointer;
+  transition: all 0.3s ease;
 }
 
 .Z_btn:hover {
-  background: linear-gradient(to right, #0a5e30, #10653c);
+  background: #6b8c6d;
+  transform: translateY(-1px);
 }
 
 @media (max-width: 600px) {
@@ -424,7 +449,6 @@
     display: none;
   }
 }
-
 
 .otp-card {
   max-width: 400px;
@@ -462,7 +486,7 @@
   text-align: center;
   border: 1px solid #e0e0e0;
   border-radius: 8px;
-  background: #f5f5f5;
+  background: #cdcdcd;
   outline: none;
   transition: border 0.2s;
 }
@@ -593,7 +617,7 @@
 .bank-form {
   display: flex;
   flex-direction: column;
-  gap: 18px;
+  gap: 5px;
 }
 .bank-row label {
   font-weight: 500;
@@ -745,10 +769,13 @@
 .slider {
   position: absolute;
   cursor: pointer;
-  top: 0; left: 0; right: 0; bottom: 0;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
   background-color: #232733;
   border-radius: 34px;
-  transition: .4s;
+  transition: 0.4s;
 }
 .slider:before {
   position: absolute;
@@ -757,8 +784,8 @@
   width: 22px;
   left: 4px;
   bottom: 3px;
-  background-color: #00bfff;
-  transition: .4s;
+  background-color: #84a98c;
+  transition: 0.4s;
   border-radius: 50%;
 }
 .switch input:checked + .slider {
@@ -769,24 +796,18 @@
 }
 .subscription-plans-dark {
   display: flex;
-  gap: 32px;
+  gap: 20px;
   justify-content: center;
-  flex-wrap: wrap;
+  margin-top: 30px;
 }
 .subscription-plan-dark {
-  background: #232733;
-  border-radius: 18px;
-  padding: 32px 28px 28px 28px;
-  min-width: 270px;
-  max-width: 320px;
-  flex: 1 1 270px;
-  box-shadow: 0 2px 16px rgba(0,0,0,0.18);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  margin-bottom: 18px;
-  color: #fff;
-  position: relative;
+  flex: 1;
+  max-width: 400px;
+  background: #1a1a1a;
+  border-radius: 10px;
+  padding: 30px;
+  text-align: center;
+  transition: transform 0.3s ease;
 }
 .subscription-plan-dark h3 {
   font-size: 1.3rem;
@@ -798,7 +819,7 @@
 .subscription-divider {
   width: 60px;
   height: 3px;
-  background: #00bfff;
+  background: #84a98c;
   border-radius: 2px;
   margin: 0 auto 18px auto;
 }
@@ -814,7 +835,7 @@
   margin-left: 2px;
 }
 .subscription-duration {
-  color: #00bfff;
+  color: #84a98c;
   font-size: 1.1rem;
   margin-bottom: 10px;
   font-weight: 500;
@@ -841,12 +862,12 @@
   gap: 8px;
 }
 .checkmark {
-  color: #00bfff;
+  color: #84a98c;
   font-size: 1.1rem;
   font-weight: bold;
 }
 .subscription-btn-dark {
-  background: #00bfff;
+  background: #84a98c;
   color: #fff;
   border: none;
   border-radius: 8px;
@@ -857,11 +878,9 @@
   cursor: pointer;
   transition: background 0.2s;
   margin-top: 8px;
-  box-shadow: 0 2px 8px rgba(0,191,255,0.08);
+  box-shadow: 0 2px 8px rgba(0, 191, 255, 0.08);
 }
-.subscription-btn-dark:hover {
-  background: #0090c7;
-}
+
 @media (max-width: 900px) {
   .subscription-plans-dark {
     flex-direction: column;
@@ -878,8 +897,11 @@
 /* Modal Overlay */
 .Z_modal_overlay {
   position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.18);
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.18);
   z-index: 1000;
   display: flex;
   align-items: center;
@@ -890,7 +912,7 @@
 .Z_modal {
   background: #fff;
   border-radius: 12px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   padding: 32px 24px 24px 24px;
   min-width: 340px;
   max-width: 95vw;
@@ -953,4 +975,173 @@
 
 .Z_modal_btn:hover {
   background: linear-gradient(90deg, #2e7d32 0%, #388e3c 100%);
+}
+
+/* Responsive Styles */
+@media (max-width: 1200px) {
+  .Z_card_wide {
+    max-width: 95%;
+    margin: 30px auto;
+  }
+}
+
+@media (max-width: 992px) {
+  .Z_container {
+    padding: 15px;
+  }
+
+  .subscription-plans-dark {
+    gap: 15px;
+  }
+
+  .subscription-plan-dark {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 768px) {
+  .Z_card,
+  .Z_card_wide {
+    padding: 20px;
+    margin: 20px auto;
+  }
+
+  .subscription-plans-dark {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .subscription-plan-dark {
+    width: 100%;
+    max-width: 400px;
+  }
+
+  .subscription-title-dark {
+    font-size: 1.5rem;
+  }
+
+  .subscription-price-dark {
+    font-size: 1.8rem;
+  }
+
+  .subscription-duration {
+    font-size: 1rem;
+  }
+
+  .subscription-desc {
+    font-size: 0.9rem;
+  }
+
+  .subscription-btn-dark {
+    padding: 10px 0;
+    font-size: 1rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .Z_card,
+  .Z_card_wide {
+    padding: 15px;
+    margin: 15px auto;
+  }
+
+  .subscription-plan-dark {
+    padding: 15px;
+  }
+
+  .subscription-title-dark {
+    font-size: 1.3rem;
+    margin-bottom: 15px;
+  }
+
+  .subscription-price-dark {
+    font-size: 1.5rem;
+  }
+
+  .subscription-duration {
+    font-size: 0.9rem;
+  }
+
+  .subscription-desc {
+    font-size: 0.85rem;
+    min-height: auto;
+  }
+
+  .subscription-plan-dark ul {
+    font-size: 0.9rem;
+  }
+
+  .subscription-plan-dark ul li {
+    margin-bottom: 6px;
+  }
+
+  .checkmark {
+    font-size: 1rem;
+  }
+
+  .subscription-btn-dark {
+    padding: 8px 0;
+    font-size: 0.9rem;
+  }
+
+  .Z_input {
+    padding: 10px 12px;
+    font-size: 0.9rem;
+  }
+  .Z_btn {
+    font-size: 15px;
+    width: 50%;
+    padding: 8px 0;
+  }
+  .pickup-form {
+    gap: 0px;
+  }
+  .otp-card h2 {
+    font-size: 20px;
+  }
+  .otp-subtext {
+    font-size: 14px;
+  }
+  .pickup-subtext,
+  .bank-subtext,
+  .brand-subtext {
+    font-size: 14px;
+  }
+}
+
+@media (max-width: 400px) {
+  .Z_card,
+  .Z_card_wide {
+    padding: 10px;
+    margin: 10px auto;
+  }
+
+  .subscription-plan-dark {
+    padding: 12px;
+  }
+
+  .subscription-title-dark {
+    font-size: 1.2rem;
+  }
+
+  .subscription-price-dark {
+    font-size: 1.3rem;
+  }
+
+  .subscription-duration {
+    font-size: 0.85rem;
+  }
+
+  .subscription-desc {
+    font-size: 0.8rem;
+  }
+
+  .subscription-plan-dark ul {
+    font-size: 0.85rem;
+  }
+
+  .subscription-btn-dark {
+    padding: 8px 0;
+    font-size: 0.85rem;
+  }
 }

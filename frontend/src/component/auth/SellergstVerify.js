@@ -2,14 +2,15 @@ import React, { useState, useRef } from 'react';
 import { Container } from 'react-bootstrap';
 import Stepper from 'react-stepper-horizontal';
 import '../../styles/seller.css';
+import CustomStepper from '../CustomStepper';
 
 function SellergstVerify() {
-    const [showGstVerification, setShowGstVerification] = useState(true);
-    const [showOtp, setShowOtp] = useState(false);
-    const [showBrandDetails, setShowBrandDetails] = useState(false);
-    const [showBankDetails, setShowBankDetails] = useState(false);
-    const [showPickupAddress, setShowPickupAddress] = useState(false);
-    const [showSubscription, setShowSubscription] = useState(false);
+    // const [showGstVerification, setShowGstVerification] = useState(true);
+    // const [showOtp, setShowOtp] = useState(false);
+    // const [showBrandDetails, setShowBrandDetails] = useState(false);
+    // const [showBankDetails, setShowBankDetails] = useState(false);
+    // const [showPickupAddress, setShowPickupAddress] = useState(false);
+    // const [showSubscription, setShowSubscription] = useState(false);
     const [gstNumber, setGstNumber] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputsRef = useRef([]);
@@ -32,6 +33,22 @@ function SellergstVerify() {
         businessType: "Wholesale Business, Retail Business",
         businessAddress: "4517 Washington Ave. Manchester, Kentucky 39495"
     });
+    const [currentStep, setCurrentStep] = useState(0);
+    const [showGstVerification, setShowGstVerification] = useState(true);
+    const [showOtp, setShowOtp] = useState(false);
+    const [showBrandDetails, setShowBrandDetails] = useState(false);
+    const [showBankDetails, setShowBankDetails] = useState(false);
+    const [showPickupAddress, setShowPickupAddress] = useState(false);
+    const [showSubscription, setShowSubscription] = useState(false);
+
+    const steps = [
+        { label: "Account Creation", title: "Account Creation" },
+        { label: "Seller Details", title: "Seller Details" },
+        { label: "Brand Details", title: "Brand Details" },
+        { label: "Bank Details", title: "Bank Details" },
+        { label: "Pickup Address", title: "Pickup Address" },
+        { label: "Verify & Submit", title: "Verify & Submit" },
+    ];
 
     const handleOtpChange = (e, idx) => {
         const value = e.target.value.replace(/[^0-9]/g, '');
@@ -129,7 +146,164 @@ function SellergstVerify() {
                             />
                         </div>
                     </Container> */}
+                    <style jsx>{`
+        .stepper-container {
+          width: 100%;
+          margin: 20px 0;
+          padding: 0 20px;
+        }
 
+        .stepper-wrapper {
+          display: flex;
+          justify-content: space-between;
+          align-items: flex-start;
+          position: relative;
+          max-width: 800px;
+          margin: 0 auto;
+        }
+
+        .stepper-item {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          flex: 1;
+          position: relative;
+        }
+
+        .stepper-step {
+          position: relative;
+          display: flex;
+          align-items: center;
+          width: 100%;
+          margin-bottom: 10px;
+          justify-content: center;
+        }
+
+        .step-number {
+          width: 40px;
+          height: 40px;
+          border-radius: 50%;
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          font-weight: 600;
+          font-size: 14px;
+          position: relative;
+          z-index: 2;
+          transition: all 0.3s ease;
+        }
+
+        .step-number.completed,
+        .stepper-step.completed .step-number {
+          background-color: #84a98c;
+          color: white;
+          border: 2px solid #84a98c;
+        }
+
+        .step-number.active,
+        .stepper-step.active .step-number {
+          background-color: #84a98c;
+          color: white;
+          border: 2px solid #84a98c;
+        }
+
+        .step-number.default,
+        .stepper-step.default .step-number {
+          background-color: #f8f9fa;
+          color: #666666;
+          border: 2px solid #ddd;
+        }
+
+        .step-line {
+          position: absolute;
+          height: 2px;
+          top: 50%;
+          left: 50px;
+          right: -50%;
+          transform: translateY(-50%);
+          z-index: 1;
+          transition: all 0.3s ease;
+        }
+
+        .completed-line {
+          background-color: #84a98c;
+        }
+
+        .default-line {
+          background-color: #ddd;
+        }
+
+        .step-label {
+          text-align: center;
+          font-size: 14px;
+          margin-top: 8px;
+          transition: all 0.3s ease;
+          white-space: nowrap;
+        }
+
+        .active-label {
+          color: #84a98c;
+          font-weight: 600;
+        }
+
+        .default-label {
+          color: #666666;
+        }
+
+        .seller-container {
+          min-height: 100vh;
+          background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+          padding: 20px;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+          .stepper-container {
+            padding: 0 10px;
+          }
+          
+          .step-number {
+            width: 32px;
+            height: 32px;
+            font-size: 12px;
+          }
+          
+          .step-label {
+            font-size: 10px;
+            margin-top: 6px;
+          }
+          
+          .step-line {
+            left: 50px;
+          }
+        }
+
+        @media (max-width: 576px) {
+
+        .stepper-container {
+            width: 100%;
+            max-width: 100vw;
+            margin: 20px 0;
+            padding: 0 20px;
+            overflow-x: auto;
+            } 
+        .step-line {
+                left: 40px;
+                }
+
+           .stepper-item {
+             margin-bottom: 10px;
+    margin-right: 5px;
+        }
+    .step-label {
+    font-size: 12px;}
+       
+        }
+      `}</style>
+                    <CustomStepper steps={steps} activeStep={currentUser.filledSteps} />
                     {showGstVerification ? (
                         <div className="Z_card">
                             <h2>Seller Details</h2>

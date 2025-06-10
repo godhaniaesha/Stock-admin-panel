@@ -42,6 +42,7 @@ const EditProduct = () => {
     const [selectedColors, setSelectedColors] = useState([]);
     const [productImage, setProductImage] = useState(null);
     const [newImageFile, setNewImageFile] = useState(null);
+    const [existingImagePath, setExistingImagePath] = useState(null);
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
     const [validationError, setValidationError] = useState('');
@@ -98,9 +99,11 @@ const EditProduct = () => {
 
             // Set product image
             if (currentProduct.images && currentProduct.images.length > 0) {
-                setProductImage(currentProduct.images[0]);
+                setExistingImagePath(currentProduct.images[0]);
+                setProductImage(`http://localhost:2221/${currentProduct.images[0]}`);
             } else {
                 setProductImage(null);
+                setExistingImagePath(null);
             }
 
             // Set sizes if available
@@ -122,7 +125,8 @@ const EditProduct = () => {
     // Handle success/error states
     useEffect(() => {
         if (success) {
-            alert('Product updated successfully!');
+            // alert('Product updated successfully!');
+            navigate('/products/view')
             dispatch(clearProductSuccess());
         }
     }, [success, dispatch, navigate]);
@@ -153,29 +157,27 @@ const EditProduct = () => {
 
         if (!file) {
             setValidationError('Please select a file');
-            setProductImage(null);
-            setNewImageFile(null);
             return;
         }
 
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (!validTypes.includes(file.type)) {
             setValidationError('Invalid file type. Only PNG, JPG and JPEG are allowed');
-            setProductImage(null);
-            setNewImageFile(null);
             return;
         }
 
         const maxSize = 5 * 1024 * 1024; // 5MB in bytes
         if (file.size > maxSize) {
             setValidationError('File size exceeds 5MB limit');
-            setProductImage(null);
-            setNewImageFile(null);
             return;
         }
 
-        const imageUrl = URL.createObjectURL(file);
-        setProductImage(imageUrl);
+        // Create preview URL for display
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProductImage(reader.result);
+        };
+        reader.readAsDataURL(file);
         setNewImageFile(file);
     };
 
@@ -218,25 +220,37 @@ const EditProduct = () => {
 
         const formData = new FormData();
 
-        // Append all product data fields
-        for (const key in productData) {
-            if (key === 'isActive') {
-                formData.append(key, productData[key]);
-            } else if (key === 'stock' || key === 'price' || key === 'discount' || key === 'tax' || key === 'lowStockThreshold') {
-                formData.append(key, parseFloat(productData[key]) || 0);
+        // Format the data properly before sending
+        const formattedData = {
+            ...productData,
+            stock: parseInt(productData.stock) || 0,
+            price: parseFloat(productData.price) || 0,
+            discount: parseFloat(productData.discount) || 0,
+            tax: parseFloat(productData.tax) || 0,
+            lowStockThreshold: parseInt(productData.lowStockThreshold) || 5,
+            isActive: productData.isActive === "true" || productData.isActive === true,
+            tags: Array.isArray(tags) ? tags : [],
+            sizes: Array.isArray(selectedSize) ? selectedSize : [],
+            colors: Array.isArray(selectedColors) ? selectedColors : []
+        };
+
+        // Append all formatted data fields
+        for (const key in formattedData) {
+            if (key === 'images') continue; // Skip images as we'll handle it separately
+            if (typeof formattedData[key] === 'object') {
+                formData.append(key, JSON.stringify(formattedData[key]));
             } else {
-                formData.append(key, productData[key]);
+                formData.append(key, formattedData[key]);
             }
         }
 
-        // Append arrays
-        formData.append('tags', JSON.stringify(tags));
-        formData.append('sizes', JSON.stringify(selectedSize));
-        formData.append('colors', JSON.stringify(selectedColors));
-
-        // Append new image file if it exists
+        // Handle image update
         if (newImageFile) {
-            formData.append('productImage', newImageFile);
+            // If there's a new image, append it
+            formData.append('images', newImageFile);
+        } else if (existingImagePath) {
+            // If there's an existing image and no new image, keep the existing one
+            formData.append('existingImage', existingImagePath);
         }
 
         try {
@@ -332,6 +346,7 @@ const EditProduct = () => {
                                                 e.stopPropagation();
                                                 setProductImage(null);
                                                 setNewImageFile(null);
+                                                setExistingImagePath(null);
                                             }}
                                         >
                                             ×

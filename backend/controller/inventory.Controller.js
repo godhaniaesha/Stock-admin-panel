@@ -1,11 +1,11 @@
 const mongoose = require('mongoose');
-const {Inventory} = require('../model');
+const { Inventory } = require('../model');
 
 // Create Inventory
 const createInventory = async (req, res) => {
     try {
         const { category, subcategory, sellerId, product, quantity, lowStockLimit } = req.body;
-        const inventory = new Inventory({ category, subcategory,sellerId, product, quantity, lowStockLimit });
+        const inventory = new Inventory({ category, subcategory, sellerId, product, quantity, lowStockLimit });
         await inventory.save();
         res.status(201).json(inventory);
     } catch (err) {
@@ -72,9 +72,12 @@ const getInventory = async (req, res) => {
 // Update Inventory
 const updateInventory = async (req, res) => {
     try {
-        const { category, subcategory,sellerId , product, quantity, lowStockLimit } = req.body;
-        const updateData = { category, subcategory,sellerId, product, quantity, lowStockLimit };
+        const { category, subcategory, sellerId, product, quantity, lowStockLimit } = req.body;
+        console.log("req.body",req.body)
+        const updateData = { category, subcategory, sellerId, product, quantity, lowStockLimit };
+        console.log("updateData: ", updateData)
         const inventory = await Inventory.findByIdAndUpdate(req.params.id, updateData, { new: true });
+        console.log(inventory, "inventoryyy")
         res.json(inventory);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -112,7 +115,7 @@ const getLowInventory = async (req, res) => {
             {
                 $lookup: {
                     from: 'subcategories',
-                    localField: 'subcategory',  
+                    localField: 'subcategory',
                     foreignField: '_id',
                     as: 'subcategory'
                 }

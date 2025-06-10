@@ -71,7 +71,10 @@ const createProduct = async (req, res) => {
 
         // Save image paths to DB
         if (images && images.length > 0) {
-            const imagePaths = images.map((img) => img.path);
+            const imagePaths = images.map((img) => {
+                // Convert backslashes to forward slashes and remove any double slashes
+                return img.path.replace(/\\/g, '/').replace(/\/+/g, '/');
+            });
             productData.images = imagePaths;
         }
 
@@ -209,6 +212,34 @@ const updateProduct = async (req, res) => {
         const updateData = req.body;
         const images = req.files; // New uploaded files, if any
 
+        // Parse JSON strings back to objects
+        if (typeof updateData.tags === 'string') {
+            try {
+                updateData.tags = JSON.parse(updateData.tags);
+            } catch (e) {
+                updateData.tags = [];
+            }
+        }
+        if (typeof updateData.sizes === 'string') {
+            try {
+                updateData.sizes = JSON.parse(updateData.sizes);
+            } catch (e) {
+                updateData.sizes = [];
+            }
+        }
+        if (typeof updateData.colors === 'string') {
+            try {
+                updateData.colors = JSON.parse(updateData.colors);
+            } catch (e) {
+                updateData.colors = [];
+            }
+        }
+
+        // Convert string boolean to actual boolean
+        if (typeof updateData.isActive === 'string') {
+            updateData.isActive = updateData.isActive === 'true';
+        }
+
         // Check for duplicate SKU (excluding current product)
         const existingSku = await Product.findOne({ sku: updateData.sku, _id: { $ne: id } });
         if (existingSku) {
@@ -227,11 +258,19 @@ const updateProduct = async (req, res) => {
             });
         }
 
-        // If new images are uploaded, append them to the images array
+        // Handle image updates
         if (images && images.length > 0) {
-            const newImagePaths = images.map(img => img.path);
+            // If new images are uploaded, use them
+            const newImagePaths = images.map(img => {
+                return img.path.replace(/\\/g, '/').replace(/\/+/g, '/');
+            });
             updateData.images = newImagePaths;
+        } else if (updateData.existingImage) {
+            // If no new images but existing image is provided, keep it
+            updateData.images = [updateData.existingImage];
         }
+        // Remove the existingImage field as it's not part of the schema
+        delete updateData.existingImage;
 
         const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
             new: true,

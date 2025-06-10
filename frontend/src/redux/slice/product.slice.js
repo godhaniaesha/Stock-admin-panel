@@ -70,7 +70,7 @@ export const updateProduct = createAsyncThunk(
             const response = await axios.put(`${API_URL}/update/${id}`, productData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'multipart/form-data'
                 }
             });
             return response.data;

@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/Z_styles.css';
-import { Table, Modal } from 'react-bootstrap';
+import { Table, Modal, Button, Spinner } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
@@ -15,6 +15,8 @@ const CategoryList = () => {
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [categoryToDelete, setCategoryToDelete] = useState(null);
     const [timeFilter, setTimeFilter] = useState('thisMonth');
+    const [selectedCategories, setSelectedCategories] = useState([]);
+    const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
 
     useEffect(() => {
         dispatch(fetchCategories());
@@ -77,6 +79,43 @@ const CategoryList = () => {
         setCategoryToDelete(null);
     };
 
+    // Handle checkbox selection
+    const handleCategorySelection = (categoryId) => {
+        setSelectedCategories(prev =>
+            prev.includes(categoryId)
+                ? prev.filter(id => id !== categoryId)
+                : [...prev, categoryId]
+        );
+    };
+
+    // Handle select all
+    const handleSelectAll = () => {
+        if (selectedCategories.length === filteredCategories.length) {
+            setSelectedCategories([]);
+        } else {
+            setSelectedCategories(filteredCategories.map(cat => cat._id));
+        }
+    };
+
+    // Handle bulk delete
+    const handleBulkDelete = () => {
+        setShowBulkDeleteModal(true);
+    };
+
+    const confirmBulkDelete = async () => {
+        if (selectedCategories.length > 0) {
+            try {
+                await Promise.all(
+                    selectedCategories.map(id => dispatch(deleteCategory(id)).unwrap())
+                );
+                setSelectedCategories([]);
+                setShowBulkDeleteModal(false);
+            } catch (error) {
+                console.error('Bulk delete error:', error);
+            }
+        }
+    };
+
     if (isLoading) {
         return <div>Loading categories...</div>;
     }
@@ -104,6 +143,15 @@ const CategoryList = () => {
                                 <option value="lastMonth">Last Month</option>
                                 <option value="last3Months">Last 3 Months</option>
                             </select>
+                            {selectedCategories.length > 0 && (
+                                <button
+                                    className="Z_btn Z_btn_delete"
+                                    onClick={handleBulkDelete}
+                                    disabled={isLoading}
+                                >
+                                    Delete Selected ({selectedCategories.length})
+                                </button>
+                            )}
                         </div>
                     </div>
                     <div className="Z_table_scroll_container">
@@ -112,7 +160,13 @@ const CategoryList = () => {
                                 <tr>
                                     <th>
                                         <div className="Z_custom_checkbox">
-                                            <input type="checkbox" id="selectAll" className="Z_checkbox_input" />
+                                            <input 
+                                                type="checkbox" 
+                                                id="selectAll" 
+                                                className="Z_checkbox_input"
+                                                checked={selectedCategories.length === filteredCategories.length && filteredCategories.length > 0}
+                                                onChange={handleSelectAll}
+                                            />
                                             <label htmlFor="selectAll" className="Z_checkbox_label"></label>
                                         </div>
                                     </th>
@@ -132,6 +186,8 @@ const CategoryList = () => {
                                                     type="checkbox"
                                                     id={`checkbox-${category._id}`}
                                                     className="Z_checkbox_input"
+                                                    checked={selectedCategories.includes(category._id)}
+                                                    onChange={() => handleCategorySelection(category._id)}
                                                 />
                                                 <label
                                                     htmlFor={`checkbox-${category._id}`}
@@ -165,9 +221,9 @@ const CategoryList = () => {
                                         </td>
                                         <td>
                                             <div className="Z_action_buttons">
-                                                <button className="Z_action_btn Z_view_btn">
+                                                {/* <button className="Z_action_btn Z_view_btn">
                                                     <TbEye size={22} />
-                                                </button>
+                                                </button> */}
                                                 <button
                                                     className="Z_action_btn Z_edit_btn"
                                                     onClick={() => handleEdit(category)}
@@ -190,36 +246,59 @@ const CategoryList = () => {
                 </div>
             </section>
 
-            {/* Delete Confirmation Modal */}
-            <div className='Z_Dlt_modal'>
-                <Modal
-                    show={showDeleteModal}
-                    onHide={handleDeleteCancel}
-                    centered
-                    className={`${isDarkMode ? 'd_dark' : 'd_light'}`}
-                >
-                    <Modal.Header closeButton>
-                        <Modal.Title>Delete Category</Modal.Title>
-                    </Modal.Header>
-                    <Modal.Body>
-                        Are you sure you want to delete the category "{categoryToDelete?.title}"?
-                    </Modal.Body>
-                    <Modal.Footer>
-                        <button
-                            className="Z_btn Z_btn_cancel"
-                            onClick={handleDeleteCancel}
-                        >
-                            Cancel
-                        </button>
-                        <button
-                            className="Z_btn Z_btn_delete"
-                            onClick={handleDeleteConfirm}
-                        >
-                            Delete
-                        </button>
-                    </Modal.Footer>
-                </Modal>
-            </div>
+            {/* Single Delete Modal */}
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Delete</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete category "{categoryToDelete?.title}"? This action cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button
+                        variant="danger"
+                        onClick={handleDeleteConfirm}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? (
+                            <>
+                                <Spinner animation="border" size="sm" className="me-2" />
+                                Deleting...
+                            </>
+                        ) : (
+                            'Delete'
+                        )}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Bulk Delete Modal */}
+            <Modal show={showBulkDeleteModal} onHide={() => setShowBulkDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Bulk Delete</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete <strong>{selectedCategories.length}</strong> selected category(s)? This action cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowBulkDeleteModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={confirmBulkDelete} disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Spinner animation="border" size="sm" className="me-2" />
+                                Deleting...
+                            </>
+                        ) : (
+                            'Confirm Delete'
+                        )}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
         </>
     );
 };

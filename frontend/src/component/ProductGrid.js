@@ -593,9 +593,10 @@ function ProductGrid() {
                                 <Col key={product._id} lg={3} md={4} sm={6} xs={12} className="mb-4">
                                     <Card className="h-100 Z_product_card">
                                         <div className="Z_product_image">
-                                            <img
-                                                src={product.images?.[0] || 'https://via.placeholder.com/400x400'}
-                                                alt={product.productName}
+                                            <img 
+                                            src={`http://localhost:2221/${product.images?.[0]}`}
+                                                // src={product.images?.[0] || 'https://via.placeholder.com/400x400'} 
+                                                alt={product.productName} 
                                             />
                                         </div>
                                         <div className="Z_product_info">

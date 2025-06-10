@@ -53,14 +53,28 @@ export const updateInventory = createAsyncThunk(
     async ({ id, updatedData }, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`${API_URL}/update/${id}`, updatedData, {
+            console.log("Sending update request with:", { id, updatedData });
+            
+            const response = await axios.put(`${API_URL}/${id}`, updatedData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
             });
-            return response.data;
+            
+            console.log("Update response:", response.data);
+            
+            // After successful update, fetch the updated inventory
+            const updatedResponse = await axios.get(`${API_URL}/${id}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                },
+            });
+            
+            console.log("Fetched updated inventory:", updatedResponse.data);
+            return updatedResponse.data;
         } catch (error) {
+            console.error("Update error:", error);
             return rejectWithValue(error.response?.data?.message || 'Failed to update inventory');
         }
     }
@@ -169,9 +183,11 @@ const productSlice = createSlice({
             })
             .addCase(updateInventory.fulfilled, (state, action) => {
                 state.isLoading = false;
-                state.inventory = state.inventory.map((item) =>
-                    item._id === action.payload._id ? action.payload : item
-                );
+                // Update the inventory in the state with the new data
+                const index = state.inventory.findIndex(item => item._id === action.payload._id);
+                if (index !== -1) {
+                    state.inventory[index] = action.payload;
+                }
                 state.success = true;
             })
             .addCase(updateInventory.rejected, (state, action) => {

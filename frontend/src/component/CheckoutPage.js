@@ -2,6 +2,10 @@ import React, { useState } from 'react';
 import '../styles/checkout.css';
 import { CreditCard, Truck, MapPin } from 'lucide-react';
 import { useOutletContext } from 'react-router-dom';
+import { BsCreditCard2Front, BsChevronDown, BsChevronRight } from 'react-icons/bs';
+import { FaWallet, FaUniversity } from 'react-icons/fa';
+import { SiGooglepay, SiPhonepe, SiPaytm } from 'react-icons/si';
+import { MdAccountBalance } from 'react-icons/md';
 
 const CheckoutPage = () => {
   const { isDarkMode } = useOutletContext();
@@ -15,7 +19,14 @@ const CheckoutPage = () => {
     city: '',
     country: '',
     shippingMethod: 'dhl',
-    promoCode: ''
+    promoCode: '',
+    paymentMethod: 'card',
+    cardNumber: '',
+    cardExpiry: '',
+    cardCvv: '',
+    cardName: '',
+    upiId: '',
+    selectedBank: ''
   });
 
   const handleInputChange = (e) => {
@@ -30,6 +41,28 @@ const CheckoutPage = () => {
     setFormData(prev => ({
       ...prev,
       shippingMethod: method
+    }));
+  };
+
+  const handlePaymentMethodChange = (method) => {
+    setFormData(prev => ({
+      ...prev,
+      paymentMethod: method
+    }));
+  };
+
+  const handleCardInput = (e, field) => {
+    const { value } = e.target;
+    setFormData(prev => ({
+      ...prev,
+      [field]: value
+    }));
+  };
+
+  const togglePaymentMethod = (method) => {
+    setFormData(prev => ({
+      ...prev,
+      paymentMethod: method
     }));
   };
 
@@ -173,7 +206,7 @@ const CheckoutPage = () => {
             </div>
           </div>
 
-          <div className="d_checkout_section mt-4">
+          {/* <div className="d_checkout_section mt-4">
             <div className="d_section_header">
               <CreditCard className="d_section_icon" />
               <h2 className="d_section_title">Shipping Method</h2>
@@ -230,7 +263,186 @@ const CheckoutPage = () => {
                 </div>
               </label>
             </div>
+          </div> */}
+
+          <div className="d_checkout_section mt-4">
+            <div className="d_section_header">
+              <CreditCard className="d_section_icon" />
+              <h2 className="d_section_title">Payment Method</h2>
+            </div>
+            <div className="d_payment_methods">
+              {/* Credit/Debit Card */}
+              <div className={`d_payment_option ${formData.paymentMethod === 'card' ? 'open' : ''}`}>
+                <div 
+                  className="d_payment_header"
+                  onClick={() => togglePaymentMethod('card')}
+                >
+                  <div className="d_payment_title">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      checked={formData.paymentMethod === 'card'}
+                      onChange={() => handlePaymentMethodChange('card')}
+                    />
+                    <span>Credit/Debit Card</span>
+                  </div>
+                  <div className="d_payment_icons">
+                    <BsCreditCard2Front size={24} />
+                    <FaWallet size={24} />
+                  </div>
+                  <span className="d_accordion_icon">
+                    {formData.paymentMethod === 'card' ? (
+                      <BsChevronDown size={20} />
+                    ) : (
+                      <BsChevronRight size={20} />
+                    )}
+                  </span>
+                </div>
+                {formData.paymentMethod === 'card' && (
+                  <div className="d_payment_details">
+                    <div className="d_form_group">
+                      <label>Card Number</label>
+                      <input 
+                        type="text" 
+                        className="d_input" 
+                        placeholder="1234 5678 9012 3456"
+                        maxLength="19"
+                        value={formData.cardNumber}
+                        onChange={(e) => handleCardInput(e, 'cardNumber')}
+                      />
+                    </div>
+                    <div className="d_card_row">
+                      <div className="d_form_group">
+                        <label>Expiry Date</label>
+                        <input 
+                          type="text" 
+                          className="d_input" 
+                          placeholder="MM/YY"
+                          maxLength="5"
+                          value={formData.cardExpiry}
+                          onChange={(e) => handleCardInput(e, 'cardExpiry')}
+                        />
+                      </div>
+                      <div className="d_form_group">
+                        <label>CVV</label>
+                        <input 
+                          type="password" 
+                          className="d_input" 
+                          placeholder="123"
+                          maxLength="3"
+                          value={formData.cardCvv}
+                          onChange={(e) => handleCardInput(e, 'cardCvv')}
+                        />
+                      </div>
+                    </div>
+                    <div className="d_form_group">
+                      <label>Card Holder Name</label>
+                      <input 
+                        type="text" 
+                        className="d_input" 
+                        placeholder="John Doe"
+                        value={formData.cardName}
+                        onChange={(e) => handleCardInput(e, 'cardName')}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* UPI */}
+              <div className={`d_payment_option ${formData.paymentMethod === 'upi' ? 'open' : ''}`}>
+                <div 
+                  className="d_payment_header"
+                  onClick={() => togglePaymentMethod('upi')}
+                >
+                  <div className="d_payment_title">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      checked={formData.paymentMethod === 'upi'}
+                      onChange={() => handlePaymentMethodChange('upi')}
+                    />
+                    <span>UPI</span>
+                  </div>
+                  <div className="d_payment_icons">
+                    <SiGooglepay size={24} />
+                    <SiPhonepe size={24} />
+                    <SiPaytm size={24} />
+                  </div>
+                  <span className="d_accordion_icon">
+                    {formData.paymentMethod === 'upi' ? (
+                      <BsChevronDown size={20} />
+                    ) : (
+                      <BsChevronRight size={20} />
+                    )}
+                  </span>
+                </div>
+                {formData.paymentMethod === 'upi' && (
+                  <div className="d_payment_details">
+                    <div className="d_form_group">
+                      <label>UPI ID</label>
+                      <input 
+                        type="text" 
+                        className="d_input" 
+                        placeholder="username@upi"
+                        value={formData.upiId}
+                        onChange={(e) => handleInputChange('upiId', e.target.value)}
+                      />
+                    </div>
+                  </div>
+                )}
+              </div>
+
+              {/* Net Banking */}
+              <div className={`d_payment_option ${formData.paymentMethod === 'netbanking' ? 'open' : ''}`}>
+                <div 
+                  className="d_payment_header"
+                  onClick={() => togglePaymentMethod('netbanking')}
+                >
+                  <div className="d_payment_title">
+                    <input
+                      type="radio"
+                      name="paymentMethod"
+                      checked={formData.paymentMethod === 'netbanking'}
+                      onChange={() => handlePaymentMethodChange('netbanking')}
+                    />
+                    <span>Net Banking</span>
+                  </div>
+                  <div className="d_payment_icons">
+                    <MdAccountBalance size={24} />
+                    <FaUniversity size={24} />
+                  </div>
+                  <span className="d_accordion_icon">
+                    {formData.paymentMethod === 'netbanking' ? (
+                      <BsChevronDown size={20} />
+                    ) : (
+                      <BsChevronRight size={20} />
+                    )}
+                  </span>
+                </div>
+                {formData.paymentMethod === 'netbanking' && (
+                  <div className="d_payment_details">
+                    <div className="d_form_group">
+                      <label>Select Bank</label>
+                      <select 
+                        className="d_input"
+                        value={formData.selectedBank}
+                        onChange={(e) => handleInputChange('selectedBank', e.target.value)}
+                      >
+                        <option value="">Select your bank</option>
+                        <option value="hdfc">HDFC Bank</option>
+                        <option value="icici">ICICI Bank</option>
+                        <option value="sbi">State Bank of India</option>
+                        <option value="axis">Axis Bank</option>
+                        <option value="kotak">Kotak Mahindra Bank</option>
+                      </select>
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
           </div>
+          
         </div>
 
         <div className="col-lg-4">

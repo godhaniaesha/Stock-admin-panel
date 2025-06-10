@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/Z_styles.css';
-import { Table, Modal } from 'react-bootstrap';
+import { Table, Modal, Button, Spinner } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
@@ -17,6 +17,8 @@ function SubcategoryList() {
     const [subcategoryToDelete, setSubcategoryToDelete] = useState(null);
     const [timeFilter, setTimeFilter] = useState('thisMonth');
     const [currentPage, setCurrentPage] = useState(1);
+    const [selectedSubcategories, setSelectedSubcategories] = useState([]);
+    const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
     const itemsPerPage = 9;
 
     useEffect(() => {
@@ -121,6 +123,43 @@ function SubcategoryList() {
         return pageNumbers;
     };
 
+    // Handle checkbox selection
+    const handleSubcategorySelection = (subcategoryId) => {
+        setSelectedSubcategories(prev =>
+            prev.includes(subcategoryId)
+                ? prev.filter(id => id !== subcategoryId)
+                : [...prev, subcategoryId]
+        );
+    };
+
+    // Handle select all
+    const handleSelectAll = () => {
+        if (selectedSubcategories.length === currentSubcategories.length) {
+            setSelectedSubcategories([]);
+        } else {
+            setSelectedSubcategories(currentSubcategories.map(sub => sub._id));
+        }
+    };
+
+    // Handle bulk delete
+    const handleBulkDelete = () => {
+        setShowBulkDeleteModal(true);
+    };
+
+    const confirmBulkDelete = async () => {
+        if (selectedSubcategories.length > 0) {
+            try {
+                await Promise.all(
+                    selectedSubcategories.map(id => dispatch(deleteSubcategory(id)).unwrap())
+                );
+                setSelectedSubcategories([]);
+                setShowBulkDeleteModal(false);
+            } catch (error) {
+                console.error('Bulk delete error:', error);
+            }
+        }
+    };
+
     if (isLoading) {
         return <div>Loading subcategories...</div>;
     }
@@ -146,6 +185,15 @@ function SubcategoryList() {
                                 <option value="lastMonth">Last Month</option>
                                 <option value="last3Months">Last 3 Months</option>
                             </select>
+                            {selectedSubcategories.length > 0 && (
+                                <button
+                                    className="Z_btn Z_btn_delete"
+                                    onClick={handleBulkDelete}
+                                    disabled={isLoading}
+                                >
+                                    Delete Selected ({selectedSubcategories.length})
+                                </button>
+                            )}
                         </div>
                     </div>
                     <div className="Z_table_scroll_container">
@@ -154,11 +202,17 @@ function SubcategoryList() {
                                 <tr>
                                     <th>
                                         <div className="Z_custom_checkbox">
-                                            <input type="checkbox" id="selectAll" className="Z_checkbox_input" />
+                                            <input 
+                                                type="checkbox" 
+                                                id="selectAll" 
+                                                className="Z_checkbox_input"
+                                                checked={selectedSubcategories.length === currentSubcategories.length && currentSubcategories.length > 0}
+                                                onChange={handleSelectAll}
+                                            />
                                             <label htmlFor="selectAll" className="Z_checkbox_label"></label>
                                         </div>
                                     </th>
-                                    <th>Subcategory ID</th>
+                                    {/* <th>Subcategory ID</th> */}
                                     <th>Category Name</th>
                                     <th>Subcategory Details</th>
                                     <th>Description</th>
@@ -174,6 +228,8 @@ function SubcategoryList() {
                                                     type="checkbox"
                                                     id={`checkbox-${subcategory._id}`}
                                                     className="Z_checkbox_input"
+                                                    checked={selectedSubcategories.includes(subcategory._id)}
+                                                    onChange={() => handleSubcategorySelection(subcategory._id)}
                                                 />
                                                 <label
                                                     htmlFor={`checkbox-${subcategory._id}`}
@@ -181,7 +237,7 @@ function SubcategoryList() {
                                                 ></label>
                                             </div>
                                         </td>
-                                        <td>#{subcategory._id}</td>
+                                        {/* <td>#{subcategory._id}</td> */}
                                         <td>
                                             <div className="Z_category_name_cell">
                                                 <div className="Z_table_product_name">{subcategory.category?.title || 'N/A'}</div>
@@ -206,9 +262,9 @@ function SubcategoryList() {
                                         </td>
                                         <td>
                                             <div className="Z_action_buttons">
-                                                <button className="Z_action_btn Z_view_btn">
+                                                {/* <button className="Z_action_btn Z_view_btn">
                                                     <TbEye size={22} />
-                                                </button>
+                                                </button> */}
                                                 <button 
                                                     className="Z_action_btn Z_edit_btn"
                                                     onClick={() => handleEdit(subcategory)}
@@ -256,32 +312,57 @@ function SubcategoryList() {
                 </div>
             </section>
 
-            {/* Delete Confirmation Modal */}
-            <Modal
-                show={showDeleteModal}
-                onHide={handleDeleteCancel}
-                centered
-                className={`${isDarkMode ? 'd_dark' : 'd_light'}`}
-            >
+            {/* Single Delete Modal */}
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
                 <Modal.Header closeButton>
-                    <Modal.Title>Delete Subcategory</Modal.Title>
+                    <Modal.Title>Confirm Delete</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to delete the subcategory "{subcategoryToDelete?.subcategoryTitle}"?
+                    Are you sure you want to delete subcategory "{subcategoryToDelete?.subcategoryTitle}"? This action cannot be undone.
                 </Modal.Body>
                 <Modal.Footer>
-                    <button
-                        className="Z_btn Z_btn_cancel"
-                        onClick={handleDeleteCancel}
-                    >
+                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                         Cancel
-                    </button>
-                    <button
-                        className="Z_btn Z_btn_delete"
+                    </Button>
+                    <Button
+                        variant="danger"
                         onClick={handleDeleteConfirm}
+                        disabled={isLoading}
                     >
-                        Delete
-                    </button>
+                        {isLoading ? (
+                            <>
+                                <Spinner animation="border" size="sm" className="me-2" />
+                                Deleting...
+                            </>
+                        ) : (
+                            'Delete'
+                        )}
+                    </Button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Bulk Delete Modal */}
+            <Modal show={showBulkDeleteModal} onHide={() => setShowBulkDeleteModal(false)}>
+                <Modal.Header closeButton>
+                    <Modal.Title>Confirm Bulk Delete</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete <strong>{selectedSubcategories.length}</strong> selected subcategory(s)? This action cannot be undone.
+                </Modal.Body>
+                <Modal.Footer>
+                    <Button variant="secondary" onClick={() => setShowBulkDeleteModal(false)}>
+                        Cancel
+                    </Button>
+                    <Button variant="danger" onClick={confirmBulkDelete} disabled={isLoading}>
+                        {isLoading ? (
+                            <>
+                                <Spinner animation="border" size="sm" className="me-2" />
+                                Deleting...
+                            </>
+                        ) : (
+                            'Confirm Delete'
+                        )}
+                    </Button>
                 </Modal.Footer>
             </Modal>
         </>

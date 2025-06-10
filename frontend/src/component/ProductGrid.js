@@ -581,7 +581,8 @@ function ProductGrid() {
                                     <div className="Z_product_card">
                                         <div className="Z_product_image">
                                             <img 
-                                                src={product.images?.[0] || 'https://via.placeholder.com/400x400'} 
+                                            src={`http://localhost:2221/${product.images?.[0]}`}
+                                                // src={product.images?.[0] || 'https://via.placeholder.com/400x400'} 
                                                 alt={product.productName} 
                                             />
                                         </div>

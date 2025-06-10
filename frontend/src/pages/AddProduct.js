@@ -83,13 +83,7 @@ const AddProduct = () => {
     const validateAndHandleFile = (file) => {
         // Reset error state
         setError('');
-        // Revoke previous object URL if exists
-        if (productImagePreview) {
-            URL.revokeObjectURL(productImagePreview);
-        }
-        setProductImagePreview(null);
-        setProductImageFile(null);
-
+        
         // Check if file exists
         if (!file) {
             setError('Please select a file');
@@ -110,9 +104,12 @@ const AddProduct = () => {
             return false;
         }
 
-        // If validation passes, create URL and set image
-        const imageUrl = URL.createObjectURL(file);
-        setProductImagePreview(imageUrl);
+        // If validation passes, create preview and set file
+        const reader = new FileReader();
+        reader.onloadend = () => {
+            setProductImagePreview(reader.result);
+        };
+        reader.readAsDataURL(file);
         setProductImageFile(file);
         return true;
     };
@@ -157,13 +154,13 @@ const AddProduct = () => {
         }
 
         actualFormData.append('sellerId', sellerId);
-        actualFormData.append('tags', JSON.stringify(tags)); // Assuming backend expects JSON string for arrays
+        actualFormData.append('tags', JSON.stringify(tags));
         actualFormData.append('sizes', JSON.stringify(selectedSize));
         actualFormData.append('colors', JSON.stringify(selectedColors));
-        actualFormData.append('isActive', true); // Boolean will be converted to string "true"
+        actualFormData.append('isActive', true);
 
         if (productImageFile) {
-            actualFormData.append('images', productImageFile, productImageFile.name);
+            actualFormData.append('images', productImageFile);
         }
 
         try {
@@ -189,9 +186,6 @@ const AddProduct = () => {
                 });
                 setSelectedSize([]);
                 setSelectedColors([]);
-                if (productImagePreview) {
-                    URL.revokeObjectURL(productImagePreview);
-                }
                 setProductImagePreview(null);
                 setProductImageFile(null);
                 setTags([]);
@@ -247,9 +241,6 @@ const AddProduct = () => {
                                         className="x_remove_image" 
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            if (productImagePreview) {
-                                                URL.revokeObjectURL(productImagePreview);
-                                            }
                                             setProductImagePreview(null);
                                             setProductImageFile(null);
                                             if (document.getElementById('fileInput')) {

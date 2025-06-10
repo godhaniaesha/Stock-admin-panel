@@ -14,14 +14,50 @@ const createInventory = async (req, res) => {
 };
 
 // Get All Inventory
+// Get All Inventory with Lookup
 const getInventories = async (req, res) => {
     try {
-        const inventories = await Inventory.find();
+        const inventories = await Inventory.aggregate([
+            {
+                $lookup: {
+                    from: 'categories', // collection name in MongoDB
+                    localField: 'category',
+                    foreignField: '_id',
+                    as: 'categoryData'
+                }
+            },
+            {
+                $unwind: '$categoryData'
+            },
+            {
+                $lookup: {
+                    from: 'subcategories',
+                    localField: 'subcategory',
+                    foreignField: '_id',
+                    as: 'subcategoryData'
+                }
+            },
+            {
+                $unwind: '$subcategoryData'
+            },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'product',
+                    foreignField: '_id',
+                    as: 'productData'
+                }
+            },
+            {
+                $unwind: '$productData'
+            }
+        ]);
         res.json(inventories);
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
+
 
 // Get Single Inventory
 const getInventory = async (req, res) => {

@@ -12,21 +12,20 @@ function ProductList() {
     const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    
-    // Get product state
+
     const productState = useSelector((state) => state.product || {});
     const { products = [], isLoading: productsLoading = false, error: productError = null } = productState;
-    
-    // Get category state
+
     const categoryState = useSelector((state) => state.category || {});
     const { categories = [], isLoading: categoriesLoading = false } = categoryState;
 
     const [showDeleteModal, setShowDeleteModal] = useState(false);
     const [productToDelete, setProductToDelete] = useState(null);
+    const [selectedProducts, setSelectedProducts] = useState([]);
+    const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
     const [timeFilter, setTimeFilter] = useState('thisMonth');
 
     useEffect(() => {
-        // Fetch products and categories when the component mounts
         dispatch(fetchProducts());
         dispatch(fetchCategories());
     }, [dispatch]);
@@ -36,11 +35,11 @@ function ProductList() {
     };
 
     const handleEdit = (product) => {
-        navigate('/products/edit', { state: { productData: product } });
+        navigate(`/products/edit/${product._id}`);
     };
 
     const handleView = (product) => {
-        navigate('/products/view', { state: { productData: product } });
+        navigate(`/products/details/${product._id}`);
     };
 
     const handleDeleteClick = (product) => {
@@ -98,12 +97,10 @@ function ProductList() {
 
     const filteredProducts = filterProductsByTime(products);
 
-    // Show loading state if either products or categories are loading
     if (productsLoading || categoriesLoading) {
         return <div>Loading products and categories...</div>;
     }
 
-    // Show error state if there's a product error
     if (productError) {
         return <div>Error loading products: {productError}</div>;
     }
@@ -116,15 +113,16 @@ function ProductList() {
                         <h4>All Product List</h4>
                         <div className="Z_table_actions">
                             <button className="Z_add_product_btn" onClick={handleAddProduct}>Add Product</button>
-                            <select 
-                                className="Z_time_filter" 
-                                value={timeFilter}
-                                onChange={handleTimeFilterChange}
-                            >
+                            <select className="Z_time_filter" value={timeFilter} onChange={handleTimeFilterChange}>
                                 <option value="thisMonth">This Month</option>
                                 <option value="lastMonth">Last Month</option>
                                 <option value="last3Months">Last 3 Months</option>
                             </select>
+                            {selectedProducts.length > 0 && (
+                                <button className="Z_add_product_btn" onClick={() => setShowBulkDeleteModal(true)}>
+                                    Delete Selected
+                                </button>
+                            )}
                         </div>
                     </div>
                     <div className="Z_table_scroll_container">
@@ -133,7 +131,19 @@ function ProductList() {
                                 <tr>
                                     <th>
                                         <div className="Z_custom_checkbox">
-                                            <input type="checkbox" id="selectAll" className="Z_checkbox_input" />
+                                            <input
+                                                type="checkbox"
+                                                id="selectAll"
+                                                className="Z_checkbox_input"
+                                                checked={selectedProducts.length === filteredProducts.length && filteredProducts.length > 0}
+                                                onChange={(e) => {
+                                                    if (e.target.checked) {
+                                                        setSelectedProducts(filteredProducts.map(product => product._id));
+                                                    } else {
+                                                        setSelectedProducts([]);
+                                                    }
+                                                }}
+                                            />
                                             <label htmlFor="selectAll" className="Z_checkbox_label"></label>
                                         </div>
                                     </th>
@@ -147,31 +157,36 @@ function ProductList() {
                             </thead>
                             <tbody>
                                 {filteredProducts.map((product) => {
-                                    // Find the category for the current product
-                                    const productCategory = categories.find(category => category._id === product.categoryId);
+                                    const categoryIdToMatch = product.categoryId ? product.categoryId._id : null;
+                                    const productCategory = categories.find(category => category._id === categoryIdToMatch);
                                     const categoryTitle = productCategory ? productCategory.title : 'N/A';
 
                                     return (
                                         <tr key={product._id}>
                                             <td>
                                                 <div className="Z_custom_checkbox">
-                                                    <input 
-                                                        type="checkbox" 
+                                                    <input
+                                                        type="checkbox"
                                                         id={`checkbox-${product._id}`}
-                                                        className="Z_checkbox_input" 
+                                                        className="Z_checkbox_input"
+                                                        checked={selectedProducts.includes(product._id)}
+                                                        onChange={(e) => {
+                                                            if (e.target.checked) {
+                                                                setSelectedProducts([...selectedProducts, product._id]);
+                                                            } else {
+                                                                setSelectedProducts(selectedProducts.filter(id => id !== product._id));
+                                                            }
+                                                        }}
                                                     />
-                                                    <label 
-                                                        htmlFor={`checkbox-${product._id}`} 
-                                                        className="Z_checkbox_label"
-                                                    ></label>
+                                                    <label htmlFor={`checkbox-${product._id}`} className="Z_checkbox_label"></label>
                                                 </div>
                                             </td>
                                             <td>
                                                 <div className="Z_product_info_cell">
-                                                    <img 
-                                                        src={product.images && product.images[0] ? `http://localhost:2221/${product.images[0]}` : 'placeholder.jpg'} // Added check for images array and placeholder
-                                                        alt={product.productName} 
-                                                        className="Z_table_product_img" 
+                                                    <img
+                                                        src={product.images && product.images[0] ? `http://localhost:2221/${product.images[0]}` : 'placeholder.jpg'}
+                                                        alt={product.productName}
+                                                        className="Z_table_product_img"
                                                     />
                                                     <div>
                                                         <div className="Z_table_product_name">{product.productName}</div>
@@ -186,7 +201,7 @@ function ProductList() {
                                                     <div className="Z_stock_sold">Low Stock: {product.lowStockThreshold}</div>
                                                 </div>
                                             </td>
-                                            <td>{categoryTitle}</td> {/* Display the category title */}
+                                            <td>{categoryTitle}</td>
                                             <td>
                                                 <div className="Z_rating_cell">
                                                     <div className="Z_rating_wrapper">
@@ -198,24 +213,9 @@ function ProductList() {
                                             </td>
                                             <td>
                                                 <div className="Z_action_buttons">
-                                                    <button 
-                                                        className="Z_action_btn Z_view_btn"
-                                                        onClick={() => handleView(product)}
-                                                    >
-                                                        <TbEye size={22}/>
-                                                    </button>
-                                                    <button 
-                                                        className="Z_action_btn Z_edit_btn"
-                                                        onClick={() => handleEdit(product)}
-                                                    >
-                                                        <TbEdit size={22}/>
-                                                    </button>
-                                                    <button 
-                                                        className="Z_action_btn Z_delete_btn"
-                                                        onClick={() => handleDeleteClick(product)}
-                                                    >
-                                                        <RiDeleteBin6Line size={22}/>
-                                                    </button>
+                                                    <button className="Z_action_btn Z_view_btn" onClick={() => handleView(product)}><TbEye size={22} /></button>
+                                                    <button className="Z_action_btn Z_edit_btn" onClick={() => handleEdit(product)}><TbEdit size={22} /></button>
+                                                    <button className="Z_action_btn Z_delete_btn" onClick={() => handleDeleteClick(product)}><RiDeleteBin6Line size={22} /></button>
                                                 </div>
                                             </td>
                                         </tr>
@@ -227,7 +227,7 @@ function ProductList() {
                 </div>
             </section>
 
-            {/* Delete Confirmation Modal */}
+            {/* Single Delete Confirmation Modal */}
             <Modal
                 show={showDeleteModal}
                 onHide={handleDeleteCancel}
@@ -241,15 +241,39 @@ function ProductList() {
                     Are you sure you want to delete the product "{productToDelete?.productName}"?
                 </Modal.Body>
                 <Modal.Footer>
-                    <button
-                        className="Z_btn Z_btn_cancel"
-                        onClick={handleDeleteCancel}
-                    >
-                        Cancel
-                    </button>
+                    <button className="Z_btn Z_btn_cancel" onClick={handleDeleteCancel}>Cancel</button>
+                    <button className="Z_btn Z_btn_delete" onClick={handleDeleteConfirm}>Delete</button>
+                </Modal.Footer>
+            </Modal>
+
+            {/* Bulk Delete Confirmation Modal */}
+            <Modal
+                show={showBulkDeleteModal}
+                onHide={() => setShowBulkDeleteModal(false)}
+                centered
+                className={`${isDarkMode ? 'd_dark' : 'd_light'}`}
+            >
+                <Modal.Header closeButton>
+                    <Modal.Title>Delete Selected Products</Modal.Title>
+                </Modal.Header>
+                <Modal.Body>
+                    Are you sure you want to delete <strong>{selectedProducts.length}</strong> selected products?
+                </Modal.Body>
+                <Modal.Footer>
+                    <button className="Z_btn Z_btn_cancel" onClick={() => setShowBulkDeleteModal(false)}>Cancel</button>
                     <button
                         className="Z_btn Z_btn_delete"
-                        onClick={handleDeleteConfirm}
+                        onClick={async () => {
+                            try {
+                                await Promise.all(
+                                    selectedProducts.map(id => dispatch(deleteProduct(id)).unwrap())
+                                );
+                                setSelectedProducts([]);
+                                setShowBulkDeleteModal(false);
+                            } catch (error) {
+                                console.error('Failed to delete selected products:', error);
+                            }
+                        }}
                     >
                         Delete
                     </button>

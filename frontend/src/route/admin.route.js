@@ -68,6 +68,7 @@ function UserRoutes() {
                     <Route path="profile" element={<Profile />} />
                     <Route path="stock" element={<StockOverview />} />
                     <Route path="stock/add" element={<AddInventory />} />
+                    <Route path="stock/edit/:id" element={<EditInventory />} />
                     <Route path="stock/adjust" element={<StockAdjustments />} />
                     <Route path="stock/alerts" element={<StockAlert />} />
                     
@@ -80,7 +81,7 @@ function UserRoutes() {
                     <Route path="subcategories/edit" element={<EditSubcategory />} />
 
                     <Route path="products" element={<ProductGrid />} />
-                    <Route path="products/details" element={<ProductDetails />} />
+                    <Route path="products/details/:id" element={<ProductDetails />} />
                     <Route path="products/add" element={<AddProduct />} />
                     <Route path="products/edit/:id" element={<EditProduct />} />
                     <Route path="products/view" element={<ProductList />} />

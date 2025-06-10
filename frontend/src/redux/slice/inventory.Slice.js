@@ -21,9 +21,6 @@ export const createInventory = createAsyncThunk(
         }
     }
 );
- 
- 
- 
 // GET ALL
 export const fetchInventories = createAsyncThunk(
     'inventory/fetchAll',
@@ -49,7 +46,7 @@ export const fetchInventoryById = createAsyncThunk(
         }
     }
 );
- 
+
 // UPDATE
 export const updateInventory = createAsyncThunk(
     'inventory/update',
@@ -68,7 +65,7 @@ export const updateInventory = createAsyncThunk(
         }
     }
 );
- 
+
 // DELETE
 export const deleteInventory = createAsyncThunk(
     'inventory/delete',
@@ -138,7 +135,6 @@ const productSlice = createSlice({
                 state.error = action.payload;
                 state.success = false;
             })
- 
             // FETCH ALL
             .addCase(fetchInventories.pending, (state) => {
                 state.isLoading = true;
@@ -152,7 +148,7 @@ const productSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload;
             })
- 
+
             // FETCH ONE
             .addCase(fetchInventoryById.pending, (state) => {
                 state.isLoading = true;
@@ -166,7 +162,6 @@ const productSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload;
             })
- 
             // UPDATE
             .addCase(updateInventory.pending, (state) => {
                 state.isLoading = true;
@@ -183,7 +178,7 @@ const productSlice = createSlice({
                 state.isLoading = false;
                 state.error = action.payload;
             })
- 
+
             // DELETE
             .addCase(deleteInventory.pending, (state) => {
                 state.isLoading = true;

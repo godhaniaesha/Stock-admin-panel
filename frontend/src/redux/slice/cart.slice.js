@@ -114,9 +114,13 @@ const cartSlice = createSlice({
                 state.loading = false;
                 const index = state.items.findIndex(item => item._id === action.payload.data._id);
                 if (index !== -1) {
-                    state.items[index] = action.payload.data;
+                    // Replace the entire item with the updated one from the server
+                    state.items[index] = {
+                        ...action.payload.data,
+                        productId: action.payload.data.productId // Ensure product details are preserved
+                    };
                 }
-                cartSlice.caseReducers.calculateTotals(state); // Recalculate totals
+                cartSlice.caseReducers.calculateTotals(state);
             })
             .addCase(updateCartItem.rejected, (state, action) => {
                 state.loading = false;

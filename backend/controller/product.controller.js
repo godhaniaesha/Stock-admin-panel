@@ -2,14 +2,56 @@ const {Product} = require('../model');
 const Category = require('../model/category.model');
 const Subcategory = require('../model/subcategory.model');
 const Users = require('../model/Register.model');
-
+const fs = require('fs');
+const path = require('path');
 // Create a new product
+// const createProduct = async (req, res) => {
+//     try {
+//         const productData = req.body;
+//         console.log(req.body);
+        
+
+//         const existingSku = await Product.findOne({ sku: productData.sku });
+//         if (existingSku) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'Product with this SKU already exists'
+//             });
+//         }
+
+//         const existingTag = await Product.findOne({ tagNumber: productData.tagNumber });
+//         if (existingTag) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'Product with this tag number already exists'
+//             });
+//         }
+
+//         const newProduct = new Product(productData);
+//         const savedProduct = await newProduct.save();
+
+//         res.status(201).json({
+//             success: true,
+//             message: 'Product created successfully',
+//             data: savedProduct
+//         });
+//     } catch (error) {
+//         res.status(400).json({
+//             success: false,
+//             message: 'Error creating product',
+//             error: error.message
+//         });
+//     }
+// };
 const createProduct = async (req, res) => {
     try {
         const productData = req.body;
-        console.log(req.body);
-        
+        const images = req.files; // images from multer
 
+        console.log('Product Data:', productData);
+        console.log('Uploaded Images:', images);
+
+        // Check for duplicate SKU
         const existingSku = await Product.findOne({ sku: productData.sku });
         if (existingSku) {
             return res.status(400).json({
@@ -18,12 +60,19 @@ const createProduct = async (req, res) => {
             });
         }
 
+        // Check for duplicate Tag
         const existingTag = await Product.findOne({ tagNumber: productData.tagNumber });
         if (existingTag) {
             return res.status(400).json({
                 success: false,
                 message: 'Product with this tag number already exists'
             });
+        }
+
+        // Save image paths to DB
+        if (images && images.length > 0) {
+            const imagePaths = images.map((img) => img.path);
+            productData.images = imagePaths;
         }
 
         const newProduct = new Product(productData);
@@ -42,6 +91,7 @@ const createProduct = async (req, res) => {
         });
     }
 };
+
 
 // Get all products
 const getAllProducts = async (req, res) => {
@@ -107,11 +157,59 @@ const getProductById = async (req, res) => {
 };
 
 // Update product
+// const updateProduct = async (req, res) => {
+//     try {
+//         const { id } = req.params;
+//         const updateData = req.body;
+
+//         const existingSku = await Product.findOne({ sku: updateData.sku, _id: { $ne: id } });
+//         if (existingSku) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'Another product with this SKU already exists'
+//             });
+//         }
+
+//         const existingTag = await Product.findOne({ tagNumber: updateData.tagNumber, _id: { $ne: id } });
+//         if (existingTag) {
+//             return res.status(400).json({
+//                 success: false,
+//                 message: 'Another product with this tag number already exists'
+//             });
+//         }
+
+//         const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {
+//             new: true,
+//             runValidators: true
+//         });
+
+//         if (!updatedProduct) {
+//             return res.status(404).json({
+//                 success: false,
+//                 message: 'Product not found'
+//             });
+//         }
+
+//         res.status(200).json({
+//             success: true,
+//             message: 'Product updated successfully',
+//             data: updatedProduct
+//         });
+//     } catch (error) {
+//         res.status(400).json({
+//             success: false,
+//             message: 'Error updating product',
+//             error: error.message
+//         });
+//     }
+// };
 const updateProduct = async (req, res) => {
     try {
         const { id } = req.params;
         const updateData = req.body;
+        const images = req.files; // New uploaded files, if any
 
+        // Check for duplicate SKU (excluding current product)
         const existingSku = await Product.findOne({ sku: updateData.sku, _id: { $ne: id } });
         if (existingSku) {
             return res.status(400).json({
@@ -120,12 +218,19 @@ const updateProduct = async (req, res) => {
             });
         }
 
+        // Check for duplicate Tag Number (excluding current product)
         const existingTag = await Product.findOne({ tagNumber: updateData.tagNumber, _id: { $ne: id } });
         if (existingTag) {
             return res.status(400).json({
                 success: false,
                 message: 'Another product with this tag number already exists'
             });
+        }
+
+        // If new images are uploaded, append them to the images array
+        if (images && images.length > 0) {
+            const newImagePaths = images.map(img => img.path);
+            updateData.images = newImagePaths;
         }
 
         const updatedProduct = await Product.findByIdAndUpdate(id, updateData, {

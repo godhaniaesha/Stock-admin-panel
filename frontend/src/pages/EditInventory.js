@@ -1,7 +1,9 @@
 import React, { useState } from 'react';
 import '../styles/x_app.css';
+import { useOutletContext } from 'react-router-dom';
 
 const EditInventory = () => {
+     const { isDarkMode } = useOutletContext();
     const [inventoryData, setInventoryData] = useState({
         category: '',
         subcategory: '',
@@ -83,7 +85,7 @@ const EditInventory = () => {
     };
 
     return (
-        <div className="x_product_page_container">
+        <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
             <div className="x_add_product_container">
                 <div className="x_product_form">
                     <div className="x_product_info">

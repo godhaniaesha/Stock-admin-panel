@@ -12,7 +12,7 @@ export const createProduct = createAsyncThunk(
             const response = await axios.post(`${API_URL}/addProduct`, productData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'multipart/form-data'
                 }
             });
             return response.data;
@@ -49,7 +49,7 @@ export const fetchProductById = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/product/${id}`, {
+            const response = await axios.get(`${API_URL}/get/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }
@@ -67,7 +67,7 @@ export const updateProduct = createAsyncThunk(
     async ({ id, productData }, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.put(`${API_URL}/updateProduct/${id}`, productData, {
+            const response = await axios.put(`${API_URL}/update/${id}`, productData, {
                 headers: {
                     'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json'
@@ -86,7 +86,7 @@ export const deleteProduct = createAsyncThunk(
     async (id, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.delete(`${API_URL}/deleteProduct/${id}`, {
+            const response = await axios.delete(`${API_URL}/delete/${id}`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 }

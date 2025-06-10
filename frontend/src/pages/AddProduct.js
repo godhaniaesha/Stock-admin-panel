@@ -36,7 +36,8 @@ const AddProduct = () => {
 
     const [selectedSize, setSelectedSize] = useState([]);
     const [selectedColors, setSelectedColors] = useState([]);
-    const [productImage, setProductImage] = useState(null);
+    const [productImagePreview, setProductImagePreview] = useState(null); // For UI preview
+    const [productImageFile, setProductImageFile] = useState(null); // For actual file object
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
     const [error, setError] = useState('');
@@ -48,6 +49,15 @@ const AddProduct = () => {
         dispatch(fetchCategories());
         dispatch(fetchSubcategories());
     }, [dispatch]);
+
+    useEffect(() => {
+        // Cleanup function to revoke object URL when component unmounts or preview changes
+        return () => {
+            if (productImagePreview) {
+                URL.revokeObjectURL(productImagePreview);
+            }
+        };
+    }, [productImagePreview]);
 
     const handleCategorySelect = (categoryId) => {
         setProductData(prev => ({ ...prev, categoryId, subcategoryId: '' }));
@@ -73,30 +83,38 @@ const AddProduct = () => {
     const validateAndHandleFile = (file) => {
         // Reset error state
         setError('');
+        // Revoke previous object URL if exists
+        if (productImagePreview) {
+            URL.revokeObjectURL(productImagePreview);
+        }
+        setProductImagePreview(null);
+        setProductImageFile(null);
 
         // Check if file exists
         if (!file) {
             setError('Please select a file');
-            return;
+            return false;
         }
 
         // Check file type
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (!validTypes.includes(file.type)) {
             setError('Invalid file type. Only PNG, JPG and JPEG are allowed');
-            return;
+            return false;
         }
 
         // Check file size (5MB)
         const maxSize = 5 * 1024 * 1024; // 5MB in bytes
         if (file.size > maxSize) {
             setError('File size exceeds 5MB limit');
-            return;
+            return false;
         }
 
         // If validation passes, create URL and set image
         const imageUrl = URL.createObjectURL(file);
-        setProductImage(imageUrl);
+        setProductImagePreview(imageUrl);
+        setProductImageFile(file);
+        return true;
     };
 
     const handleTagInput = (e) => {
@@ -119,13 +137,6 @@ const AddProduct = () => {
         }));
     };
 
-    const handleImageUpload = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            setProductImage(URL.createObjectURL(file));
-        }
-    };
-
     const handleSubmit = async (e) => {
         e.preventDefault();
         
@@ -136,19 +147,29 @@ const AddProduct = () => {
             return;
         }
 
-        // Prepare the data according to the model
-        const formData = {
-            ...productData,
-            sellerId: sellerId,
-            images: productImage ? [productImage] : [],
-            tags: tags,
-            sizes: selectedSize,
-            colors: selectedColors,
-            isActive: true
-        };
+        const actualFormData = new FormData();
+
+        // Append fields from productData state
+        for (const key in productData) {
+            if (productData.hasOwnProperty(key) && productData[key] !== '') {
+                actualFormData.append(key, productData[key]);
+            }
+        }
+
+        actualFormData.append('sellerId', sellerId);
+        actualFormData.append('tags', JSON.stringify(tags)); // Assuming backend expects JSON string for arrays
+        actualFormData.append('sizes', JSON.stringify(selectedSize));
+        actualFormData.append('colors', JSON.stringify(selectedColors));
+        actualFormData.append('isActive', true); // Boolean will be converted to string "true"
+
+        if (productImageFile) {
+            actualFormData.append('images', productImageFile, productImageFile.name);
+        }
 
         try {
-            const result = await dispatch(createProduct(formData)).unwrap();
+            // Dispatch createProduct with the FormData object
+            const result = await dispatch(createProduct(actualFormData)).unwrap();
+            
             if (result) {
                 // Reset form
                 setProductData({
@@ -168,23 +189,21 @@ const AddProduct = () => {
                 });
                 setSelectedSize([]);
                 setSelectedColors([]);
-                setProductImage(null);
+                if (productImagePreview) {
+                    URL.revokeObjectURL(productImagePreview);
+                }
+                setProductImagePreview(null);
+                setProductImageFile(null);
                 setTags([]);
                 setTagInput('');
-                
+                if (document.getElementById('fileInput')) {
+                    document.getElementById('fileInput').value = null;
+                }
                 // Navigate to products list or show success message
                 navigate('/products');
             }
         } catch (error) {
             console.error('Failed to create product:', error);
-        }
-    };
-
-    const handleDrop = (e) => {
-        e.preventDefault();
-        const files = e.dataTransfer.files;
-        if (files.length > 0) {
-            handleImageUpload({ target: { files: [files[0]] } });
         }
     };
 
@@ -221,14 +240,21 @@ const AddProduct = () => {
                                 onChange={(e) => validateAndHandleFile(e.target.files[0])}
                                 accept=".png, .jpg, .jpeg"
                             />
-                            {productImage ? (
+                            {productImagePreview ? (
                                 <div className="x_image_preview">
-                                    <img src={productImage} alt="Product preview" className="x_preview_img" />
+                                    <img src={productImagePreview} alt="Product preview" className="x_preview_img" />
                                     <button 
                                         className="x_remove_image" 
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setProductImage(null);
+                                            if (productImagePreview) {
+                                                URL.revokeObjectURL(productImagePreview);
+                                            }
+                                            setProductImagePreview(null);
+                                            setProductImageFile(null);
+                                            if (document.getElementById('fileInput')) {
+                                                document.getElementById('fileInput').value = null;
+                                            }
                                         }}
                                     >
                                         ×

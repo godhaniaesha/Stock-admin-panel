@@ -3,13 +3,15 @@ import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import '../styles/Z_styles.css';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchInventories } from '../redux/slice/inventory.Slice';
 
 const StockOverview = () => {
   const { isDarkMode } = useOutletContext();
   const dispatch = useDispatch();
+    const navigate = useNavigate(); // ✅ Initialize navigate
+
 
   const { inventory, isLoading, error } = useSelector((state) => state.inventory);
   console.log(inventory, "inventory");
@@ -78,7 +80,9 @@ const StockOverview = () => {
                     <td>
                       <div className="Z_action_buttons">
                      
-                        <button className="Z_action_btn Z_edit_btn">
+                        <button className="Z_action_btn Z_edit_btn"
+                         onClick={() => navigate(`/stock/edit/${product._id}`)} // ✅ Navigate on click
+                         >
                           <TbEdit size={22} />
                         </button>
                         <button className="Z_action_btn Z_delete_btn">

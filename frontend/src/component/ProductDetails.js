@@ -1,16 +1,24 @@
 import React, { useState, useEffect } from 'react';
+import { useParams, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchProductById, resetCurrentProduct } from '../redux/slice/product.slice';
 import { BsLightningFill } from 'react-icons/bs';
 // Import icons from a chosen library (e.g., Font Awesome)
 import { FaHeart, FaRegHeart, FaShoppingCart, FaShippingFast, FaUndo, FaStar, FaPlay, FaPause, FaLock } from 'react-icons/fa';
 import { GiStarFormation } from 'react-icons/gi';
 import { IoMdArrowDropleft, IoMdArrowDropright } from 'react-icons/io';
 import { MdStars } from 'react-icons/md';
-
+import { toast } from 'react-toastify';
 
 const ProductDetail = () => {
-  const [selectedImage, setSelectedImage] = useState(0);
-  const [selectedSize, setSelectedSize] = useState('M');
-  const [selectedColor, setSelectedColor] = useState('#E6D5B8');
+  const { id: productId } = useParams();
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { currentProduct, isLoading, error: productError } = useSelector((state) => state.product);
+
+  const [selectedImageIndex, setSelectedImageIndex] = useState(0);
+  const [selectedSize, setSelectedSize] = useState('');
+  const [selectedColor, setSelectedColor] = useState('');
   const [quantity, setQuantity] = useState(1);
   const [isWishlist, setIsWishlist] = useState(false);
   const [showZoom, setShowZoom] = useState(false);
@@ -18,51 +26,99 @@ const ProductDetail = () => {
 
   const images = [
     "https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=400&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1556906781-9a412961c28c?w=400&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=400&h=500&fit=crop",
-    "https://images.unsplash.com/photo-1591047139829-d91aecb6caea?w=400&h:500&fit=crop",
-    "https://images.unsplash.com/photo-1573855619003-97b4799dcd8b?w=400&h=500&fit=crop"
   ];
+
+  useEffect(() => {
+    if (productId) {
+      dispatch(fetchProductById(productId));
+    }
+    return () => {
+      dispatch(resetCurrentProduct());
+    };
+  }, [dispatch, productId]);
+
+  useEffect(() => {
+    if (currentProduct) {
+      if (currentProduct.availableSizes && currentProduct.availableSizes.length > 0) {
+        setSelectedSize(currentProduct.availableSizes[0]);
+      } else if (currentProduct.weight) { // Fallback to weight if availableSizes is not present
+        setSelectedSize(currentProduct.weight);
+      }
+      if (currentProduct.availableColors && currentProduct.availableColors.length > 0) {
+        setSelectedColor(currentProduct.availableColors[0]);
+      }
+      setSelectedImageIndex(0);
+    }
+  }, [currentProduct]);
+
+  const productImages = currentProduct?.images?.map(img => `http://localhost:2221/${img}`) || [];
 
   // Auto slide effect
   useEffect(() => {
-    if (autoSlide) {
+    if (autoSlide && productImages.length > 1) {
       const interval = setInterval(() => {
-        setSelectedImage(prev => (prev + 1) % images.length);
+        setSelectedImageIndex(prev => (prev + 1) % productImages.length);
       }, 3000);
       return () => clearInterval(interval);
     }
-  }, [autoSlide, images.length]);
+  }, [autoSlide, productImages.length]);
 
   const handleImageClick = (index) => {
-    setSelectedImage(index);
+    setSelectedImageIndex(index);
     setAutoSlide(false);
     setTimeout(() => setAutoSlide(true), 10000); // Resume auto-slide after 10 seconds
   };
 
   const nextImage = () => {
-    setSelectedImage(prev => (prev + 1) % images.length);
+    if (productImages.length === 0) return;
+    setSelectedImageIndex(prev => (prev + 1) % productImages.length);
     setAutoSlide(false);
     setTimeout(() => setAutoSlide(true), 10000);
   };
 
   const prevImage = () => {
-    setSelectedImage(prev => (prev - 1 + images.length) % images.length);
+    if (productImages.length === 0) return;
+    setSelectedImageIndex(prev => (prev - 1 + productImages.length) % productImages.length);
     setAutoSlide(false);
     setTimeout(() => setAutoSlide(true), 10000);
   };
 
-  const colors = ['#E6D5B8', '#CDE8D5', '#F2F0F4', '#D5B2E0', '#FA92C7'];
-  const sizes = ['XS', 'S', 'M', 'L', 'XL'];
+  const availableSizes = currentProduct?.availableSizes || (currentProduct?.weight ? [currentProduct.weight] : []);
+  const availableColors = currentProduct?.availableColors || [];
 
   const ratingData = [
-    { stars: 5, percentage: 70 },
-    { stars: 4, percentage: 20 },
-    { stars: 3, percentage: 7 },
-    { stars: 2, percentage: 2 },
-    { stars: 1, percentage: 1 }
+    { stars: 5, percentage: currentProduct?.ratingBreakdown?.fiveStarPercentage || 0 },
+    { stars: 4, percentage: currentProduct?.ratingBreakdown?.fourStarPercentage || 0 },
+    { stars: 3, percentage: currentProduct?.ratingBreakdown?.threeStarPercentage || 0 },
+    { stars: 2, percentage: currentProduct?.ratingBreakdown?.twoStarPercentage || 0 },
+    { stars: 1, percentage: currentProduct?.ratingBreakdown?.oneStarPercentage || 0 }
   ];
+  const reviews = currentProduct?.reviews || [];
+
+  if (isLoading) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--dark-bg)', color: 'var(--dark-text)' }}>
+        Loading product details...
+      </div>
+    );
+  }
+
+  if (productError) {
+    toast.error(`Error: ${productError}`);
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--dark-bg)', color: 'var(--dark-text)' }}>
+        Error loading product. Please try again later.
+      </div>
+    );
+  }
+
+  if (!currentProduct) {
+    return (
+      <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', height: '100vh', background: 'var(--dark-bg)', color: 'var(--dark-text)' }}>
+        Product not found.
+      </div>
+    );
+  }
 
   return (
     <div style={{
@@ -700,10 +756,14 @@ const ProductDetail = () => {
         {/* Image Section */}
         <div className="image-section">
           <div className="product-badge"><MdStars></MdStars>  Premium Quality</div>
-          <div className="main-image" onClick={() => setShowZoom(true)}>
-            <img src={images[selectedImage]} alt="Product" className="slide-animation" />
+          <div className="main-image" onClick={() => productImages.length > 0 && setShowZoom(true)}>
+            {productImages.length > 0 ? (
+              <img src={productImages[selectedImageIndex]} alt={currentProduct.productName} className="slide-animation" />
+            ) : (
+              <img src="https://via.placeholder.com/500x500?text=No+Image" alt="Placeholder" />
+            )}
             
-            {/* Navigation Controls */}
+            {productImages.length > 1 && (<>
             <button className="image-controls prev-btn" onClick={(e) => { e.stopPropagation(); prevImage(); }}>
               <IoMdArrowDropleft />
             </button>
@@ -711,7 +771,6 @@ const ProductDetail = () => {
               <IoMdArrowDropright />
             </button>
             
-            {/* Auto-slide toggle */}
             <button 
               className="auto-slide-toggle"
               onClick={(e) => { e.stopPropagation(); setAutoSlide(!autoSlide); }}
@@ -719,67 +778,68 @@ const ProductDetail = () => {
               {autoSlide ? <><FaPause /> Pause</> : <><FaPlay /> Play</>}
             </button>
             
-            {/* Image indicators */}
             <div className="image-indicators">
-              {images.map((_, index) => (
+              {productImages.map((_, index) => (
                 <div
                   key={index}
-                  className={`indicator ${selectedImage === index ? 'active' : ''}`}
+                  className={`indicator ${selectedImageIndex === index ? 'active' : ''}`}
                   onClick={(e) => { e.stopPropagation(); handleImageClick(index); }}
                 />
               ))}
             </div>
+            </>)}
           </div>
           
+          {productImages.length > 1 && (
           <div className="thumbnail-grid">
-            {images.map((img, index) => (
+            {productImages.map((img, index) => (
               <div
                 key={index}
-                className={`thumbnail ${selectedImage === index ? 'active' : ''}`}
+                className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
                 onClick={() => handleImageClick(index)}
               >
-                <img src={img} alt={`View ${index + 1}`} />
+                <img src={img} alt={`View ${index + 1} of ${currentProduct.productName}`} />
               </div>
             ))}
           </div>
+          )}
         </div>
 
         {/* Details Section */}
         <div className="details-section">
-          <h1 className="product-title">Cotton Rich Jersey Slim Blazer</h1>
-          <p className="product-id">Product ID: GY345912</p>
+          <h1 className="product-title">{currentProduct.productName}</h1>
+          <p className="product-id">Product ID: {currentProduct.SKU || currentProduct._id}</p>
           
           <p className="product-description">
-            Elevate your wardrobe with this sophisticated cotton-rich jersey slim blazer. 
-            Perfect for both professional and casual occasions, featuring premium materials 
-            and expert craftsmanship for lasting comfort and style.
+            {currentProduct.description || 'No description available.'}
           </p>
 
           <div className="stats-card">
             <div className="stats-grid">
               <div className="stat-item">
                 <span className="stat-value">$120.40</span>
-                <span className="stat-label">Price</span>
+                <span className="stat-label">${currentProduct.price?.toFixed(2)}</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">987</span>
-                <span className="stat-label">Orders</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-value">104</span>
+                <span className="stat-value">{currentProduct.stock}</span>
                 <span className="stat-label">In Stock</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">$12.5K</span>
-                <span className="stat-label">Revenue</span>
+                <span className="stat-value">{currentProduct.averageRating || 'N/A'} <FaStar size={14}/></span>
+                <span className="stat-label">Rating</span>
+              </div>
+              <div className="stat-item">
+                <span className="stat-value">{reviews.length || 0}</span>
+                <span className="stat-label">Reviews</span>
               </div>
             </div>
           </div>
 
+          {availableSizes.length > 0 && (
           <div className="option-section">
             <div className="option-label">Size</div>
             <div className="size-options">
-              {sizes.map((size) => (
+              {availableSizes.map((size) => (
                 <button
                   key={size}
                   className={`size-btn ${selectedSize === size ? 'active' : ''}`}
@@ -790,28 +850,16 @@ const ProductDetail = () => {
               ))}
             </div>
           </div>
-
-          <div className="option-section">
-            <div className="option-label">Color</div>
-            <div className="color-options">
-              {colors.map((color) => (
-                <div
-                  key={color}
-                  className={`color-dot ${selectedColor === color ? 'active' : ''}`}
-                  style={{ backgroundColor: color }}
-                  onClick={() => setSelectedColor(color)}
-                />
-              ))}
-            </div>
-          </div>
-
+          )}
+       
           {/* Feature Tags */}
+          {currentProduct.tags && currentProduct.tags.length > 0 && (
           <div className="feature-tags">
-            <span className="feature-tag"><FaShippingFast /> Free Shipping</span>
-            <span className="feature-tag"><FaUndo /> Easy Returns</span>
-            <span className="feature-tag"><GiStarFormation></GiStarFormation> Premium Quality</span>
-            <span className="feature-tag"><BsLightningFill></BsLightningFill> Fast Delivery</span>
+            {currentProduct.tags.map(tag => (
+              <span className="feature-tag" key={tag}><GiStarFormation /> {tag}</span>
+            ))}
           </div>
+          )}
 
           {/* Quantity Selector */}
           <div className="quantity-selector">
@@ -872,37 +920,34 @@ const ProductDetail = () => {
             <h3 className="info-title">Product Details</h3>
             <table className="info-table">
               <tbody>
-                <tr>
-                  <td>Material</td>
-                  <td>100% Cotton Rich Jersey</td>
-                </tr>
-                <tr>
-                  <td>Fit</td>
-                  <td>Slim Fit Design</td>
-                </tr>
-                <tr>
-                  <td>Length</td>
-                  <td>72cm (Size 12)</td>
-                </tr>
-                <tr>
-                  <td>Lining</td>
-                  <td>55% Polyester, 45% Viscose</td>
-                </tr>
-                <tr>
-                  <td>Care</td>
-                  <td>Machine Washable</td>
-                </tr>
+                {currentProduct.material && <tr><td>Material</td><td>{currentProduct.material}</td></tr>}
+                {currentProduct.fit && <tr><td>Fit</td><td>{currentProduct.fit}</td></tr>}
+                {currentProduct.dimensions && <tr><td>Dimensions</td><td>{currentProduct.dimensions}</td></tr>}
+                {currentProduct.weight && <tr><td>Weight</td><td>{currentProduct.weight}</td></tr>}
+                {currentProduct.careInstructions && <tr><td>Care</td><td>{currentProduct.careInstructions}</td></tr>}
+                {currentProduct.brand && <tr><td>Brand</td><td>{currentProduct.brand}</td></tr>}
+                {currentProduct.originCountry && <tr><td>Origin</td><td>{currentProduct.originCountry}</td></tr>}
+                {currentProduct.specifications && Object.entries(currentProduct.specifications).map(([key, value]) => (
+                    <tr key={key}>
+                        <td>{key.charAt(0).toUpperCase() + key.slice(1)}</td>
+                        <td>{value}</td>
+                    </tr>
+                ))}
               </tbody>
             </table>
           </div>
 
+          {(currentProduct.averageRating || reviews.length > 0) && (
           <div className="info-card">
             <h3 className="info-title">Ratings & Reviews</h3>
+            {currentProduct.averageRating && (
             <div className="rating-header">
-              <div className="rating-score">4.7</div>
-              <div className="rating-text">Based on 5,438 ratings</div>
+              <div className="rating-score">{currentProduct.averageRating.toFixed(1)}</div>
+              <div className="rating-text">Based on {reviews.length} rating{reviews.length !== 1 && 's'}</div>
             </div>
+            )}
             
+            {currentProduct.ratingBreakdown && (
             <div className="rating-bars">
               {ratingData.map((rating) => (
                 <div key={rating.stars} className="rating-row">
@@ -916,27 +961,36 @@ const ProductDetail = () => {
                 </div>
               ))}
             </div>
+            )}
 
-            <div className="review-item">
-              <div className="reviewer-name">Houston Flatley-Hudson</div>
-              <div className="review-text">
-                Amazing quality and perfect fit! The material feels premium and the tailoring is excellent. 
-                Definitely worth the investment for a versatile piece that works for both work and casual occasions.
+            {reviews.map((review, index) => (
+              <div key={review._id || index} className="review-item">
+                <div className="reviewer-name">{review.userName || review.userId?.name || 'Anonymous'}</div>
+                 <div className="d-flex align-items-center mb-1">
+                    {[...Array(5)].map((_, i) => (
+                        <FaStar key={i} color={i < review.rating ? '#ffc107' : '#e0e0e0'} />
+                    ))}
+                </div>
+                <div className="review-text">{review.comment}</div>
+                {review.images && review.images.length > 0 && (
+                  <div className="review-images">
+                    {review.images.map((img, imgIdx) => (
+                      <img key={imgIdx} src={`http://localhost:2221/${img}`} alt={`Review image ${imgIdx + 1}`} className="review-image" />
+                    ))}
+                  </div>
+                )}
+                <div className="review-date">{new Date(review.createdAt).toLocaleDateString()}</div>
               </div>
-              <div className="review-images">
-                <img src="https://images.unsplash.com/photo-1617127365659-c47fa864d8bc?w=50&h=50&fit=crop" alt="Review" className="review-image" />
-                <img src="https://images.unsplash.com/photo-1594633312681-425c7b97ccd1?w=50&h=50&fit=crop" alt="Review" className="review-image" />
-              </div>
-              <div className="review-date">June 02, 2025</div>
-            </div>
+            ))}
           </div>
+          )}
         </div>
       </div>
 
       {/* Zoom Overlay */}
-      {showZoom && (
+      {showZoom && productImages.length > 0 && (
         <div className="zoom-overlay" onClick={() => setShowZoom(false)}>
-          <img src={images[selectedImage]} alt="Zoomed Product" className="zoom-image" />
+          <img src={productImages[selectedImageIndex]} alt={`Zoomed ${currentProduct.productName}`} className="zoom-image" />
         </div>
       )}
     </div>

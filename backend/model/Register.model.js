@@ -34,7 +34,11 @@ const RegisterSchema = new mongoose.Schema({
     },
     googleClientId: {
         type: String
-    }
+    },
+    profileImage: {
+        type: String,
+        default: ''
+    },
 },
     {
         timestamps: true,
@@ -43,4 +47,4 @@ const RegisterSchema = new mongoose.Schema({
 );
 
 const Users = mongoose.model('usersaa', RegisterSchema)
-module.exports = Users; 
+module.exports = Users;

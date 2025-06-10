@@ -150,6 +150,22 @@ export const logoutUser = createAsyncThunk('auth/logout', async (userId, { rejec
   }
 });
 
+export const updateProfile = createAsyncThunk('auth/updateProfile', async ({ id, formData }, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register/updateprofile/${id}`, {
+      method: 'PUT',
+      body: formData, 
+    });
+    const data = await response.json();
+    if (!response.ok || !data.success) {
+      throw new Error(data.message || 'Profile update failed');
+    }
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.message || 'An unknown error occurred during profile update.');
+  }
+});
+
 // ========== SLICE ========== //
 
 const authSlice = createSlice({
@@ -329,6 +345,26 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.success = false;
         state.message = action.payload || 'Logout failed.';
+      })
+
+      // --- Update Profile ---
+      .addCase(updateProfile.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+        state.success = false;
+        state.message = 'Updating profile...';
+      })
+      .addCase(updateProfile.fulfilled, (state, action) => {
+        state.loading = false;
+        state.success = true;
+        state.user = action.payload.data;
+        state.message = action.payload.message || 'Profile updated successfully.';
+      })
+      .addCase(updateProfile.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+        state.success = false;
+        state.message = action.payload || 'Profile update failed.';
       });
   }
 });

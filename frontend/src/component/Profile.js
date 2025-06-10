@@ -4,23 +4,57 @@ import {
   Camera, X, Check, Edit3, Save
 } from 'lucide-react';
 import '../styles/d_style.css';
+import { useOutletContext } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getAllUsers, updateProfile } from '../redux/slice/auth.slice';
 
-const Profile = ({ isDarkMode = false }) => {
+const Profile = () => {
+  const { isDarkMode } = useOutletContext();
+  const dispatch = useDispatch();
+  const allUsers = useSelector(state => state.auth.users);
+  const [currentUser, setCurrentUser] = useState(null);
+
   const [formData, setFormData] = useState({
-    fullName: 'Admin User',
-    email: 'admin@example.com',
-    role: 'Administrator',
-    phone: '+1 234 567 8900',
-    company: 'Stock Admin Inc.',
-    address: '123 Admin Street, City, Country',
+    fullName: '',
+    email: '',
+    role: '',
+    phone: '',
+    company: '',
+    address: '',
     password: '',
     confirmPassword: ''
   });
+
   const [isEditing, setIsEditing] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=150&h=150&fit=crop&crop=face');
+  const [previewUrl, setPreviewUrl] = useState('');
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    const userId = localStorage.getItem('user');
+    dispatch(getAllUsers());
+
+    if (userId && allUsers.length > 0) {
+      const user = allUsers.find(u => u._id === userId);
+      if (user) {
+        setCurrentUser(user);
+        setFormData({
+          fullName: user.fullName || '',
+          email: user.email || '',
+          role: user.role || '',
+          phone: user.phone || '',
+          company: user.company || '',
+          address: user.address || '',
+          password: '',
+          confirmPassword: ''
+        });
+        if (user.profileImage) {
+          setPreviewUrl(`http://localhost:2221/KAssets/profileImage/${user.profileImage}`);
+        }
+      }
+    }
+  }, [dispatch, allUsers]);
 
   useEffect(() => {
     setErrors({});
@@ -66,9 +100,29 @@ const Profile = ({ isDarkMode = false }) => {
   const handleSubmit = async () => {
     if (!validateForm()) return;
     setIsLoading(true);
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    setIsEditing(false);
-    setIsLoading(false);
+
+    const userId = localStorage.getItem('user');
+    const formDataToSend = new FormData();
+
+    Object.keys(formData).forEach(key => {
+      if (formData[key]) {
+        formDataToSend.append(key, formData[key]);
+      }
+    });
+
+    if (selectedFile) {
+      formDataToSend.append('profileImage', selectedFile);
+    }
+
+    try {
+      await dispatch(updateProfile({ id: userId, formData: formDataToSend })).unwrap();
+      setIsEditing(false);
+    } catch (error) {
+      console.error('Failed to update profile:', error);
+      setErrors(prev => ({ ...prev, submit: 'Failed to update profile. Please try again.' }));
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   const formFields = [
@@ -84,8 +138,8 @@ const Profile = ({ isDarkMode = false }) => {
   const theme = isDarkMode ? 'dark' : 'light';
 
   return (
-    <div className="db_container">
-      <div className="db_profile" data-theme={isDarkMode ? 'dark' : 'light'}>
+    <div className="w-100">
+      <div className="db_profile w-100" data-theme={isDarkMode ? 'dark' : 'light'}>
         <div className="db_profile_header">
           <div className="db_header_content">
             <h2 className="db_title">Profile Settings</h2>
@@ -105,7 +159,7 @@ const Profile = ({ isDarkMode = false }) => {
           <div className="db_profile_sidebar">
             <div className="db_profile_image">
               <div className="db_profile_avatar">
-                <img src={previewUrl} alt="Profile Avatar" className="db_avatar_img" />
+                <img src={previewUrl || 'default-avatar-url.jpg'} alt="Profile Avatar" className="db_avatar_img" />
                 {isEditing && (
                   <div className="db_photo_overlay">
                     <input

@@ -62,7 +62,11 @@ const updateCartItem = async (req, res) => {
         const { id } = req.params;
         const { quantity } = req.body;
 
-        const updated = await Cart.findByIdAndUpdate(id, { quantity }, { new: true });
+        const updated = await Cart.findByIdAndUpdate(
+            id, 
+            { quantity }, 
+            { new: true }
+        ).populate('productId');
 
         if (!updated) {
             return res.status(404).json({ success: false, message: 'Cart item not found' });

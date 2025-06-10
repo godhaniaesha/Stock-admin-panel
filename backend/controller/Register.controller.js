@@ -1,6 +1,8 @@
 const {Register} = require("../model")
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
+const fs = require('fs');
+const path = require('path');
 
 const generateTokens = async (id) => {
     console.log("id", id);
@@ -305,6 +307,59 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+const updateUser = async (req, res) => {
+    try {
+        const { id } = req.params;
+        const updateData = req.body;
+
+        // Handle password update
+        if (updateData.password) {
+            updateData.password = await bcrypt.hash(updateData.password, 10);
+        }
+
+        // Handle file upload
+        if (req.file) {
+            // Delete old profile image if exists
+            const oldUser = await Register.findById(id);
+            if (oldUser.profileImage) {
+                const oldImagePath = path.join(__dirname, '..', 'uploads', oldUser.profileImage);
+                if (fs.existsSync(oldImagePath)) {
+                    fs.unlinkSync(oldImagePath);
+                }
+            }
+
+            // Set new profile image
+            updateData.profileImage = req.file.filename;
+        }
+
+        const updatedUser = await Register.findByIdAndUpdate(
+            id,
+            { $set: updateData },
+            { new: true, runValidators: true }
+        ).select('-password -refreshToken');
+
+        if (!updatedUser) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            data: updatedUser,
+            message: "User updated successfully"
+        });
+    } catch (error) {
+        console.error("Update user error:", error);
+        res.status(500).json({
+            success: false,
+            message: "Failed to update user",
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     RegisterUser,
     login,
@@ -312,5 +367,6 @@ module.exports = {
     generateNewToken,
     authnticateCheck,
     generateTokens,
-    getAllUsers
+    getAllUsers,
+    updateUser
 }; 

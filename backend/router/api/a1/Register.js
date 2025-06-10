@@ -4,6 +4,7 @@ const passport = require("passport");
 const { generateTokens } = require("../../../controller/Register.controller");
 const Users = require("../../../model/Register.model");
 const { registerController } = require("../../../controller");
+const upload = require("../../../middleware/upload");
 
 const router = express.Router();
 
@@ -30,6 +31,8 @@ router.post("/logoutUser",
 router.get("/authnticateCheck",
     registerController.authnticateCheck
 )
+
+router.put("/updateprofile/:id", upload.single('profileImage'), registerController.updateUser);
 
 // router.post(
 //    "/verifyOTP",

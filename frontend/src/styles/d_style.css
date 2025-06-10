@@ -35,7 +35,7 @@
     padding: 24px;
     border-radius: 12px;
     border: 1px solid var(--border);
-    max-width: 860px;
+    /* max-width: 860px; */
     margin: 30px auto;
     font-family: sans-serif;
   }
@@ -333,7 +333,7 @@
 
 .db_profile_header {
   padding: 2rem;
-  background: linear-gradient(to right, var(--accent-color), #282f36);
+  background: linear-gradient(to right, #6a9c89, #406459);
   color: white;
 }
 

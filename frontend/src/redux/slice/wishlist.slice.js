@@ -8,6 +8,8 @@ export const addToWishlist = createAsyncThunk(
     'wishlist/addToWishlist',
     async ({ userId, productId }) => {
         const response = await axios.post(`${API_URL}/addWishlist`, { userId, productId });
+        console.log(response, "response.data");
+        
         return response.data;
     }
 );

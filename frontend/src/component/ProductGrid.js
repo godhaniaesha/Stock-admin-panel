@@ -12,12 +12,13 @@ import { fetchProducts } from '../redux/slice/product.slice';
 import { fetchCategories } from '../redux/slice/category.slice';
 import { fetchSubcategories } from '../redux/slice/subCategory.slice';
 import { addToCart, getCart } from '../redux/slice/cart.slice';
-import { addToWishlist, getWishlist } from '../redux/slice/wishlist.slice';
+import { addToWishlist, getAllWishlists, getWishlist, removeFromWishlist } from '../redux/slice/wishlist.slice';
 
 function ProductGrid() {
     const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
     const navigate = useNavigate();
+    const [localWishlist, setLocalWishlist] = useState([]);
     const [filters, setFilters] = useState({
         expandedFilter: null,
         showOffcanvas: false,
@@ -79,7 +80,33 @@ function ProductGrid() {
 
     const handleWishlistToggle = (product) => {
         const userId = localStorage.getItem('user');
-        if (userId) dispatch(addToWishlist({ userId, productId: product._id }));
+        if (!userId) return;
+
+        // If already in wishlist, remove it
+        if (isProductInWishlist(product._id)) {
+            // Find the wishlist item id (not product id)
+            const wishlistItem = wishlistItems.find(item => item.productId._id === product._id);
+            if (wishlistItem) {
+                setLocalWishlist((prev) => prev.filter(id => id !== product._id));
+                dispatch(removeFromWishlist(wishlistItem._id))
+                    .then(() => {
+                        dispatch(getWishlist(userId));
+                    })
+                    .catch(() => {
+                        setLocalWishlist((prev) => [...prev, product._id]);
+                    });
+            }
+        } else {
+            // Add to wishlist
+            setLocalWishlist((prev) => [...prev, product._id]);
+            dispatch(addToWishlist({ userId, productId: product._id }))
+                .then(() => {
+                    dispatch(getWishlist(userId));
+                })
+                .catch(() => {
+                    setLocalWishlist((prev) => prev.filter(id => id !== product._id));
+                });
+        }
     };
 
     const handleAddToCart = async (product) => {
@@ -98,8 +125,17 @@ function ProductGrid() {
     };
 
     const isProductInWishlist = (productId) => {
+        // Show local state immediately, fallback to redux state
+        if (localWishlist.length > 0) {
+            return localWishlist.includes(productId);
+        }
         return wishlistItems.some(item => item.productId._id === productId);
     };
+    useEffect(() => {
+        if (wishlistItems && wishlistItems.length > 0) {
+            setLocalWishlist(wishlistItems.map(item => item.productId._id));
+        }
+    }, [wishlistItems]);
 
     if (isLoading) return <div className="text-center p-5">Loading...</div>;
     if (error) return <div className="text-center p-5 text-danger">Error: {error}</div>;
@@ -593,10 +629,10 @@ function ProductGrid() {
                                 <Col key={product._id} lg={3} md={4} sm={6} xs={12} className="mb-4">
                                     <Card className="h-100 Z_product_card">
                                         <div className="Z_product_image">
-                                            <img 
-                                            src={`http://localhost:2221/${product.images?.[0]}`}
+                                            <img
+                                                src={`http://localhost:2221/${product.images?.[0]}`}
                                                 // src={product.images?.[0] || 'https://via.placeholder.com/400x400'} 
-                                                alt={product.productName} 
+                                                alt={product.productName}
                                             />
                                         </div>
                                         <div className="Z_product_info">
@@ -620,7 +656,7 @@ function ProductGrid() {
                                                 <span className="Z_rating_count">({product.reviews || 0} Reviews)</span>
                                             </div>
                                             <div className="Z_product_actions d-flex justify-content-between">
-                                                
+
                                                 <Button
                                                     className="Z_add_to_cart_btn"
                                                     onClick={() => handleAddToCart(product)}

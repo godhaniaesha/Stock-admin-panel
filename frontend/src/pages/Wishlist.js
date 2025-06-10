@@ -5,7 +5,9 @@ import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { getAllWishlists, removeFromWishlist } from '../redux/slice/wishlist.slice';
+import { getAllWishlists, getWishlist, removeFromWishlist } from '../redux/slice/wishlist.slice';
+import { IoMdCart } from 'react-icons/io';
+import { addToCart, getCart } from '../redux/slice/cart.slice';
 
 function Wishlist() {
     const { isDarkMode } = useOutletContext();
@@ -27,7 +29,20 @@ function Wishlist() {
     if (error) {
         return <div className="text-center p-5 text-danger">Error: {error}</div>;
     }
+    const handleMoveToCart = async (item) => {
+        const userId = localStorage.getItem('user');
+        if (!userId) return;
 
+        // 1. Remove from wishlist
+        await dispatch(removeFromWishlist(item._id));
+
+        // 2. Add to cart (default quantity 1)
+        await dispatch(addToCart({ userId, productId: item.productId._id, quantity: 1 }));
+
+        // 3. Optionally refresh wishlist and cart
+        dispatch(getWishlist(userId));
+        // dispatch(getCart(userId));
+    };
     return (
         <>
             <section className={`Z_product_section w-100 ${isDarkMode ? 'd_dark' : 'd_light'} mx-5 my-3`}>
@@ -65,13 +80,13 @@ function Wishlist() {
                                     <tr key={item._id}>
                                         <td>
                                             <div className="Z_custom_checkbox">
-                                                <input 
-                                                    type="checkbox" 
-                                                    id={`checkbox-${item._id}`} 
-                                                    className="Z_checkbox_input" 
+                                                <input
+                                                    type="checkbox"
+                                                    id={`checkbox-${item._id}`}
+                                                    className="Z_checkbox_input"
                                                 />
-                                                <label 
-                                                    htmlFor={`checkbox-${item._id}`} 
+                                                <label
+                                                    htmlFor={`checkbox-${item._id}`}
                                                     className="Z_checkbox_label"
                                                 ></label>
                                             </div>
@@ -104,17 +119,17 @@ function Wishlist() {
                                         </td>
                                         <td>
                                             <div className="Z_action_buttons">
-                                                <button className="Z_action_btn Z_view_btn">
-                                                    <TbEye size={22}/>
+                                                <button className="Z_action_btn Z_view_btn" onClick={() => handleMoveToCart(item)}>
+                                                    <IoMdCart size={22} />
                                                 </button>
-                                                <button className="Z_action_btn Z_edit_btn">
+                                                {/* <button className="Z_action_btn Z_edit_btn">
                                                     <TbEdit size={22}/>
-                                                </button>
-                                                <button 
+                                                </button> */}
+                                                <button
                                                     className="Z_action_btn Z_delete_btn"
                                                     onClick={() => handleDelete(item._id)}
                                                 >
-                                                    <RiDeleteBin6Line size={22}/>
+                                                    <RiDeleteBin6Line size={22} />
                                                 </button>
                                             </div>
                                         </td>

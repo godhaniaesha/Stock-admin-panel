@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
-import { 
-  User, Mail, Lock, Phone, Building, MapPin, 
+import {
+  User, Mail, Lock, Phone, Building, MapPin,
   Camera, X, Check, Edit3, Save
 } from 'lucide-react';
 import '../styles/d_style.css';
@@ -31,10 +31,14 @@ const Profile = () => {
   const [errors, setErrors] = useState({});
   const [isLoading, setIsLoading] = useState(false);
 
+  // Fetch users only once
+  useEffect(() => {
+    dispatch(getAllUsers());
+  }, [dispatch]);
+
+  // Set form data only when user changes
   useEffect(() => {
     const userId = localStorage.getItem('user');
-    dispatch(getAllUsers());
-
     if (userId && allUsers.length > 0) {
       const user = allUsers.find(u => u._id === userId);
       if (user) {
@@ -54,7 +58,7 @@ const Profile = () => {
         }
       }
     }
-  }, [dispatch, allUsers]);
+  }, [allUsers]);
 
   useEffect(() => {
     setErrors({});

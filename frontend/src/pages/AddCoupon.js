@@ -241,7 +241,7 @@ const AddCoupon = () => {
 
                 <div className="x_btn_wrapper mt-3">
                     <button type="submit" className="x_btn x_btn_create" onClick={handleSubmit}>Create Coupon</button>
-                    <button type="button" className="x_btn x_btn_cancel">Cancel</button>
+                    <button type="button" className="x_btn x_btn_cancel" onClick={() => navigate('/coupons')}>Cancel</button>
                 </div>
             </div>
         </div>

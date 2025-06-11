@@ -134,6 +134,8 @@ function ProductGrid() {
     useEffect(() => {
         if (wishlistItems && wishlistItems.length > 0) {
             setLocalWishlist(wishlistItems.map(item => item.productId._id));
+           
+            
         }
     }, [wishlistItems]);
 

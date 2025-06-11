@@ -1,7 +1,12 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import '../styles/checkout.css';
-import { CreditCard, Truck, MapPin, CheckCircle2 } from 'lucide-react';
+import { CreditCard, Truck, MapPin, CheckCircle2, ChevronDown } from 'lucide-react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+import { useDispatch, useSelector } from 'react-redux';
+import { getCart, removeFromCart } from '../redux/slice/cart.slice';
+import { fetchCoupons } from '../redux/slice/coupon.slice';
+import { createOrder } from '../redux/slice/order.slice';
+import { createPayment } from '../redux/slice/payment.slice';
 import { BsCreditCard2Front, BsChevronDown, BsChevronRight } from 'react-icons/bs';
 import { FaWallet, FaUniversity } from 'react-icons/fa';
 import { SiGooglepay, SiPhonepe, SiPaytm } from 'react-icons/si';
@@ -92,15 +97,129 @@ const CheckoutPage = () => {
   const { isDarkMode } = useOutletContext();
   const [formData, setFormData] = useState(initialValues);
   const [showSuccessModal, setShowSuccessModal] = useState(false);
+  const [selectedCoupon, setSelectedCoupon] = useState(null);
   const navigate = useNavigate();
+  const dispatch = useDispatch();
+  const userId = localStorage.getItem('user');
+  const { items: cartItems, loading, error } = useSelector((state) => state.cart);
+  const { coupons, isLoading: couponsLoading } = useSelector((state) => state.coupon);
+  const [orderId, setOrderId] = useState(null);
 
-  const handleSubmit = (values, { setSubmitting }) => {
-    console.log('Form submitted:', values);
-    // Simulate API call
-    setTimeout(() => {
-      setSubmitting(false);
+  useEffect(() => {
+    if (userId) {
+      dispatch(getCart(userId));
+      dispatch(fetchCoupons());
+    }
+  }, [dispatch, userId]);
+
+  // Add new useEffect to get coupon from localStorage
+  useEffect(() => {
+    const storedCoupon = localStorage.getItem('selectedCoupon');
+    if (storedCoupon) {
+      const parsedCoupon = JSON.parse(storedCoupon);
+      setSelectedCoupon(parsedCoupon);
+    }
+  }, []);
+
+  // Calculate totals
+  const subtotal = cartItems?.reduce((total, item) => total + (item.productId?.price * item.quantity), 0) || 0;
+  const discount = selectedCoupon ? (subtotal * selectedCoupon.discountPercentage / 100) : 0;
+  const deliveryCharge = 50;
+  const tax = subtotal * 0.155; // 15.5% tax
+  const finalTotal = subtotal + tax + deliveryCharge - discount;
+
+  const handleCouponChange = (e) => {
+    const couponId = e.target.value;
+    const coupon = coupons.find(c => c._id === couponId);
+    setSelectedCoupon(coupon || null);
+  };
+
+  const handleSubmit = async (values, { setSubmitting }) => {
+    try {
+      console.log('Form Values:', values);
+      console.log('Cart Items:', cartItems);
+      
+      // Get coupon from localStorage
+      const storedCoupon = localStorage.getItem('selectedCoupon');
+      const couponData = storedCoupon ? JSON.parse(storedCoupon) : null;
+      console.log('Coupon from localStorage:', couponData);
+      
+      if (!cartItems || cartItems.length === 0) {
+        console.error('No items in cart');
+        return;
+      }
+
+      const orderData = {
+        userId: userId,
+        couponId: couponData ? couponData.id : null,
+        // Personal Details
+        firstName: values.firstName,
+        lastName: values.lastName,
+        email: values.email,
+        phone: values.phone,
+        // Shipping Details
+        address: values.address,
+        zipCode: values.zipCode,
+        city: values.city,
+        country: values.country,
+        // Payment Details
+        paymentMethod: values.paymentMethod,
+        paymentDetails: values.paymentMethod === 'card' ? {
+          cardNumber: values.cardNumber,
+          cardName: values.cardName
+        } : values.paymentMethod === 'upi' ? {
+          upiId: values.upiId
+        } : {
+          bank: values.selectedBank
+        },
+        // Order Items
+        items: cartItems.map(item => ({
+          productId: item.productId._id,
+          quantity: item.quantity,
+          price: item.productId.price
+        })),
+        // Amount Details
+        totalAmount: subtotal,
+        discountAmount: discount,
+        deliveryCharge: deliveryCharge,
+        tax: tax,
+        finalAmount: finalTotal,
+        paymentStatus: 'pending',
+        status: 'pending'
+      };
+
+      console.log('Order Data being sent:', orderData);
+
+      // Create order first
+      const orderResponse = await dispatch(createOrder(orderData)).unwrap();
+      console.log('Order Response:', orderResponse);
+      
+      // After successful order creation, create payment record
+      const paymentData = {
+        orderId: orderResponse._id,
+        amount: finalTotal,
+        method: values.paymentMethod,
+        status: 'pending'
+      };
+
+      console.log('Payment Data being sent:', paymentData);
+      const paymentResponse = await dispatch(createPayment(paymentData)).unwrap();
+      console.log('Payment Response:', paymentResponse);
+
+      // Remove all items from cart after successful order placement
+      for (const item of cartItems) {
+        await dispatch(removeFromCart(item._id)).unwrap();
+      }
+      
+      setOrderId(orderResponse._id);
       setShowSuccessModal(true);
-    }, 1500);
+      
+    } catch (error) {
+      console.error('Order/Payment creation failed:', error);
+      // You might want to show an error message to the user here
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   const handleInputChange = (e, setFieldValue) => {
@@ -288,7 +407,7 @@ const CheckoutPage = () => {
                   <div className="d_payment_methods">
                     {/* Credit/Debit Card */}
                     <div className={`d_payment_option ${values.paymentMethod === 'card' ? 'open' : ''}`}>
-                      <div 
+                      <div
                         className="d_payment_header"
                         onClick={() => togglePaymentMethod('card', setFieldValue)}
                       >
@@ -363,7 +482,7 @@ const CheckoutPage = () => {
 
                     {/* UPI */}
                     <div className={`d_payment_option ${values.paymentMethod === 'upi' ? 'open' : ''}`}>
-                      <div 
+                      <div
                         className="d_payment_header"
                         onClick={() => togglePaymentMethod('upi', setFieldValue)}
                       >
@@ -403,7 +522,7 @@ const CheckoutPage = () => {
 
                     {/* Net Banking */}
                     <div className={`d_payment_option ${values.paymentMethod === 'netbanking' ? 'open' : ''}`}>
-                      <div 
+                      <div
                         className="d_payment_header"
                         onClick={() => togglePaymentMethod('netbanking', setFieldValue)}
                       >
@@ -454,71 +573,69 @@ const CheckoutPage = () => {
                 <div className="d_order_summary">
                   <div className="d_summary_header">
                     <h2>Order Summary</h2>
-                    <span className="d_items_count">3 Items</span>
+                    <span className="d_items_count">{cartItems?.length || 0} Items</span>
                   </div>
 
                   <div className="d_promo_section">
-                    <h3 style={{ color: 'white', marginBottom: '1rem' }}>Have a Promo Code ?</h3>
-                    <div className="d_promo_input">
-                      <input
-                        type="text"
-                        name="promoCode"
-                        placeholder="Enter your promo code"
-                        className="d_input"
-                        style={{ flex: 1 }}
-                        value={formData.promoCode}
-                        onChange={(e) => handleInputChange(e, setFieldValue)}
-                      />
-                      <button className="d_apply_btn">Apply</button>
-                    </div>
+                    <h3 style={{ color: 'white', marginBottom: '1rem' }}>Applied Coupon</h3>
+                    {selectedCoupon && (
+                      <div className="d_coupon_info" style={{ marginTop: '10px'}}>
+                        <p>Applied: {selectedCoupon.title} - {selectedCoupon.discountPercentage}% off</p>
+                        <p>Discount Amount: ${discount.toFixed(2)}</p>
+                      </div>
+                    )}
                   </div>
 
                   <div className="d_summary_items">
-                    {/* Product items */}
-                    <div className="d_summary_item">
-                      <img src="/path/to/tshirt.jpg" alt="T-shirt" className="d_item_thumbnail" />
-                      <div className="d_item_info">
-                        <h4>Men Black Slim Fit T-shirt</h4>
-                        <div className="d_item_meta">
-                          <span>Size: M</span>
-                          <span>Color: Black</span>
-                        </div>
-                        <div className="d_item_price">
-                          <span>$83.00</span>
-                          <div className="d_quantity_badge">Qty: 1</div>
+                    {cartItems?.map(item => (
+                      <div key={item._id} className="d_summary_item">
+                        <img
+                          src={`http://localhost:2221/${item.productId?.images?.[0]}`}
+                          alt={item.productId?.productName}
+                          className="d_item_thumbnail"
+                        />
+                        <div className="d_item_info">
+                          <h4>{item.productId?.productName}</h4>
+                          <div className="d_item_meta">
+                            <span>Size: {item.productId?.size || 'Standard'}</span>
+                            <span>Color: {item.productId?.color || 'Default'}</span>
+                          </div>
+                          <div className="d_item_price">
+                            <span>${item.productId?.price?.toFixed(2)}</span>
+                            <div className="d_quantity_badge">Qty: {item.quantity}</div>
+                          </div>
                         </div>
                       </div>
-                    </div>
-                    {/* Add more items as needed */}
+                    ))}
                   </div>
 
                   <div className="d_summary_calculations">
                     <div className="d_calc_row">
                       <span>Subtotal</span>
-                      <span>$777.00</span>
+                      <span>${subtotal.toFixed(2)}</span>
                     </div>
                     <div className="d_calc_row">
                       <span>Discount</span>
-                      <span className="d_discount">-$60.00</span>
+                      <span className="d_discount">-${discount.toFixed(2)}</span>
                     </div>
                     <div className="d_calc_row">
                       <span>Shipping</span>
-                      <span>$50.00</span>
+                      <span>${deliveryCharge.toFixed(2)}</span>
                     </div>
                     <div className="d_calc_row">
-                      <span>Tax (5.5%)</span>
-                      <span>$30.00</span>
+                      <span>Tax (15.5%)</span>
+                      <span>${tax.toFixed(2)}</span>
                     </div>
                     <div className="d_calc_row d_total">
                       <span>Total</span>
-                      <span>$737.00</span>
+                      <span>${finalTotal.toFixed(2)}</span>
                     </div>
                   </div>
 
-                  <button 
+                  <button
                     type="submit"
-                    className="d_checkout_btn" 
-                    disabled={isSubmitting}
+                    className="d_checkout_btn"
+                    disabled={isSubmitting || loading || !cartItems?.length}
                     style={{
                       width: '100%',
                       padding: '15px',
@@ -534,7 +651,7 @@ const CheckoutPage = () => {
                       marginTop: '20px'
                     }}
                   >
-                    {isSubmitting ? 'Processing...' : 'Placed order'}
+                    {isSubmitting ? 'Processing...' : 'Place Order'}
                   </button>
                 </div>
               </div>
@@ -553,10 +670,10 @@ const CheckoutPage = () => {
             <h2>Order Placed Successfully!</h2>
             <p>Thank you for your purchase. Your order has been received.</p>
             <div className="d_order_details">
-              <p>Order Number: #{Math.floor(Math.random() * 1000000)}</p>
+              <p>Order Number: #{orderId}</p>
               <p>A confirmation email has been sent to your email address.</p>
             </div>
-            <button 
+            <button
               className="d_continue_btn"
               onClick={handleContinueShopping}
             >

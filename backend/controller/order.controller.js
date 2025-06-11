@@ -1,9 +1,28 @@
-const { Order,Product  } = require('../model');
+const { Order, Product } = require('../model');
 
 // Create a new order
 const createOrder = async (req, res) => {
     try {
-        const { userId, couponId, addressId, items } = req.body;
+        const {
+            userId,
+            couponId,
+            firstName,
+            lastName,
+            email,
+            phone,
+            address,
+            zipCode,
+            city,
+            country,
+            paymentMethod,
+            paymentDetails,
+            items,
+            totalAmount,
+            discountAmount,
+            deliveryCharge,
+            tax,
+            finalAmount
+        } = req.body;
 
         if (!items || !Array.isArray(items) || items.length === 0) {
             return res.status(400).json({
@@ -12,8 +31,8 @@ const createOrder = async (req, res) => {
             });
         }
 
-        let totalAmount = 0;
-
+        // Validate products exist and calculate total
+        let calculatedTotal = 0;
         for (const item of items) {
             const product = await Product.findById(item.productId);
             if (!product) {
@@ -22,16 +41,36 @@ const createOrder = async (req, res) => {
                     message: `Product not found: ${item.productId}`
                 });
             }
-
-            totalAmount += product.price * item.quantity;
+            calculatedTotal += product.price * item.quantity;
         }
 
         const newOrder = new Order({
             userId,
             couponId,
-            addressId,
+            // Personal Details
+            firstName,
+            lastName,
+            email,
+            phone,
+            // Shipping Details
+            address,
+            zipCode,
+            city,
+            country,
+            // Payment Details
+            paymentMethod,
+            paymentDetails,
+            // Order Items
             items,
-            totalAmount
+            // Amount Details
+            totalAmount: calculatedTotal,
+            discountAmount: discountAmount || 0,
+            deliveryCharge,
+            tax,
+            finalAmount,
+            // Status
+            paymentStatus: 'pending',
+            status: 'pending'
         });
 
         const savedOrder = await newOrder.save();

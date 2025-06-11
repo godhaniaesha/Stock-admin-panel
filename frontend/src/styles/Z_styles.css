@@ -88,8 +88,8 @@
 .Z_setting_btn,
 .Z_filter_btn {
     background-color: transparent;
-    border: 1px solid #2d3035;
-    color: #000;
+    border: 1px solid var(--accent-color);
+    color:var(--accent-color);
 
 }
 
@@ -143,6 +143,9 @@
     .Z_right_actions button {
         padding: 6px 12px;
         font-size: 0.8rem;
+    }
+    .Z_offcan_width{
+        width: 60% !important;
     }
 }
 
@@ -239,7 +242,7 @@
 }
 
 .Z_filter_content_show {
-    max-height: 300px;
+    max-height:  fit-content;
     padding: 16px;
 }
 
@@ -1070,9 +1073,6 @@
 
     .Z_action_buttons {
         justify-content: flex-start;
-    }
-    .Z_product_section {
-        padding: 5px;
     }
 }
 
@@ -2037,8 +2037,21 @@
     .Z_faq_search .Z_search_input {
         height: 40px;
     }
+    .Z_offcan_width{
+        width: 70% !important;
+    }
 }
 
+
+@media (max-width: 375px) {
+    .Z_offcan_width{
+        width: 90% !important;
+    }
+
+    .Z_filter_option .form-check-input {
+       margin-right: 0;
+    }
+}
 /* Modal Styles */
 .Z_Dlt_modal .modal-content {
     border-radius: 8px;

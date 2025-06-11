@@ -134,8 +134,8 @@ function ProductGrid() {
     useEffect(() => {
         if (wishlistItems && wishlistItems.length > 0) {
             setLocalWishlist(wishlistItems.map(item => item.productId._id));
-           
-            
+
+
         }
     }, [wishlistItems]);
 
@@ -181,38 +181,40 @@ function ProductGrid() {
                             <Button variant="outline-secondary" className="Z_filter_btn me-2 d-xl-none" onClick={() => handleFilterChange('showOffcanvas', true)}>
                                 <FaFilter /> Filters
                             </Button>
-                            <span
-                                role="button"
-                                tabIndex={0}
-                                className="Z_header_icon mx-2 position-relative"
-                                onClick={() => navigate('/cart')}
-                                onKeyDown={(e) => e.key === 'Enter' && navigate('/cart')}
-                                title="View Cart"
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <IoMdCart size={24} />
-                                {totalItems > 0 && (
-                                    <Badge pill bg="danger" className="position-absolute top-0 start-100 translate-middle" style={{ fontSize: '0.6em', padding: '0.3em 0.5em' }}>
-                                        {totalItems > 9 ? '9+' : totalItems}
-                                    </Badge>
-                                )}
-                            </span>
-                            <span
-                                role="button"
-                                tabIndex={0}
-                                className="Z_header_icon mx-2 position-relative"
-                                onClick={() => navigate('/wishlist')}
-                                onKeyDown={(e) => e.key === 'Enter' && navigate('/wishlist')}
-                                title="View Wishlist"
-                                style={{ cursor: 'pointer' }}
-                            >
-                                <IoIosHeart size={24} />
-                                {wishlistItems && wishlistItems.length > 0 && (
-                                    <Badge pill bg="danger" className="position-absolute top-0 start-100 translate-middle" style={{ fontSize: '0.6em', padding: '0.3em 0.5em' }}>
-                                        {wishlistItems.length > 9 ? '9+' : wishlistItems.length}
-                                    </Badge>
-                                )}
-                            </span>
+                            <div>
+                                <span
+                                    role="button"
+                                    tabIndex={0}
+                                    className="Z_header_icon mx-2 position-relative"
+                                    onClick={() => navigate('/cart')}
+                                    onKeyDown={(e) => e.key === 'Enter' && navigate('/cart')}
+                                    title="View Cart"
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <IoMdCart size={24} />
+                                    {totalItems > 0 && (
+                                        <Badge pill bg="danger" className="position-absolute top-0 start-100 translate-middle" style={{ fontSize: '0.6em', padding: '0.3em 0.5em' }}>
+                                            {totalItems > 9 ? '9+' : totalItems}
+                                        </Badge>
+                                    )}
+                                </span>
+                                <span
+                                    role="button"
+                                    tabIndex={0}
+                                    className="Z_header_icon mx-2 position-relative"
+                                    onClick={() => navigate('/wishlist')}
+                                    onKeyDown={(e) => e.key === 'Enter' && navigate('/wishlist')}
+                                    title="View Wishlist"
+                                    style={{ cursor: 'pointer' }}
+                                >
+                                    <IoIosHeart size={24} />
+                                    {wishlistItems && wishlistItems.length > 0 && (
+                                        <Badge pill bg="danger" className="position-absolute top-0 start-100 translate-middle" style={{ fontSize: '0.6em', padding: '0.3em 0.5em' }}>
+                                            {wishlistItems.length > 9 ? '9+' : wishlistItems.length}
+                                        </Badge>
+                                    )}
+                                </span>
+                            </div>
                             {/* <Button variant="success" className="Z_new_product_btn" onClick={handleNewProduct}>
                                 + New Product
                             </Button> */}
@@ -415,8 +417,10 @@ function ProductGrid() {
                     {/* Offcanvas for smaller screens */}
                     <Offcanvas
                         show={filters.showOffcanvas}
+
                         onHide={() => handleFilterChange('showOffcanvas', false)}
                         placement="start"
+                        className="Z_offcan_width"
                     >
                         <Offcanvas.Header closeButton>
                             <Offcanvas.Title>Filters</Offcanvas.Title>
@@ -628,7 +632,7 @@ function ProductGrid() {
                     <Col xl={9} lg={12} md={12}>
                         <Row>
                             {filteredProducts.map((product) => (
-                                <Col key={product._id} lg={3} md={4} sm={6} xs={12} className="mb-4">
+                                <Col key={product._id} lg={4} md={6} sm={6} xs={12} className="mb-4">
                                     <Card className="h-100 Z_product_card">
                                         <div className="Z_product_image">
                                             <img

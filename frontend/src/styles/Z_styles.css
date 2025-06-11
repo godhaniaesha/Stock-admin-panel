@@ -13,7 +13,7 @@
     border-radius: 4px;
     overflow: hidden;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    width: 300px;
+    width:auto;
 }
 
 .Z_heading {
@@ -110,11 +110,11 @@
     background-color: #218838;
 }
 
-@media (max-width: 1440px) {
+/* @media (max-width: 1440px) {
     .Z_input_grp {
-        width: 235px;
+        width: 219px;
     }
-}
+} */
 
 @media (max-width: 992px) {
     .Z_right_actions {

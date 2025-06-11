@@ -282,3 +282,58 @@
       align-items: flex-start;
     }
   }
+
+
+
+  .custom-select-box {
+    position: relative;
+    width: 100%;
+    max-width: 250px;
+    font-size: 14px;
+    color: var(--dark-text);
+  }
+  
+  .select-header {
+    padding: 10px 14px;
+    background-color: var(--dark-card-bg);
+    border: 1px solid var(--dark-border);
+    border-radius: 5px;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  
+  .select-header:hover {
+    background-color: var(--accent-hover-color);
+    color: #fff;
+  }
+  
+  .select-options {
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    background-color: var(--dark-bg);
+    border: 1px solid var(--dark-border);
+    border-top: none;
+    z-index: 10;
+    border-radius: 0 0 5px 5px;
+    max-height: 200px;
+    overflow-y: auto;
+  }
+  
+  .select-option {
+    padding: 10px 14px;
+    cursor: pointer;
+    color: var(--dark-text);
+  }
+  
+  .select-option:hover {
+    background-color: var(--accent-color);
+    color: white;
+  }
+  
+  .arrow {
+    margin-left: 10px;
+  }

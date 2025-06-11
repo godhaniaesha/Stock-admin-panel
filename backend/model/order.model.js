@@ -9,18 +9,58 @@ const orderSchema = new mongoose.Schema({
     couponId: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Coupon',
+        required: false
+    },
+    // Personal Details
+    firstName: {
+        type: String,
         required: true
     },
-    addressId: {
-        type: mongoose.Schema.Types.ObjectId,
-        ref: 'Address',
+    lastName: {
+        type: String,
+        required: true
+    },
+    email: {
+        type: String,
+        required: true
+    },
+    phone: {
+        type: String,
+        required: true
+    },
+    // Shipping Details
+    address: {
+        type: String,
+        required: true
+    },
+    zipCode: {
+        type: String,
+        required: true
+    },
+    city: {
+        type: String,
+        required: true
+    },
+    country: {
+        type: String,
+        required: true
+    },
+    // Payment Details
+    paymentMethod: {
+        type: String,
+        required: true,
+        enum: ['card', 'upi', 'netbanking']
+    },
+    paymentDetails: {
+        type: Object,
         required: true
     },
     items: [
         {
             productId: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Product', required: true
+                ref: 'Product',
+                required: true
             },
             quantity: {
                 type: Number,
@@ -33,7 +73,23 @@ const orderSchema = new mongoose.Schema({
         type: Number,
         required: true
     },
-    paymentstatus :{
+    discountAmount: {
+        type: Number,
+        default: 0
+    },
+    deliveryCharge: {
+        type: Number,
+        required: true
+    },
+    tax: {
+        type: Number,
+        required: true
+    },
+    finalAmount: {
+        type: Number,
+        required: true
+    },
+    paymentStatus: {
         type: String,
         default: 'pending',
         enum: ['pending', 'paid']

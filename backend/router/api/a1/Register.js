@@ -80,4 +80,14 @@ router.get('/callback',
             .redirect('http://localhost:3000')
     });
 
+// Seller registration process routes
+router.post("/verify-gst", registerController.verifyGST);
+router.post("/add-business-details", registerController.addBusinessDetails);
+router.post("/send-otp", registerController.sendOTP);
+router.post("/verify-otp", registerController.verifyOTP);
+router.post("/add-store-details", registerController.addStoreDetails);
+router.post("/add-bank-details", registerController.addBankDetails);
+router.post("/add-pickup-address", registerController.addPickupAddress);
+router.post("/accept-terms", registerController.acceptTermsAndConditions);
+
 module.exports = router

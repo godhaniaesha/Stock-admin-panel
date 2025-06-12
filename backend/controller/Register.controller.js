@@ -496,6 +496,138 @@ const createUser = async (req, res) => {
     }
 };
 
+const verifyGST = async (req, res) => {
+    try {
+        const { gstNumber } = req.body;
+        // Here you would typically call a GST verification service
+        // For now, we'll just simulate a successful verification
+        const isValid = true; // Replace with actual verification logic
+
+        if (isValid) {
+            res.status(200).json({ success: true, message: "GST number verified successfully" });
+        } else {
+            res.status(400).json({ success: false, message: "Invalid GST number" });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: "GST verification failed", error: error.message });
+    }
+};
+
+const addBusinessDetails = async (req, res) => {
+    try {
+        const { userId, gstDetails, businessName, panNumber, businessType, registeredBusinessAddress } = req.body;
+        const updatedUser = await Register.findByIdAndUpdate(userId, 
+            { $set: { 
+                'sellerInfo.gstDetails': gstDetails,
+                'sellerInfo.businessName': businessName,
+                'sellerInfo.panNumber': panNumber,
+                'sellerInfo.businessType': businessType,
+                'sellerInfo.registeredBusinessAddress': registeredBusinessAddress
+            }},
+            { new: true }
+        );
+        res.status(200).json({ success: true, data: updatedUser, message: "Business details added successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to add business details", error: error.message });
+    }
+};
+
+const sendOTP = async (req, res) => {
+    try {
+        const { phoneNumber } = req.body;
+        // Here you would use Twilio to send an OTP
+        // For now, we'll just simulate sending an OTP
+        const otp = Math.floor(100000 + Math.random() * 900000);
+        // Save OTP to user document or a separate OTP collection
+        res.status(200).json({ success: true, message: "OTP sent successfully", otp });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to send OTP", error: error.message });
+    }
+};
+
+const verifyOTP = async (req, res) => {
+    try {
+        const { userId, otp } = req.body;
+        // Here you would verify the OTP
+        // For now, we'll just simulate a successful verification
+        const isValid = true; // Replace with actual verification logic
+        if (isValid) {
+            res.status(200).json({ success: true, message: "OTP verified successfully" });
+        } else {
+            res.status(400).json({ success: false, message: "Invalid OTP" });
+        }
+    } catch (error) {
+        res.status(500).json({ success: false, message: "OTP verification failed", error: error.message });
+    }
+};
+
+const addStoreDetails = async (req, res) => {
+    try {
+        const { userId, storeName, ownerName } = req.body;
+        const updatedUser = await Register.findByIdAndUpdate(userId, 
+            { $set: { 
+                'sellerInfo.storeName': storeName,
+                'sellerInfo.ownerName': ownerName
+            }},
+            { new: true }
+        );
+        res.status(200).json({ success: true, data: updatedUser, message: "Store details added successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to add store details", error: error.message });
+    }
+};
+
+const addBankDetails = async (req, res) => {
+    try {
+        const { userId, bankName, accountNumber, confirmAccountNumber, ifscCode } = req.body;
+        if (accountNumber !== confirmAccountNumber) {
+            return res.status(400).json({ success: false, message: "Account numbers do not match" });
+        }
+        const updatedUser = await Register.findByIdAndUpdate(userId, 
+            { $set: { 
+                'sellerInfo.bankName': bankName,
+                'sellerInfo.accountNumber': accountNumber,
+                'sellerInfo.ifscCode': ifscCode
+            }},
+            { new: true }
+        );
+        res.status(200).json({ success: true, data: updatedUser, message: "Bank details added successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to add bank details", error: error.message });
+    }
+};
+
+const addPickupAddress = async (req, res) => {
+    try {
+        const { userId, buildingNumber, street, landmark, pincode, city, state } = req.body;
+        const updatedUser = await Register.findByIdAndUpdate(userId, 
+            { $set: { 
+                'sellerInfo.pickupAddress': { buildingNumber, street, landmark, pincode, city, state }
+            }},
+            { new: true }
+        );
+        res.status(200).json({ success: true, data: updatedUser, message: "Pickup address added successfully" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to add pickup address", error: error.message });
+    }
+};
+
+const acceptTermsAndConditions = async (req, res) => {
+    try {
+        const { userId } = req.body;
+        const updatedUser = await Register.findByIdAndUpdate(userId, 
+            { $set: { 
+                'sellerInfo.termsAccepted': true,
+                'isactive': true
+            }},
+            { new: true }
+        );
+        res.status(200).json({ success: true, data: updatedUser, message: "Terms and conditions accepted, seller account activated" });
+    } catch (error) {
+        res.status(500).json({ success: false, message: "Failed to accept terms and conditions", error: error.message });
+    }
+};
+
 module.exports = {
     RegisterUser,
     login,
@@ -507,5 +639,13 @@ module.exports = {
     getUserById,
     updateUser,
     deleteUser,
-    createUser
-}; 
+    createUser,
+    verifyGST,
+    addBusinessDetails,
+    sendOTP,
+    verifyOTP,
+    addStoreDetails,
+    addBankDetails,
+    addPickupAddress,
+    acceptTermsAndConditions
+};

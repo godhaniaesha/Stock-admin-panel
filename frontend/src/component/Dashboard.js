@@ -199,11 +199,7 @@ const Dashboard = () => {
                   <div className="d_icon-wrapper">
                     <DollarSign size={24} />
                   </div>
-                  <div className="dropdown">
-                    <button className="d_btn-ghost btn-sm">
-                      <MoreVertical size={16} />
-                    </button>
-                  </div>
+                  
                 </div>
                 <h3 className="h4 fw-bold mb-1">$24,780</h3>
                 <p className="mb-2 opacity-75">Total Revenue</p>
@@ -228,11 +224,7 @@ const Dashboard = () => {
                   <div className="d_icon-wrapper">
                     <Users size={24} />
                   </div>
-                  <div className="dropdown">
-                    <button className="d_btn-ghost btn-sm">
-                      <MoreVertical size={16} />
-                    </button>
-                  </div>
+                  
                 </div>
                 <h3 className="h4 fw-bold mb-1">1,429</h3>
                 <p className="mb-2 opacity-75">Active Users</p>
@@ -257,11 +249,7 @@ const Dashboard = () => {
                   <div className="d_icon-wrapper">
                     <ShoppingCart size={24} />
                   </div>
-                  <div className="dropdown">
-                    <button className="d_btn-ghost btn-sm">
-                      <MoreVertical size={16} />
-                    </button>
-                  </div>
+                  
                 </div>
                 <h3 className="h4 fw-bold mb-1">856</h3>
                 <p className="mb-2 opacity-75">Orders</p>
@@ -286,11 +274,7 @@ const Dashboard = () => {
                   <div className="d_icon-wrapper">
                     <TrendingUp size={24} />
                   </div>
-                  <div className="dropdown">
-                    <button className="d_btn-ghost btn-sm">
-                      <MoreVertical size={16} />
-                    </button>
-                  </div>
+                  
                 </div>
                 <h3 className="h4 fw-bold mb-1">94.2%</h3>
                 <p className="mb-2 opacity-75">Conversion Rate</p>

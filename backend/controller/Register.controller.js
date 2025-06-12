@@ -47,7 +47,7 @@ const generateTokens = async (id) => {
 
 const RegisterUser = async (req, res) => {
     try {
-        console.log("Request body:", req.body); // Debug log
+        console.log("Request body:", req.body);
 
         const finduser = await Register.findOne({ email: req.body.email });
         console.log("finduser", finduser);
@@ -65,7 +65,8 @@ const RegisterUser = async (req, res) => {
         const user = await Register.create({
             ...req.body,
             password: bcryptpass,
-            role: req.body.role || 'user' // Set default role if not provided
+            role: req.body.role || 'user',
+            profileImage: req.file ? req.file.filename : ''
         });
 
         if (!user) {
@@ -76,7 +77,6 @@ const RegisterUser = async (req, res) => {
             });
         }
 
-        // Generate tokens after successful registration
         const { assesToken, refreshToken } = await generateTokens(user._id);
 
         const data = await Register.findOne({ email: req.body.email }).select("-password");
@@ -85,13 +85,13 @@ const RegisterUser = async (req, res) => {
             .cookie("assesToken", assesToken, { httpOnly: true, secure: true })
             .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
             .json({
-                accessToken:assesToken,
+                accessToken: assesToken,
                 success: true,
                 data: data,
                 message: "User created successfully",
             });
     } catch (error) {
-        console.error("Registration error:", error); // Debug log
+        console.error("Registration error:", error);
         res.status(500).json({
             success: false,
             data: [],
@@ -307,6 +307,28 @@ const getAllUsers = async (req, res) => {
     }
 };
 
+const getUserById = async (req, res) => {
+    try {
+        const user = await Register.findById(req.params.id).select('-password -refreshToken');
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        res.status(200).json({
+            success: true,
+            data: user
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error fetching user',
+            error: error.message
+        });
+    }
+};
+
 const updateUser = async (req, res) => {
     try {
         const { id } = req.params;
@@ -360,6 +382,120 @@ const updateUser = async (req, res) => {
     }
 };
 
+const deleteUser = async (req, res) => {
+    try {
+        const user = await Register.findByIdAndDelete(req.params.id);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: 'User not found'
+            });
+        }
+        res.status(200).json({
+            success: true,
+            message: 'User deleted successfully'
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error deleting user',
+            error: error.message
+        });
+    }
+};
+
+const createUser = async (req, res) => {
+    try {
+        const {
+            firstName,
+            lastName,
+            username,
+            email,
+            phone,
+            birthdate,
+            gender,
+            address,
+            city,
+            state,
+            country,
+            role,
+            password
+        } = req.body;
+
+        // Check if user already exists
+        const existingUser = await Register.findOne({ email });
+        if (existingUser) {
+            return res.status(400).json({
+                success: false,
+                message: 'User with this email already exists'
+            });
+        }
+
+        // Hash password
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Create new user
+        const user = new Register({
+            firstName,
+            lastName,
+            username,
+            email,
+            phone,
+            birthdate,
+            gender,
+            address,
+            city,
+            state,
+            country,
+            role: role || 'user',
+            password: hashedPassword,
+            profileImage: req.file ? req.file.filename : '',
+            isactive: true
+        });
+
+        await user.save();
+
+        // Get user details without sensitive data
+        const userDetails = await Register.findOne({ email }).select("-password -refreshToken");
+
+        // Try to generate tokens, but don't fail if it doesn't work
+        let tokens = null;
+        try {
+            if (process.env.ACCESS_TOKEN_KEY && process.env.REFRESH_TOKEN_KEY) {
+                tokens = await generateTokens(user._id);
+            }
+        } catch (tokenError) {
+            console.error("Token generation error:", tokenError);
+        }
+
+        const response = {
+            success: true,
+            data: userDetails,
+            message: "User created successfully"
+        };
+
+        // Only add tokens to response and cookies if they were generated successfully
+        if (tokens) {
+            response.accessToken = tokens.assesToken;
+            return res.status(201)
+                .cookie("assesToken", tokens.assesToken, { httpOnly: true, secure: true })
+                .cookie("refreshToken", tokens.refreshToken, { httpOnly: true, secure: true })
+                .json(response);
+        }
+
+        // If token generation failed, still return success but without tokens
+        return res.status(201).json(response);
+
+    } catch (error) {
+        console.error("Create user error:", error);
+        res.status(500).json({
+            success: false,
+            message: 'Error creating user',
+            error: error.message
+        });
+    }
+};
+
 module.exports = {
     RegisterUser,
     login,
@@ -368,5 +504,8 @@ module.exports = {
     authnticateCheck,
     generateTokens,
     getAllUsers,
-    updateUser
+    getUserById,
+    updateUser,
+    deleteUser,
+    createUser
 }; 

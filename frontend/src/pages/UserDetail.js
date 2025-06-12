@@ -186,9 +186,8 @@ function UserDetail() {
           <Card className="d_user-card shadow-lg">
             <Card.Header className="d_card-header text-center py-4">
               <Image
-                src={selectedUser.profileImage
-                  ? `http://localhost:2221/KAssets/image/${selectedUser.profileImage}`
-                  : `https://placehold.co/150x150/638679/ffffff?text=${selectedUser.firstName?.[0] || 'U'}`}
+               src={`http://localhost:2221/KAssets/profileImage/${selectedUser.profileImage}`}
+               
                 roundedCircle
                 className="d_profile-image mb-3"
                 alt={`${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`}
@@ -197,6 +196,7 @@ function UserDetail() {
                   e.target.src = "https://placehold.co/150x150/CCCCCC/000000?text=Error";
                 }}
               />
+              
               <Card.Title className="d_user-name mb-1">
                 {selectedUser.firstName} {selectedUser.lastName}
               </Card.Title>

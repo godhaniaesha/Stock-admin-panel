@@ -8,46 +8,56 @@ const upload = require("../../../middleware/upload");
 
 const router = express.Router();
 
-// Get all users
-router.get("/getAllregister", registerController.getAllUsers);
+//Z_ all users
+router.get("/getAllUsers", registerController.getAllUsers);
 
+//Z_ Get user by ID
+router.get("/:id", registerController.getUserById);
+
+//Z_ Create new user
+router.post("/createUser",
+    upload.single('profileImage'),
+    registerController.createUser
+);
+
+// Register new user
 router.post("/",
-    //    createOTP(),
+    upload.single('profileImage'),
     registerController.RegisterUser
-)
+);
 
+// Login user
 router.post("/login",
     registerController.login
-)
+);
 
+// Generate new tokens
 router.post("/generateNewTokens",
     registerController.generateNewToken
-)
+);
 
+// Logout user
 router.post("/logoutUser",
     registerController.logoutUser
-)
+);
 
+// Check authentication
 router.get("/authnticateCheck",
     registerController.authnticateCheck
-)
+);
 
-router.put("/updateprofile/:id", upload.single('profileImage'), registerController.updateUser);
+//Z_ Update user profile
+router.put("/updateUser/:id", 
+    upload.single('profileImage'), 
+    registerController.updateUser
+);
 
-// router.post(
-//    "/verifyOTP",
-//    verifyOTP()
-// )
+//Z_ Delete user
+router.delete("/:id",
+    registerController.deleteUser
+);
 
-// router.get('/google',
-//    passport.authenticate(
-//       'google',
-//       {
-//          scope:
-//             ['profile', 'email']
-//       }
-//    ));
-
+// Google OAuth routes
 router.get('/callback',
     passport.authenticate('google', { failureRedirect: '/login' }),
     async function (req, res) {

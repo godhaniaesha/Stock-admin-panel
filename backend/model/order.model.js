@@ -3,12 +3,12 @@ const mongoose = require('mongoose');
 const orderSchema = new mongoose.Schema({
     userId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User',
+        ref: 'usersaa', // Changed from 'Register' to 'usersaa'
         required: true
     },
     couponId: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'Coupon',
+        ref: 'coupon', // Changed from 'Coupon' to 'coupon'
         required: false
     },
     // Personal Details
@@ -59,7 +59,7 @@ const orderSchema = new mongoose.Schema({
         {
             productId: {
                 type: mongoose.Schema.Types.ObjectId,
-                ref: 'Product',
+                ref: 'product',
                 required: true
             },
             quantity: {

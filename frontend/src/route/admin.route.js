@@ -48,6 +48,7 @@ import ProductDetails from '../component/ProductDetails';
 import UserDetail from '../pages/UserDetail';
 import Seller from '../component/auth/Seller';
 import SellergstVerify from '../component/auth/SellergstVerify';
+import OrderDetailPage from '../component/OrderDetailPage';
 
 function UserRoutes() {
     return (
@@ -94,6 +95,7 @@ function UserRoutes() {
                     <Route path="cart" element={<CartList />} />
                     <Route path="wishlist" element={<Wishlist />} />
                     <Route path="checkout" element={<CheckoutPage />} />
+                    <Route path="orderdetail" element={<OrderDetailPage />} />
 
                     <Route path="users" element={<UserList />} />
                     <Route path="user-roles" element={<UserRoles />} />

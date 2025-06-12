@@ -221,9 +221,9 @@ const CategoryList = () => {
                                         </td>
                                         <td>
                                             <div className="Z_action_buttons">
-                                                {/* <button className="Z_action_btn Z_view_btn">
-                                                    <TbEye size={22} />
-                                                </button> */}
+                                                    {/* <button className="Z_action_btn Z_view_btn">
+                                                        <TbEye size={22} />
+                                                    </button> */}
                                                 <button
                                                     className="Z_action_btn Z_edit_btn"
                                                     onClick={() => handleEdit(category)}

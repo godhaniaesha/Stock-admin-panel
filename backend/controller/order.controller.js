@@ -95,15 +95,18 @@ const getAllOrders = async (req, res) => {
         const orders = await Order.find()
             .populate('userId')
             .populate('couponId')
-            .populate('addressId')
-            .populate('items.productId')
-            .sort({ createdAt: -1 });
-
+            .populate({
+                path: 'items.productId',
+                populate: [
+                    { path: 'categoryId', model: 'Category' },
+                    { path: 'subcategoryId', model: 'Subcategory' },
+                    { path: 'sellerId', model: 'usersaa' }
+                ]
+            });
         res.status(200).json({
             success: true,
             message: 'Orders retrieved successfully',
-            data: orders,
-            count: orders.length
+            data: orders
         });
     } catch (error) {
         res.status(500).json({
@@ -117,20 +120,23 @@ const getAllOrders = async (req, res) => {
 // Get order by ID
 const getOrderById = async (req, res) => {
     try {
-        const { id } = req.params;
-        const order = await Order.findById(id)
+        const order = await Order.findById(req.params.id)
             .populate('userId')
             .populate('couponId')
-            .populate('addressId')
-            .populate('items.productId');
-
+            .populate({
+                path: 'items.productId',
+                populate: [
+                    { path: 'categoryId', model: 'Category' },
+                    { path: 'subcategoryId', model: 'Subcategory' },
+                    { path: 'sellerId', model: 'usersaa' } // Assuming 'seller' refers to the 'user' model
+                ]
+            });
         if (!order) {
             return res.status(404).json({
                 success: false,
                 message: 'Order not found'
             });
         }
-
         res.status(200).json({
             success: true,
             message: 'Order retrieved successfully',
@@ -149,31 +155,13 @@ const getOrderById = async (req, res) => {
 const updateOrder = async (req, res) => {
     try {
         const { id } = req.params;
-        const updateData = req.body;
-
-        const updatedOrder = await Order.findByIdAndUpdate(id, updateData, {
-            new: true,
-            runValidators: true
-        });
-
+        const updatedOrder = await Order.findByIdAndUpdate(id, req.body, { new: true });
         if (!updatedOrder) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
+            return res.status(404).json({ message: 'Order not found' });
         }
-
-        res.status(200).json({
-            success: true,
-            message: 'Order updated successfully',
-            data: updatedOrder
-        });
+        res.status(200).json(updatedOrder);
     } catch (error) {
-        res.status(400).json({
-            success: false,
-            message: 'Error updating order',
-            error: error.message
-        });
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -182,25 +170,12 @@ const deleteOrder = async (req, res) => {
     try {
         const { id } = req.params;
         const deletedOrder = await Order.findByIdAndDelete(id);
-
         if (!deletedOrder) {
-            return res.status(404).json({
-                success: false,
-                message: 'Order not found'
-            });
+            return res.status(404).json({ message: 'Order not found' });
         }
-
-        res.status(200).json({
-            success: true,
-            message: 'Order deleted successfully',
-            data: deletedOrder
-        });
+        res.status(200).json({ message: 'Order deleted successfully' });
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error deleting order',
-            error: error.message
-        });
+        res.status(500).json({ message: error.message });
     }
 };
 
@@ -208,23 +183,40 @@ const deleteOrder = async (req, res) => {
 const getOrdersByUser = async (req, res) => {
     try {
         const { userId } = req.params;
-        const orders = await Order.find({ userId })
-            .populate('couponId')
-            .populate('addressId')
-            .populate('items.productId')
-            .sort({ createdAt: -1 });
+        const orders = await Order.find({ userId: userId })
+            .populate({
+                path: 'userId',
+                model: 'usersaa' // Use 'usersaa' as per Register.model.js export
+            })
+            .populate({
+                path: 'couponId',
+                model: 'coupon' // Use 'coupon' as per coupon.model.js export
+            })
+            .populate({
+                path: 'items.productId',
+                model: 'product',
+                populate: [
+                    {
+                        path: 'categoryId',
+                        model: 'Category' // Use 'Category' as per category.model.js export
+                    },
+                    {
+                        path: 'subcategoryId',
+                        model: 'Subcategory' // Use 'Subcategory' as per subcategory.model.js export
+                    },
+                    {
+                        path: 'sellerId',
+                        model: 'usersaa' // Use 'user' as per addUser.model.js export
+                    }
+                ]
+            });
 
-        res.status(200).json({
-            success: true,
-            message: 'User orders retrieved successfully',
-            data: orders
-        });
+        if (!orders || orders.length === 0) {
+            return res.status(404).json({ message: 'No orders found for this user' });
+        }
+        res.status(200).json(orders);
     } catch (error) {
-        res.status(500).json({
-            success: false,
-            message: 'Error retrieving user orders',
-            error: error.message
-        });
+        res.status(500).json({ message: error.message });
     }
 };
 

@@ -231,7 +231,11 @@ const CheckoutPage = () => {
       for (const item of cartItems) {
         await dispatch(removeFromCart(item._id)).unwrap();
       }
-
+      
+      // Remove selected coupon from localStorage after successful order
+      localStorage.removeItem('selectedCoupon');
+      setSelectedCoupon(null);
+      
       setOrderId(orderResponse._id);
       setShowSuccessModal(true);
 

@@ -131,7 +131,7 @@ const CategoryList = () => {
             <section className={`Z_product_section mx-0 mx-lg-5 my-3 w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
-                        <h4>All Product List</h4>
+                        <h4>All Category List</h4>
                         <div className="Z_table_actions">
                             <button className="Z_add_product_btn" onClick={() => navigate('/categories/add')}>Add Category</button>
                             <select 

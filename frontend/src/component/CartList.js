@@ -253,13 +253,9 @@ const CartList = () => {
               </div>
             </div>
 
-            <div className="d_estimated_delivery">
-              <span>📦 Estimated Delivery by {new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toLocaleDateString()}</span>
-            </div>
-
             <div className="d_cart_actions">
+              <button className="d_checkout_btn" onClick={handleCheckout}>Proceed to checkout</button>
               <button className="d_continue_btn">Continue Shopping</button>
-              <button className="d_checkout_btn" onClick={handleCheckout}>Buy Now</button>
             </div>
           </div>
         </div>

@@ -1,6 +1,6 @@
 import { useDispatch, useSelector } from "react-redux";
-import { useOutletContext } from "react-router-dom";
-import { getLowInventory } from "../redux/slice/inventory.Slice";
+import { useOutletContext, useNavigate } from "react-router-dom";
+import { getLowInventory, deleteInventory } from "../redux/slice/inventory.Slice";
 import { Table } from "react-bootstrap";
 import { useEffect } from "react";
 import { TbEdit, TbEye } from "react-icons/tb";
@@ -9,6 +9,7 @@ import { RiDeleteBin6Line } from "react-icons/ri";
 function StockAlert() {
   const { isDarkMode } = useOutletContext();
   const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const { lowInventory, isLoading, error } = useSelector(state => state.inventory);
 
@@ -16,18 +17,33 @@ function StockAlert() {
     dispatch(getLowInventory());
   }, [dispatch]);
 
+  const handleEditClick = (item) => {
+    // Navigate to edit page with the item ID
+    navigate(`/stock/edit/${item._id}`, {
+      state: {
+        itemData: item
+      }
+    });
+  };
+
+  const handleDeleteClick = async (itemId) => {
+    console.log("itemId",itemId)
+    if (window.confirm('Are you sure you want to delete this item?')) {
+      try {
+        await dispatch(deleteInventory(itemId)).unwrap();
+        // Refresh the list after successful deletion
+        dispatch(getLowInventory());
+      } catch (error) {
+        console.error('Failed to delete inventory:', error);
+      }
+    }
+  };
+
   return (
     <section className={`Z_product_section mx-0 mx-lg-5 my-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
       <div className="Z_table_wrapper">
         <div className="Z_table_header">
           <h4>Low Stock Alert</h4>
-          <div className="Z_table_actions">
-            <select className="Z_time_filter">
-              <option>All Items</option>
-              <option>Critical Stock</option>
-              <option>Warning Stock</option>
-            </select>
-          </div>
         </div>
 
         <div className="Z_table_scroll_container">
@@ -99,10 +115,16 @@ function StockAlert() {
                         <button className="Z_action_btn Z_view_btn">
                           <TbEye size={22} />
                         </button>
-                        <button className="Z_action_btn Z_edit_btn">
+                        <button
+                          className="Z_action_btn Z_edit_btn"
+                          onClick={() => handleEditClick(item)}
+                        >
                           <TbEdit size={22} />
                         </button>
-                        <button className="Z_action_btn Z_delete_btn">
+                        <button
+                          className="Z_action_btn Z_delete_btn"
+                          onClick={() => handleDeleteClick(item._id)}
+                        >
                           <RiDeleteBin6Line size={22} />
                         </button>
                       </div>
@@ -117,7 +139,5 @@ function StockAlert() {
     </section>
   );
 }
-
-
 
 export default StockAlert;

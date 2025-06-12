@@ -14,6 +14,7 @@ function Wishlist() {
     const dispatch = useDispatch();
     const { items: wishlistItems, loading, error } = useSelector((state) => state.wishlist);
 
+console.log(wishlistItems," wishlistItems");
     useEffect(() => {
         dispatch(getAllWishlists());
     }, [dispatch]);
@@ -45,7 +46,7 @@ function Wishlist() {
     };
     return (
         <>
-            <section className={`Z_product_section w-100 ${isDarkMode ? 'd_dark' : 'd_light'} mx-5 my-3`}>
+            <section className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'} mx-lg-5 my-md-3`}>
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
                         <h4>My Wishlist</h4>
@@ -93,7 +94,7 @@ function Wishlist() {
                                         </td>
                                         <td>
                                             <div className="Z_product_info_cell">
-                                                <img src={item.productId?.images?.[0] || 'https://via.placeholder.com/400x400'} alt={item.productId?.productName} className="Z_table_product_img" />
+                                                <img src={`http://localhost:2221/${item.productId?.images[0]}`} alt={item.productId?.productName} className="Z_table_product_img" />
                                                 <div>
                                                     <div className="Z_table_product_name">{item.productId?.productName}</div>
                                                     <div className="Z_table_product_size">Size: {item.productId?.size || 'Standard'}</div>

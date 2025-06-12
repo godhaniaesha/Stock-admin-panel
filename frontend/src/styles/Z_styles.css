@@ -1079,7 +1079,7 @@
 @media (max-width: 576px) {
     .Z_table_wrapper {
         padding: 12px;
-        margin: 8px;
+        margin: 0px;
     }
 }
 
@@ -1680,6 +1680,7 @@
 @media screen and (max-width:767px) {
     .Z_product_section {
         width: 86vw;
+        padding: 10px;
     }
     .Z_product_table {
         font-size: 12px;

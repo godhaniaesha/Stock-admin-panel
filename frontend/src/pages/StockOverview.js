@@ -22,7 +22,7 @@ const StockOverview = () => {
   }, [dispatch]);
 
   return (
-    <section className={`Z_product_section w-100 ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-5 my-3`}>
+    <section className={`Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-5 my-md-3`}>
       <div className="Z_table_wrapper">
         <div className="Z_table_header">
           <h4>Stock Overview</h4>

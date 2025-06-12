@@ -2,6 +2,8 @@
 import React, { useEffect } from 'react';
 import { Row, Col, Card, Dropdown, Table } from 'react-bootstrap';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import { useNavigate } from 'react-router-dom';
+
 import { GiProgression } from 'react-icons/gi';
 import { MdCancelPresentation, MdPendingActions, MdPlaylistAddCheck } from 'react-icons/md';
 import { useDispatch, useSelector } from 'react-redux';
@@ -13,6 +15,8 @@ import {  TbEye } from 'react-icons/tb';
 function OrderList() {
   const { isDarkMode } = useOutletContext();
   const dispatch = useDispatch();
+    const navigate = useNavigate();
+
   const { orders, isLoading, error } = useSelector((state) => state.order);
 
   // Pagination state
@@ -38,9 +42,11 @@ function OrderList() {
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
-
+const handleViewOrder = (orderId) => {
+  navigate(`/orderdetail/${orderId}`);
+};
   return (
-    <section className={`Z_product_section mx-0 mx-lg-5 my-3 w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+    <section className={`Z_product_section mx-0 mx-lg-5 my-md-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
       <div className="Z_order_header d-flex justify-content-between align-items-center mb-4">
         <h4 className="Z_order_title mb-0">ORDER LIST</h4>
       </div>
@@ -138,8 +144,10 @@ function OrderList() {
               <tr><td colSpan="8">No Orders Found</td></tr>
             ) : (
               currentOrders.map((order, index) => (
-                <tr key={order._id || index}> {/* Use order._id for key if available, fallback to index */}
-                  <td className="Z_order_id">{order._id || 'N/A'}</td>
+                <tr key={order._id || index}>
+                  <td className="Z_order_id">
+                    {order._id ? `...${order._id.slice(-6)}` : 'N/A'}
+                  </td>
 
                   <td className="Z_customer_name">
                     {order.userId ? `${order.userId.username}` : 'N/A'}
@@ -180,10 +188,13 @@ function OrderList() {
                     </span>
                   </td>
                   <td>
-                    <button className="Z_action_btn Z_view_btn">
-                      <TbEye size={22} />
-                    </button>
-                  </td>
+  <button 
+    className="Z_action_btn Z_view_btn"
+    onClick={() => handleViewOrder(order._id)}
+  >
+    <TbEye size={22} />
+  </button>
+</td>
                 </tr>
               ))
             )}

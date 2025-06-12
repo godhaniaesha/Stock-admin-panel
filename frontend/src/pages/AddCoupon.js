@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Form } from 'react-bootstrap';
 import moment from 'moment';
 import '../styles/x_app.css';
@@ -11,7 +11,7 @@ const AddCoupon = () => {
     const { isDarkMode } = useOutletContext();
     const navigate = useNavigate();
     const dispatch = useDispatch();
-
+    const calendarRef = useRef(null);
     const [couponData, setCouponData] = useState({
         status: 'active',
         startDate: '',
@@ -33,8 +33,27 @@ const AddCoupon = () => {
         </div>
     );
 
-    const [showCalendar, setShowCalendar] = useState(false);
     const [selectedField, setSelectedField] = useState(null);
+    const [showCalendar, setShowCalendar] = useState(false);
+
+    useEffect(() => {
+        if (!showCalendar) return;
+
+        const handleClickOutside = (event) => {
+            if (
+                calendarRef.current &&
+                !calendarRef.current.contains(event.target) &&
+                !event.target.classList.contains('x_calendar_icon') &&
+                !event.target.classList.contains('fa-calendar')
+            ) {
+                setShowCalendar(false);
+                setSelectedField(null);
+            }
+        };
+
+        document.addEventListener('mousedown', handleClickOutside);
+        return () => document.removeEventListener('mousedown', handleClickOutside);
+    }, [showCalendar]);
 
     const handleDateSelect = (day) => {
         const selectedDate = moment(day.date).format('YYYY-MM-DD'); // ✅ Correct format
@@ -69,7 +88,7 @@ const AddCoupon = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-    
+
         const dataToSubmit = {
             title: couponData.code,
             status: couponData.status,
@@ -77,13 +96,13 @@ const AddCoupon = () => {
             endDate: couponData.endDate,
             discountPercentage: parseFloat(couponData.discountPercentage),
         };
-    
+
         try {
             const result = await dispatch(createCoupon(dataToSubmit));
-            
+
             if (createCoupon.fulfilled.match(result)) {
                 dispatch(resetCouponState());
-    
+
                 // Clear form data
                 setCouponData({
                     code: '',
@@ -159,15 +178,23 @@ const AddCoupon = () => {
                                             <span
                                                 className="x_calendar_icon"
                                                 onClick={() => {
-                                                    setShowCalendar(true);
-                                                    setSelectedField('startDate');
+                                                    if (showCalendar && selectedField === 'startDate') {
+                                                        setShowCalendar(false);
+                                                        setSelectedField(null);
+                                                    } else {
+                                                        setShowCalendar(true);
+                                                        setSelectedField('startDate');
+                                                    }
                                                 }}
                                             >
                                                 <i className="fas fa-calendar"></i>
                                             </span>
                                             {showCalendar && selectedField === 'startDate' && (
-                                                <div className="x_calendar_popup">
-                                                    <Calendar onSelect={handleDateSelect} />
+                                                <div className="x_calendar_popup" ref={calendarRef}>
+                                                    <Calendar
+                                                        onSelect={handleDateSelect}
+                                                        selectedDate={couponData.startDate} // Pass selected date as prop
+                                                    />
                                                 </div>
                                             )}
                                         </div>
@@ -186,15 +213,24 @@ const AddCoupon = () => {
                                             <span
                                                 className="x_calendar_icon"
                                                 onClick={() => {
-                                                    setShowCalendar(true);
-                                                    setSelectedField('endDate');
+                                                    if (showCalendar && selectedField === 'endDate') {
+                                                        setShowCalendar(false);
+                                                        setSelectedField(null);
+                                                    } else {
+                                                        setShowCalendar(true);
+                                                        setSelectedField('endDate');
+                                                    }
                                                 }}
                                             >
                                                 <i className="fas fa-calendar"></i>
                                             </span>
+
                                             {showCalendar && selectedField === 'endDate' && (
-                                                <div className="x_calendar_popup">
-                                                    <Calendar onSelect={handleDateSelect} />
+                                                <div className="x_calendar_popup" ref={calendarRef}>
+                                                    <Calendar
+                                                        onSelect={handleDateSelect}
+                                                        selectedDate={couponData.endDate} // Pass selected date as prop
+                                                    />
                                                 </div>
                                             )}
                                         </div>

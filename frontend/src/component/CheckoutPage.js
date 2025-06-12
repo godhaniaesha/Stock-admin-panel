@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import '../styles/checkout.css';
 import { CreditCard, Truck, MapPin, CheckCircle2, ChevronDown } from 'lucide-react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
@@ -8,11 +8,13 @@ import { fetchCoupons } from '../redux/slice/coupon.slice';
 import { createOrder } from '../redux/slice/order.slice';
 import { createPayment } from '../redux/slice/payment.slice';
 import { BsCreditCard2Front, BsChevronDown, BsChevronRight } from 'react-icons/bs';
-import { FaWallet, FaUniversity } from 'react-icons/fa';
+import { FaWallet, FaUniversity, FaCalendar } from 'react-icons/fa';
 import { SiGooglepay, SiPhonepe, SiPaytm } from 'react-icons/si';
 import { MdAccountBalance } from 'react-icons/md';
 import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
+import moment from 'moment';
+import Calendar from './Calendar';
 
 const validationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -74,7 +76,7 @@ const validationSchema = Yup.object().shape({
       .required('Please select a bank')
   })
 });
-
+ 
 const initialValues = {
   firstName: '',
   lastName: '',
@@ -104,6 +106,8 @@ const CheckoutPage = () => {
   const { items: cartItems, loading, error } = useSelector((state) => state.cart);
   const { coupons, isLoading: couponsLoading } = useSelector((state) => state.coupon);
   const [orderId, setOrderId] = useState(null);
+  const [showExpiryCalendar, setShowExpiryCalendar] = useState(false);
+  const expiryCalendarRef = useRef(null);
 
   useEffect(() => {
     if (userId) {
@@ -120,6 +124,23 @@ const CheckoutPage = () => {
       setSelectedCoupon(parsedCoupon);
     }
   }, []);
+
+
+  useEffect(() => {
+    if (!showExpiryCalendar) return;
+    const handleClickOutside = (event) => {
+      if (
+        expiryCalendarRef.current &&
+        !expiryCalendarRef.current.contains(event.target) &&
+        !event.target.classList.contains('expiry_calendar_icon') &&
+        !event.target.classList.contains('fa-calendar')
+      ) {
+        setShowExpiryCalendar(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showExpiryCalendar]);
 
   // Calculate totals
   const subtotal = cartItems?.reduce((total, item) => total + (item.productId?.price * item.quantity), 0) || 0;
@@ -138,12 +159,12 @@ const CheckoutPage = () => {
     try {
       console.log('Form Values:', values);
       console.log('Cart Items:', cartItems);
-      
+
       // Get coupon from localStorage
       const storedCoupon = localStorage.getItem('selectedCoupon');
       const couponData = storedCoupon ? JSON.parse(storedCoupon) : null;
       console.log('Coupon from localStorage:', couponData);
-      
+
       if (!cartItems || cartItems.length === 0) {
         console.error('No items in cart');
         return;
@@ -193,7 +214,7 @@ const CheckoutPage = () => {
       // Create order first
       const orderResponse = await dispatch(createOrder(orderData)).unwrap();
       console.log('Order Response:', orderResponse);
-      
+
       // After successful order creation, create payment record
       const paymentData = {
         orderId: orderResponse._id,
@@ -210,10 +231,10 @@ const CheckoutPage = () => {
       for (const item of cartItems) {
         await dispatch(removeFromCart(item._id)).unwrap();
       }
-      
+
       setOrderId(orderResponse._id);
       setShowSuccessModal(true);
-      
+
     } catch (error) {
       console.error('Order/Payment creation failed:', error);
       // You might want to show an error message to the user here
@@ -267,6 +288,36 @@ const CheckoutPage = () => {
   const handleContinueShopping = () => {
     setShowSuccessModal(false);
     navigate('/products');
+  };
+
+  const calendarRef = useRef(null);
+const [selectedField, setSelectedField] = useState(null);
+   const [showCalendar, setShowCalendar] = useState(false);
+  
+      useEffect(() => {
+          if (!showCalendar) return;
+  
+          const handleClickOutside = (event) => {
+              if (
+                  calendarRef.current &&
+                  !calendarRef.current.contains(event.target) &&
+                  !event.target.classList.contains('x_calendar_icon') &&
+                  !event.target.classList.contains('fa-calendar')
+              ) {
+                  setShowCalendar(false);
+                  setSelectedField(null);
+              }
+          };
+  
+          document.addEventListener('mousedown', handleClickOutside);
+          return () => document.removeEventListener('mousedown', handleClickOutside);
+      }, [showCalendar]);
+
+  const handleExpiryDateSelect = (day, setFieldValue) => {
+    // Format as MM/YY
+    const formatted = moment(day.date).format('MM/YY');
+    setFieldValue('cardExpiry', formatted);
+    setShowExpiryCalendar(false);
   };
 
   return (
@@ -430,7 +481,7 @@ const CheckoutPage = () => {
                         </span>
                       </div>
                       {values.paymentMethod === 'card' && (
-                        <div className="d_payment_details">
+                        <div className="d_payment_details x_product_form">
                           <div className="d_form_group">
                             <label>Card Number</label>
                             <Field
@@ -445,13 +496,69 @@ const CheckoutPage = () => {
                           <div className="d_card_row">
                             <div className="d_form_group">
                               <label>Expiry Date</label>
-                              <Field
+                              {/* <Field
                                 type="text"
                                 name="cardExpiry"
                                 className={`d_input ${touched.cardExpiry && errors.cardExpiry ? 'is-invalid' : ''}`}
                                 placeholder="MM/YY"
                                 maxLength="5"
+                              /> */}
+                              {/* <input
+                                type="text"
+                                name="cardExpiry"
+                                className={`d_input ${touched.cardExpiry && errors.cardExpiry ? 'is-invalid' : ''}`}
+                                placeholder="MM/YY"
+                                maxLength="5"
+                                readOnly
                               />
+                              <span
+                                className="expiry_calendar_icon"
+                                style={{ position: 'absolute', right: 10, top: 10, cursor: 'pointer' }}
+                                onClick={() => setShowExpiryCalendar((prev) => !prev)}
+                              >
+                              <FaCalendar />
+                              </span>
+                              {showExpiryCalendar && (
+                                <div className="x_calendar_popup" ref={expiryCalendarRef}>
+                                  <Calendar
+                                    onSelect={(day) => handleExpiryDateSelect(day, setFieldValue)}
+                                    selectedDate={values.cardExpiry ? moment(values.cardExpiry, 'MM/YY').toDate() : undefined}
+                                    mode="month" // Optional: if you want month/year picker only
+                                  />
+                                </div>
+                              )} */}
+                               <div className="x_date_input_wrapper">
+                                            <input
+                                                type="text"
+                                                name="startDate"
+                                                value={touched.cardExpiry}
+                                                readOnly
+                                                className="x_input"
+                                                placeholder="yyyy-mm-dd"
+                                            />
+                                            <span
+                                                className="x_calendar_icon"
+                                                onClick={() => {
+                                                    if (showCalendar && selectedField === 'cardExpiry') {
+                                                        setShowCalendar(false);
+                                                        setSelectedField(null);
+                                                    } else {
+                                                        setShowCalendar(true);
+                                                        setSelectedField('cardExpiry');
+                                                    }
+                                                }}
+                                            >
+                                                <i className="fas fa-calendar"></i>
+                                            </span>
+                                            {showCalendar && selectedField === 'cardExpiry' && (
+                                                <div className="x_calendar_popup" ref={calendarRef}>
+                                                    <Calendar
+                                                        onSelect={handleExpiryDateSelect}
+                                                        selectedDate={touched.cardExpiry} // Pass selected date as prop
+                                                    />
+                                                </div>
+                                            )}
+                                        </div>
                               <ErrorMessage name="cardExpiry" component="div" className="error-message" />
                             </div>
                             <div className="d_form_group">
@@ -579,7 +686,7 @@ const CheckoutPage = () => {
                   <div className="d_promo_section">
                     <h3 style={{ color: 'white', marginBottom: '1rem' }}>Applied Coupon</h3>
                     {selectedCoupon && (
-                      <div className="d_coupon_info" style={{ marginTop: '10px'}}>
+                      <div className="d_coupon_info" style={{ marginTop: '10px' }}>
                         <p>Applied: {selectedCoupon.title} - {selectedCoupon.discountPercentage}% off</p>
                         <p>Discount Amount: ${discount.toFixed(2)}</p>
                       </div>

@@ -95,7 +95,7 @@ function UserRoutes() {
                     <Route path="cart" element={<CartList />} />
                     <Route path="wishlist" element={<Wishlist />} />
                     <Route path="checkout" element={<CheckoutPage />} />
-                    <Route path="orderdetail" element={<OrderDetailPage />} />
+                    <Route path="orderdetail/:id" element={<OrderDetailPage />} />
 
                     <Route path="users" element={<UserList />} />
                     <Route path="user-roles" element={<UserRoles />} />

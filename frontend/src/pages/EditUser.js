@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useParams, useNavigate } from 'react-router-dom';
 import '../styles/x_app.css';
+import { db_fetchUserById, db_updateUser } from '../redux/slice/userSlice';
 
 const EditUser = () => {
+    const { id } = useParams();
+    const navigate = useNavigate();
+    const dispatch = useDispatch();
+    const { selectedUser, isLoading, error: reduxError } = useSelector(state => state.user);
+
     const [userData, setUserData] = useState({
         firstName: '',
         lastName: '',
@@ -19,12 +27,43 @@ const EditUser = () => {
     });
 
     const [userImage, setUserImage] = useState(null);
-    const [error, setError] = useState('');
+    const [formError, setFormError] = useState('');
     const [isGenderOpen, setIsGenderOpen] = useState(false);
     const [isRoleOpen, setIsRoleOpen] = useState(false);
-    // Add these two new state variables for password visibility
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
+    // Fetch user data when component mounts
+    useEffect(() => {
+        if (id) {
+            dispatch(db_fetchUserById(id));
+        }
+    }, [dispatch, id]);
+
+    // Update form when user data is fetched
+    useEffect(() => {
+        if (selectedUser) {
+            setUserData({
+                firstName: selectedUser.firstName || '',
+                lastName: selectedUser.lastName || '',
+                email: selectedUser.email || '',
+                phone: selectedUser.phone || '',
+                birthdate: selectedUser.birthdate ? new Date(selectedUser.birthdate).toISOString().split('T')[0] : '',
+                gender: selectedUser.gender || '',
+                address: selectedUser.address || '',
+                city: selectedUser.city || '',
+                state: selectedUser.state || '',
+                country: selectedUser.country || '',
+                role: selectedUser.role || '',
+                password: '',
+                confirmPassword: ''
+            });
+
+            if (selectedUser.profileImage) {
+                setUserImage(`http://localhost:2221/KAssets/profileImage/${selectedUser.profileImage}`);
+            }
+        }
+    }, [selectedUser]);
 
     const genderOptions = [
         { value: 'male', label: 'Male' },
@@ -34,8 +73,9 @@ const EditUser = () => {
 
     const roleOptions = [
         { value: 'admin', label: 'Admin' },
-        { value: 'manager', label: 'Manager' },
-        { value: 'staff', label: 'Staff' }
+        { value: 'seller', label: 'Seller' },
+        { value: 'staff', label: 'Staff' },
+        { value: 'user', label: 'User' }
     ];
 
     const handleGenderSelect = (value) => {
@@ -49,22 +89,22 @@ const EditUser = () => {
     };
 
     const validateAndHandleFile = (file) => {
-        setError('');
+        setFormError('');
 
         if (!file) {
-            setError('Please select a file');
+            setFormError('Please select a file');
             return;
         }
 
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (!validTypes.includes(file.type)) {
-            setError('Invalid file type. Only PNG, JPG and JPEG are allowed');
+            setFormError('Invalid file type. Only PNG, JPG and JPEG are allowed');
             return;
         }
 
         const maxSize = 5 * 1024 * 1024; // 5MB in bytes
         if (file.size > maxSize) {
-            setError('File size exceeds 5MB limit');
+            setFormError('File size exceeds 5MB limit');
             return;
         }
 
@@ -80,16 +120,62 @@ const EditUser = () => {
         }));
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
+        setFormError('');
+
+        // Validate passwords if they are provided
+        if (userData.password || userData.confirmPassword) {
+            if (userData.password !== userData.confirmPassword) {
+                setFormError('Passwords do not match');
+                return;
+            }
+            if (userData.password.length < 6) {
+                setFormError('Password must be at least 6 characters long');
+                return;
+            }
+        }
+
+        try {
+            const formData = new FormData();
+            
+            // Append all form fields
+            Object.keys(userData).forEach(key => {
+                if (key !== 'confirmPassword' && userData[key]) {
+                    formData.append(key, userData[key]);
+                }
+            });
+
+            // Append profile image if changed
+            if (userImage && userImage.startsWith('blob:')) {
+                const response = await fetch(userImage);
+                const blob = await response.blob();
+                formData.append('profileImage', blob, 'profile.jpg');
+            }
+
+            await dispatch(db_updateUser({ id, formData })).unwrap();
+            navigate('/users');
+        } catch (error) {
+            setFormError(error.message || 'Failed to update user');
+        }
     };
+
+    if (isLoading) {
+        return (
+            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+                <div className="spinner-border" role="status">
+                    <span className="visually-hidden">Loading...</span>
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="x_product_page_container">
             <div className="x_add_product_container">
                 {/* Image Upload Section */}
                 <div className="x_upload_section">
-                    <h2 className="x_product_title">Add User Photo</h2>
+                    <h2 className="x_product_title">Edit User Photo</h2>
                     <div className="x_upload_container x_form_p">
                         <div className="x_upload_area"
                             onDrop={(e) => {
@@ -108,14 +194,25 @@ const EditUser = () => {
                                 accept=".png, .jpg, .jpeg"
                             />
                             <div className="x_upload_content">
-                                <div className="x_upload_icon">
-                                    <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent-green)">
-                                        <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
-                                    </svg>
-                                </div>
-                                <p className="x_upload_text">Drop your image here, or <span className="x_browse_text">click to browse</span></p>
-                                <p className="x_upload_hint">Maximum file size: 5MB. Allowed formats: PNG, JPG, JPEG</p>
-                                {error && <p className="x_error_message">{error}</p>}
+                                {userImage ? (
+                                    <img 
+                                        src={userImage} 
+                                        alt="Profile Preview" 
+                                        style={{ maxWidth: '200px', maxHeight: '200px' }}
+                                        className="img-thumbnail"
+                                    />
+                                ) : (
+                                    <>
+                                        <div className="x_upload_icon">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent-green)">
+                                                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                                            </svg>
+                                        </div>
+                                        <p className="x_upload_text">Drop your image here, or <span className="x_browse_text">click to browse</span></p>
+                                        <p className="x_upload_hint">Maximum file size: 5MB. Allowed formats: PNG, JPG, JPEG</p>
+                                    </>
+                                )}
+                                {(formError || reduxError) && <p className="x_error_message">{formError || reduxError}</p>}
                             </div>
                         </div>
                     </div>
@@ -371,8 +468,21 @@ const EditUser = () => {
                 </div>
 
                 <div className="x_btn_wrapper mt-3">
-                    <button type="submit" className="x_btn x_btn_create">Save Changes</button>
-                    <button type="button" className="x_btn x_btn_cancel">Cancel</button>
+                    <button 
+                        type="submit" 
+                        className="x_btn x_btn_create"
+                        onClick={handleSubmit}
+                        disabled={isLoading}
+                    >
+                        {isLoading ? 'Saving...' : 'Save Changes'}
+                    </button>
+                    <button 
+                        type="button" 
+                        className="x_btn x_btn_cancel"
+                        onClick={() => navigate('/userlist')}
+                    >
+                        Cancel
+                    </button>
                 </div>
             </div>
         </div>

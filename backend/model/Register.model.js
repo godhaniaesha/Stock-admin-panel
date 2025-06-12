@@ -1,10 +1,17 @@
 const mongoose = require("mongoose");
 
 const RegisterSchema = new mongoose.Schema({
+    firstName: {
+        type: String,
+        required: true
+    },
+    lastName: {
+        type: String,
+        required: true
+    },
     username: {
         type: String,
-        trim: true,
-        required: true,
+        trim: true
     },
     email: {
         type: String,
@@ -16,10 +23,30 @@ const RegisterSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    birthdate: {
+        type: Date,
+        required: true
+    },
+    gender: {
+        type: String,
+        enum: ['male', 'female', 'other'],
+    },
+    address: {
+        type: String,
+    },
+    city: {
+        type: String,
+    },
+    state: {
+        type: String,
+    },
+    country: {
+        type: String,
+    },
     password: {
         type: String,
         trim: true,
-        unique: true,
+        required: true,
     },
     isactive: {
         type: Boolean,
@@ -27,7 +54,7 @@ const RegisterSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['admin', 'seller', 'staff','user'],
+        enum: ['admin', 'seller'],
     },
     refreshToken: {
         type: String

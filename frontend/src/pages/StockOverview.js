@@ -59,7 +59,8 @@ const StockOverview = () => {
                     <td>
                       <div className="Z_product_info_cell">
                         <img
-                          src={product.productData?.images[0] || 'https://via.placeholder.com/60'}
+                        src={`http://localhost:2221/${product.productData?.images[0]}`}
+                          // src={product.productData?.images[0] || 'https://via.placeholder.com/60'}
                           alt={product.productData?.productName || 'N/A'}
                           className="Z_table_product_img"
                         />

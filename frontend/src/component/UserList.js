@@ -234,14 +234,14 @@ function UserList() {
             )}
 
             {/* Debug Info (remove in production) */}
-            {process.env.NODE_ENV === 'development' && (
+            {/* {process.env.NODE_ENV === 'development' && (
                 <Alert variant="info" className="mb-3">
                     <small>
-                        Debug: Users loaded: {users.length}, Loading: {isLoading.toString()},
+                        Debug: Users loaded: {users.length}, Loading: {isLoading.toString()}, 
                         Redux keys: {Object.keys(fullState).join(', ')}
                     </small>
                 </Alert>
-            )}
+            )} */}
 
             {/* Statistics Cards */}
             <Row className="mb-4">
@@ -391,6 +391,7 @@ function UserList() {
                                 </tr>
                             ) : (
                                 filteredUsers.map(user => (
+                                    // console.log("Users",user)
                                     <tr key={user._id || user.id}>
                                         <td>
                                             <Form.Check
@@ -403,10 +404,9 @@ function UserList() {
                                         <td>
                                             <div className="Z_product_info_cell">
                                                 <img
-                                                    src={`http://localhost:2221/${user.profileImage}`}
+                                                    src={`http://localhost:2221/KAssets/profileImage/${user.profileImage}`}
                                                     alt={user.name || 'User'}
                                                     className="Z_table_product_img"
-
                                                 />
                                                 <span className="Z_table_product_name">
                                                     {user.firstName || user.lastName || 'N/A'}
@@ -433,7 +433,7 @@ function UserList() {
                                                 <button
                                                     className="Z_action_btn Z_edit_btn"
                                                     title="Edit User"
-                                                    onClick={() => handleEditUser(user._id || user.id)} 
+                                                    onClick={() => handleEditUser(user._id || user.id)}
                                                 >
                                                     <TbEdit size={22} />
                                                 </button>

@@ -66,6 +66,65 @@ const RegisterSchema = new mongoose.Schema({
         type: String,
         default: ''
     },
+    // New seller-specific fields
+    sellerInfo: {
+        gstNumber: {
+            type: String,
+        },
+        gstDetails: {
+            type: String,
+        },
+        businessName: {
+            type: String,
+        },
+        panNumber: {
+            type: String,
+        },
+        businessType: {
+            type: String,
+        },
+        registeredBusinessAddress: {
+            type: String,
+        },
+        storeName: {
+            type: String,
+        },
+        ownerName: {
+            type: String,
+        },
+        bankName: {
+            type: String,
+        },
+        accountNumber: {
+            type: String,
+        },
+        confirmAccountNumber: {
+            type: String,
+        },
+        ifscCode: {
+            type: String,
+        },
+        pickupAddress: {
+            buildingNumber: {
+                type: String,
+            },
+            street: {
+                type: String,
+            },
+            landmark: {
+                type: String,
+            },
+            pincode: {
+                type: String,
+            },
+            city: {
+                type: String,
+            },
+            state: {
+                type: String,
+            }
+        }
+    }
 },
     {
         timestamps: true,

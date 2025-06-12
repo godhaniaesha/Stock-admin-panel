@@ -166,6 +166,126 @@ export const updateProfile = createAsyncThunk('auth/updateProfile', async ({ id,
   }
 });
 
+export const verifyGST = createAsyncThunk('auth/verifyGST', async (gstNumber, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register/verify-gst`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ gstNumber })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'GST verification failed');
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
+export const addBusinessDetails = createAsyncThunk('auth/addBusinessDetails', async (businessDetails, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register/add-business-details`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(businessDetails)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to add business details');
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
+export const sendOTP = createAsyncThunk('auth/sendOTP', async (phoneNumber, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register/send-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phoneNumber })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to send OTP');
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
+export const verifyOTP = createAsyncThunk('auth/verifyOTP', async ({ userId, otp }, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register/verify-otp`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId, otp })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'OTP verification failed');
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
+export const addStoreDetails = createAsyncThunk('auth/addStoreDetails', async (storeDetails, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register/add-store-details`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(storeDetails)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to add store details');
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
+export const addBankDetails = createAsyncThunk('auth/addBankDetails', async (bankDetails, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register/add-bank-details`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(bankDetails)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to add bank details');
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
+export const addPickupAddress = createAsyncThunk('auth/addPickupAddress', async (addressDetails, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register/add-pickup-address`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(addressDetails)
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to add pickup address');
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
+export const acceptTermsAndConditions = createAsyncThunk('auth/acceptTerms', async (userId, { rejectWithValue }) => {
+  try {
+    const response = await fetch(`${BASE_URL}/register/accept-terms`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ userId })
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.message || 'Failed to accept terms and conditions');
+    return data;
+  } catch (err) {
+    return rejectWithValue(err.message);
+  }
+});
+
 // ========== SLICE ========== //
 
 const authSlice = createSlice({
@@ -176,18 +296,26 @@ const authSlice = createSlice({
     loading: false,
     error: null,
     success: false,
-    message: ''
+    message: '',
+    currentStep: 0,
+    gstVerified: false,
+    businessDetailsAdded: false,
+    otpSent: false,
+    otpVerified: false,
+    storeDetailsAdded: false,
+    bankDetailsAdded: false,
+    pickupAddressAdded: false,
+    termsAccepted: false,
   },
   reducers: {
     clearAuthState: (state) => {
-      state.loading = false;
       state.error = null;
       state.success = false;
       state.message = '';
     },
-    clearUserData: (state) => {
-      state.user = null;
-    }
+    setCurrentStep: (state, action) => {
+      state.currentStep = action.payload;
+    },
   },
   extraReducers: (builder) => {
     builder
@@ -365,9 +493,63 @@ const authSlice = createSlice({
         state.error = action.payload;
         state.success = false;
         state.message = action.payload || 'Profile update failed.';
+      })
+
+      // --- Verify GST ---
+      .addCase(verifyGST.pending, (state) => {
+        state.loading = true;
+      })
+      .addCase(verifyGST.fulfilled, (state, action) => {
+        state.loading = false;
+        state.gstVerified = true;
+        state.message = action.payload.message;
+      })
+      .addCase(verifyGST.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.payload;
+      })
+
+      // --- Add Business Details ---
+      .addCase(addBusinessDetails.fulfilled, (state, action) => {
+        state.businessDetailsAdded = true;
+        state.user = action.payload.data;
+      })
+
+      // --- Send OTP ---
+      .addCase(sendOTP.fulfilled, (state) => {
+        state.otpSent = true;
+      })
+
+      // --- Verify OTP ---
+      .addCase(verifyOTP.fulfilled, (state) => {
+        state.otpVerified = true;
+      })
+
+      // --- Add Store Details ---
+      .addCase(addStoreDetails.fulfilled, (state, action) => {
+        state.storeDetailsAdded = true;
+        state.user = action.payload.data;
+      })
+
+      // --- Add Bank Details ---
+      .addCase(addBankDetails.fulfilled, (state, action) => {
+        state.bankDetailsAdded = true;
+        state.user = action.payload.data;
+      })
+
+      // --- Add Pickup Address ---
+      .addCase(addPickupAddress.fulfilled, (state, action) => {
+        state.pickupAddressAdded = true;
+        state.user = action.payload.data;
+      })
+
+      // --- Accept Terms And Conditions ---
+      .addCase(acceptTermsAndConditions.fulfilled, (state, action) => {
+        state.termsAccepted = true;
+        state.user = action.payload.data;
       });
   }
 });
 
-export const { clearAuthState, clearUserData } = authSlice.actions;
+export const { clearAuthState, setCurrentStep } = authSlice.actions;
 export default authSlice.reducer;

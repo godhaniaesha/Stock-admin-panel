@@ -11,9 +11,9 @@
 .Z_input_grp {
     background-color: #fff;
     border-radius: 4px;
-    overflow: hidden;
+    /* overflow: hidden; */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-    width: 300px;
+    width:auto;
 }
 
 .Z_heading {
@@ -88,8 +88,8 @@
 .Z_setting_btn,
 .Z_filter_btn {
     background-color: transparent;
-    border: 1px solid #2d3035;
-    color: #000;
+    border: 1px solid var(--accent-color);
+    color:var(--accent-color);
 
 }
 
@@ -110,11 +110,11 @@
     background-color: #218838;
 }
 
-@media (max-width: 1440px) {
+/* @media (max-width: 1440px) {
     .Z_input_grp {
-        width: 235px;
+        width: 219px;
     }
-}
+} */
 
 @media (max-width: 992px) {
     .Z_right_actions {
@@ -143,6 +143,9 @@
     .Z_right_actions button {
         padding: 6px 12px;
         font-size: 0.8rem;
+    }
+    .Z_offcan_width{
+        width: 60% !important;
     }
 }
 
@@ -233,13 +236,13 @@
 
 .Z_filter_content {
     max-height: 0;
-    overflow: hidden;
+    /* overflow: hidden; */
     transition: max-height 0.3s ease-out;
     padding: 0 16px;
 }
 
 .Z_filter_content_show {
-    max-height: 300px;
+    max-height:  fit-content;
     padding: 16px;
 }
 
@@ -263,7 +266,7 @@
 .Z_product_card {
     background: #fff;
     border-radius: 8px;
-    overflow: hidden;
+    /* overflow: hidden; */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
     height: 100%;
@@ -277,7 +280,7 @@
 .Z_product_image {
     position: relative;
     padding-top: 100%;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .Z_product_image img {
@@ -797,7 +800,7 @@
 .Z_product_card {
     background: #fff;
     border-radius: 8px;
-    overflow: hidden;
+    /* overflow: hidden; */
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     transition: transform 0.2s, box-shadow 0.2s;
     height: 100%;
@@ -811,7 +814,7 @@
 .Z_product_image {
     position: relative;
     padding-top: 100%;
-    overflow: hidden;
+    /* overflow: hidden; */
 }
 
 .Z_product_image img {
@@ -1071,15 +1074,12 @@
     .Z_action_buttons {
         justify-content: flex-start;
     }
-    .Z_product_section {
-        padding: 5px;
-    }
 }
 
 @media (max-width: 576px) {
     .Z_table_wrapper {
         padding: 12px;
-        margin: 8px;
+        margin: 0px;
     }
 }
 
@@ -1680,6 +1680,7 @@
 @media screen and (max-width:767px) {
     .Z_product_section {
         width: 86vw;
+        padding: 10px;
     }
     .Z_product_table {
         font-size: 12px;
@@ -2037,8 +2038,21 @@
     .Z_faq_search .Z_search_input {
         height: 40px;
     }
+    .Z_offcan_width{
+        width: 70% !important;
+    }
 }
 
+
+@media (max-width: 375px) {
+    .Z_offcan_width{
+        width: 90% !important;
+    }
+
+    .Z_filter_option .form-check-input {
+       margin-right: 0;
+    }
+}
 /* Modal Styles */
 .Z_Dlt_modal .modal-content {
     border-radius: 8px;
@@ -2138,4 +2152,16 @@
 
 .Z_reset_button:hover {
     background-color: #c82333;
+}
+
+.Z_header_icon {
+  color:var(--accent-color); /* Adjust color to fit your light background header */
+  transition: color 0.2s ease-in-out, transform 0.2s ease-in-out;
+}
+
+.Z_header_icon:hover,
+.Z_header_icon:focus {
+  color: var(--accent-hover-color); /* Or your desired hover color */
+  transform: scale(1.1);
+  outline: none; /* Remove default focus outline if you add custom focus styles */
 }

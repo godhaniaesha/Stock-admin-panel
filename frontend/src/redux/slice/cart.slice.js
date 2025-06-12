@@ -6,9 +6,13 @@ const API_URL = 'http://localhost:2221/api/a1/cart';
 // Async thunks for API calls
 export const addToCart = createAsyncThunk(
     'cart/addToCart',
-    async ({ userId, productId, quantity }) => {
-        const response = await axios.post(`${API_URL}/addCart`, { userId, productId, quantity });
-        return response.data;
+    async ({ userId, productId, quantity }, { rejectWithValue }) => {
+        try {
+            const response = await axios.post(`${API_URL}/addCart`, { userId, productId, quantity });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Error adding to cart');
+        }
     }
 );
 
@@ -22,9 +26,13 @@ export const getCart = createAsyncThunk(
 
 export const updateCartItem = createAsyncThunk(
     'cart/updateCartItem',
-    async ({ id, quantity }) => {
-        const response = await axios.put(`${API_URL}/updateCart/${id}`, { quantity });
-        return response.data;
+    async ({ id, quantity }, { rejectWithValue }) => {
+        try {
+            const response = await axios.put(`${API_URL}/updateCart/${id}`, { quantity });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Error updating cart');
+        }
     }
 );
 
@@ -41,7 +49,8 @@ const initialState = {
     loading: false,
     error: null,
     totalItems: 0,
-    totalAmount: 0
+    totalAmount: 0,
+    stockLimitReached: false
 };
 
 const cartSlice = createSlice({
@@ -52,12 +61,17 @@ const cartSlice = createSlice({
             state.items = [];
             state.totalItems = 0;
             state.totalAmount = 0;
+            state.stockLimitReached = false;
         },
         calculateTotals: (state) => {
-            state.totalItems = state.items.length; // Count distinct items
+            state.totalItems = state.items.length;
             state.totalAmount = state.items.reduce((total, item) => {
                 return total + (item.productId?.price * item.quantity);
             }, 0);
+        },
+        checkStockLimit: (state, action) => {
+            const { productId, currentQuantity, availableStock } = action.payload;
+            state.stockLimitReached = currentQuantity >= availableStock;
         }
     },
     extraReducers: (builder) => {
@@ -77,11 +91,12 @@ const cartSlice = createSlice({
                 } else {
                     state.items.push(action.payload.data);
                 }
-                cartSlice.caseReducers.calculateTotals(state); // Recalculate totals
+                cartSlice.caseReducers.calculateTotals(state);
             })
             .addCase(addToCart.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
+                state.stockLimitReached = true;
             })
             // Get cart
             .addCase(getCart.pending, (state) => {
@@ -91,15 +106,7 @@ const cartSlice = createSlice({
             .addCase(getCart.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = action.payload.data;
-                // Explicitly use totalProducts from the API response for totalItems
-                // if it's provided in the payload.
-                if (typeof action.payload.totalProducts === 'number') {
-                    state.totalItems = action.payload.totalProducts;
-                }
-                // calculateTotals will still run to calculate totalAmount.
-                // It will also re-calculate totalItems based on state.items.length,
-                // which should be consistent with action.payload.totalProducts from your backend.
-                cartSlice.caseReducers.calculateTotals(state); 
+                cartSlice.caseReducers.calculateTotals(state);
             })
             .addCase(getCart.rejected, (state, action) => {
                 state.loading = false;
@@ -114,17 +121,14 @@ const cartSlice = createSlice({
                 state.loading = false;
                 const index = state.items.findIndex(item => item._id === action.payload.data._id);
                 if (index !== -1) {
-                    // Replace the entire item with the updated one from the server
-                    state.items[index] = {
-                        ...action.payload.data,
-                        productId: action.payload.data.productId // Ensure product details are preserved
-                    };
+                    state.items[index] = action.payload.data;
                 }
                 cartSlice.caseReducers.calculateTotals(state);
             })
             .addCase(updateCartItem.rejected, (state, action) => {
                 state.loading = false;
-                state.error = action.error.message;
+                state.error = action.payload;
+                state.stockLimitReached = true;
             })
             // Remove from cart
             .addCase(removeFromCart.pending, (state) => {
@@ -134,7 +138,7 @@ const cartSlice = createSlice({
             .addCase(removeFromCart.fulfilled, (state, action) => {
                 state.loading = false;
                 state.items = state.items.filter(item => item._id !== action.meta.arg);
-                cartSlice.caseReducers.calculateTotals(state); // Recalculate totals
+                cartSlice.caseReducers.calculateTotals(state);
             })
             .addCase(removeFromCart.rejected, (state, action) => {
                 state.loading = false;
@@ -143,5 +147,5 @@ const cartSlice = createSlice({
     }
 });
 
-export const { clearCart, calculateTotals } = cartSlice.actions;
+export const { clearCart, calculateTotals, checkStockLimit } = cartSlice.actions;
 export default cartSlice.reducer;

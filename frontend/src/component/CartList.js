@@ -39,7 +39,14 @@ const CartList = () => {
 
   const handleQuantityChange = (itemId, currentQty, change) => {
     const newQty = currentQty + change;
+    const item = cartItems.find(item => item._id === itemId);
     if (newQty > 0) {
+      
+      if (newQty > item.quantity) {
+        
+        alert(`Stock limit reached! Only ${item.quantity} items available.`);
+        return;
+      }
       dispatch(updateCartItem({ id: itemId, quantity: newQty }));
     }
   };
@@ -75,9 +82,9 @@ const CartList = () => {
     return <div className="text-center p-5">Loading...</div>;
   }
 
-  if (error) {
-    return <div className="text-center p-5 text-danger">Error: {error}</div>;
-  }
+  // if (error) {
+  //   return <div className="text-center p-5 text-danger">Error: {error}</div>;
+  // }
 
   // Calculate totals
   const subtotal = cartItems?.reduce((total, item) => total + (item.productId?.price * item.quantity), 0) || 0;

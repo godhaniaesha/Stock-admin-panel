@@ -76,7 +76,7 @@ const validationSchema = Yup.object().shape({
       .required('Please select a bank')
   })
 });
- 
+
 const initialValues = {
   firstName: '',
   lastName: '',
@@ -231,6 +231,11 @@ const CheckoutPage = () => {
       for (const item of cartItems) {
         await dispatch(removeFromCart(item._id)).unwrap();
       }
+
+      // Remove selected coupon from localStorage after successful order
+      localStorage.removeItem('selectedCoupon');
+      setSelectedCoupon(null);
+
       setOrderId(orderResponse._id);
       setShowSuccessModal(true);
 
@@ -290,27 +295,27 @@ const CheckoutPage = () => {
   };
 
   const calendarRef = useRef(null);
-const [selectedField, setSelectedField] = useState(null);
-   const [showCalendar, setShowCalendar] = useState(false);
-  
-      useEffect(() => {
-          if (!showCalendar) return;
-  
-          const handleClickOutside = (event) => {
-              if (
-                  calendarRef.current &&
-                  !calendarRef.current.contains(event.target) &&
-                  !event.target.classList.contains('x_calendar_icon') &&
-                  !event.target.classList.contains('fa-calendar')
-              ) {
-                  setShowCalendar(false);
-                  setSelectedField(null);
-              }
-          };
-  
-          document.addEventListener('mousedown', handleClickOutside);
-          return () => document.removeEventListener('mousedown', handleClickOutside);
-      }, [showCalendar]);
+  const [selectedField, setSelectedField] = useState(null);
+  const [showCalendar, setShowCalendar] = useState(false);
+
+  useEffect(() => {
+    if (!showCalendar) return;
+
+    const handleClickOutside = (event) => {
+      if (
+        calendarRef.current &&
+        !calendarRef.current.contains(event.target) &&
+        !event.target.classList.contains('x_calendar_icon') &&
+        !event.target.classList.contains('fa-calendar')
+      ) {
+        setShowCalendar(false);
+        setSelectedField(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [showCalendar]);
 
   const handleExpiryDateSelect = (day, setFieldValue) => {
     // Format as MM/YY
@@ -495,13 +500,13 @@ const [selectedField, setSelectedField] = useState(null);
                           <div className="d_card_row">
                             <div className="d_form_group">
                               <label>Expiry Date</label>
-                              {/* <Field
+                              <Field
                                 type="text"
                                 name="cardExpiry"
                                 className={`d_input ${touched.cardExpiry && errors.cardExpiry ? 'is-invalid' : ''}`}
                                 placeholder="MM/YY"
                                 maxLength="5"
-                              /> */}
+                              />
                               {/* <input
                                 type="text"
                                 name="cardExpiry"
@@ -526,7 +531,7 @@ const [selectedField, setSelectedField] = useState(null);
                                   />
                                 </div>
                               )} */}
-                               <div className="x_date_input_wrapper">
+                              {/* <div className="x_date_input_wrapper">
                                             <input
                                                 type="text"
                                                 name="startDate"
@@ -557,7 +562,7 @@ const [selectedField, setSelectedField] = useState(null);
                                                     />
                                                 </div>
                                             )}
-                                        </div>
+                                        </div> */}
                               <ErrorMessage name="cardExpiry" component="div" className="error-message" />
                             </div>
                             <div className="d_form_group">

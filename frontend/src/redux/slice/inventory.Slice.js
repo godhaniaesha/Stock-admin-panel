@@ -104,12 +104,14 @@ export const getLowInventory = createAsyncThunk(
             'Authorization': `Bearer ${token}`
           }
         });
-        return response.data;
+        // Filter products where quantity is less than or equal to lowStockLimit
+        const lowInventory = response.data.filter(item => item.quantity <= item.lowStockLimit);
+        return lowInventory;
       } catch (error) {
         return rejectWithValue(error.response?.data?.message || 'Failed to fetch low inventory');
       }
     }
-  );
+);
  
 const productSlice = createSlice({
     name: 'inventory',

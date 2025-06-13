@@ -27,7 +27,7 @@ function StockAlert() {
   };
 
   const handleDeleteClick = async (itemId) => {
-    console.log("itemId",itemId)
+    console.log("itemId", itemId)
     if (window.confirm('Are you sure you want to delete this item?')) {
       try {
         await dispatch(deleteInventory(itemId)).unwrap();
@@ -99,6 +99,9 @@ function StockAlert() {
                       <div className="Z_stock_info">
                         <div>{item.quantity} Items Left</div>
                         <div className="Z_stock_sold">Threshold: {item.lowStockLimit}</div>
+                        <div className={`Z_stock_status ${item.quantity <= item.lowStockLimit / 2 ? 'critical' : 'warning'}`}>
+                          {item.quantity <= item.lowStockLimit / 2 ? 'Critical Stock' : 'Low Stock'}
+                        </div>
                       </div>
                     </td>
                     <td>{item.category?.title || 'N/A'}</td>

@@ -1,4 +1,4 @@
-const {Register} = require("../model")
+const { Register } = require("../model")
 const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const fs = require('fs');
@@ -122,7 +122,7 @@ const login = async (req, res) => {
         return res.status(200)
             .cookie("accessToken", assesToken, { httpOnly: true, secure: true })
             .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
-            .json({ success: true,finduser:finduser, data: userDetails, accessToken: assesToken, message: "Login successful" }); // Added accessToken to the response body
+            .json({ success: true, finduser: finduser, data: userDetails, accessToken: assesToken, message: "Login successful" }); // Added accessToken to the response body
 
     } catch (error) {
         return res.status(500).json({ success: false, message: "Login failed: " + error.message });
@@ -284,7 +284,7 @@ const authnticateCheck = async (req, res) => {
 const getAllUsers = async (req, res) => {
     try {
         const users = await Register.find({}).select("-password -refreshToken");
-        
+
         if (!users || users.length === 0) {
             return res.status(404).json({
                 success: false,

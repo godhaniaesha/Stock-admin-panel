@@ -42,11 +42,11 @@ const CartList = () => {
     const item = cartItems.find(item => item._id === itemId);
     if (newQty > 0) {
       
-      if (newQty > item.quantity) {
+      // if (newQty > item.quantity) {
         
-        alert(`Stock limit reached! Only ${item.quantity} items available.`);
-        return;
-      }
+      //   alert(`Stock limit reached! Only ${item.quantity} items available.`);
+      //   return;
+      // }
       dispatch(updateCartItem({ id: itemId, quantity: newQty }));
     }
   };

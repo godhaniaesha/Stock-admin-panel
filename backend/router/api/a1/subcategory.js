@@ -4,7 +4,7 @@ const {subcategoryController} = require('../../../controller');
 const upload = require('../../../middleware/upload');
 
 // Example routes
-router.post('/createSubcategory', upload.single("image"), subcategoryController.createSubcategory);
+router.post('/CreateSubcat', upload.single("image"), subcategoryController.createSubcategory);
 router.get('/getSubcategories', subcategoryController.getSubcategories);
 router.get('/:id', subcategoryController.getSubcategory);
 router.put('/updateSubcategory/:id', upload.single("image"), subcategoryController.updateSubcategory);

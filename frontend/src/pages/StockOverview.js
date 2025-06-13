@@ -27,7 +27,7 @@ const StockOverview = () => {
         <div className="Z_table_header">
           <h4>Stock Overview</h4>
           <div className="Z_table_actions">
-            <button className="Z_add_product_btn">Add Stock</button>
+            <button className="Z_add_product_btn" onClick={() => navigate('/stock/add')}>Add Stock</button>
             <select className="Z_time_filter">
               <option>This Month</option>
               <option>Last Month</option>

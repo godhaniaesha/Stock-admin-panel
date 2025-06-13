@@ -1,20 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import { Nav, Form, InputGroup, Badge } from 'react-bootstrap';
 import { 
-  FaTachometerAlt, FaBoxes, FaExchangeAlt, FaUsers, 
-  FaChartLine, FaCog, FaSearch, FaAngleDown, 
-  FaBoxOpen, FaClipboardList, FaShoppingCart, FaFileInvoice,
-  FaUserCog, FaUserPlus, FaChartBar, FaChartPie,
-  FaBell, FaStar, FaMoon, FaSun, FaEdit, FaEye,
-  FaPlus, FaHeart, FaShoppingBag, FaBars, FaTags,
-  FaLayerGroup, FaList
+  FaTachometerAlt, FaBoxes, FaUsers, FaChartLine, FaCog, FaSearch, FaAngleDown, 
+  FaClipboardList, FaShoppingCart, FaFileInvoice, FaUserPlus, FaChartBar, FaChartPie,
+  FaBell, FaStar, FaPlus, FaHeart, FaShoppingBag, FaBars, FaTags, FaLayerGroup, FaList, FaEdit, FaEye
 } from 'react-icons/fa';
 import { RiCoupon3Fill } from "react-icons/ri";
 import { BsFillGrid1X2Fill } from "react-icons/bs";
 import { Link, useLocation } from 'react-router-dom';
-import '../styles/admin.css';  
+import '../styles/admin.css';
 import { TbListDetails } from 'react-icons/tb';
-import { BiDetail } from 'react-icons/bi';
 
 const Sidebar = ({ show, isDarkMode }) => {
   const location = useLocation();
@@ -24,24 +19,16 @@ const Sidebar = ({ show, isDarkMode }) => {
   const [isExpanded, setIsExpanded] = useState(false);
 
   const toggleFavorite = (path) => {
-    setFavorites(prev => 
-      prev.includes(path) 
-        ? prev.filter(p => p !== path)
-        : [...prev, path]
-    );
+    setFavorites(prev => prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]);
   };
 
   const toggleSubmenu = (menu) => {
     setExpandedMenus(prev => {
       const newState = {};
-      // Close all menus except the clicked one
       Object.keys(prev).forEach(key => {
         newState[key] = key === menu ? !prev[menu] : false;
       });
-      // If the menu wasn't previously in state, add it as open
-      if (!(menu in prev)) {
-        newState[menu] = true;
-      }
+      if (!(menu in prev)) newState[menu] = true;
       return newState;
     });
   };
@@ -99,6 +86,7 @@ const Sidebar = ({ show, isDarkMode }) => {
         { title: 'Coupon List', path: '/coupons', icon: <FaList size={14} /> },
         { title: 'Add Coupon', path: '/coupons/add', icon: <FaPlus size={14} /> },
         // { title: 'Edit Coupon', path: '/coupons/edit', icon: <FaEdit size={14} /> }
+        { title: 'Edit Coupon', path: '/coupons/edit', icon: <FaEdit size={14} />, hidden: true }
       ]
     },
     {
@@ -142,7 +130,7 @@ const Sidebar = ({ show, isDarkMode }) => {
     const hasSubmenu = item.submenu && item.submenu.length > 0;
     const isMenuExpanded = expandedMenus[item.title];
     const isFavorite = item.path && favorites.includes(item.path);
-    const isSubmenuActive = hasSubmenu && item.submenu.some(subItem => location.pathname === subItem.path);
+    const isSubmenuActive = hasSubmenu && item.submenu.some(subItem => location.pathname.startsWith(subItem.path));
 
     const menuContent = (
       <div className={`d-flex align-items-center justify-content-between w-100 ${(isActive || isSubmenuActive) ? 'active-item' : ''}`}>
@@ -152,9 +140,7 @@ const Sidebar = ({ show, isDarkMode }) => {
         </div>
         {isExpanded && (
           <div className="d-flex align-items-center">
-            {item.notifications && (
-              <Badge bg="danger" className="me-2">{item.notifications}</Badge>
-            )}
+            {item.notifications && <Badge bg="danger" className="me-2">{item.notifications}</Badge>}
             {item.path && (
               <FaStar
                 className={`favorite-icon ${isFavorite ? 'active' : ''}`}
@@ -165,9 +151,7 @@ const Sidebar = ({ show, isDarkMode }) => {
                 }}
               />
             )}
-            {hasSubmenu && (
-              <FaAngleDown className={`submenu-arrow ms-2 ${isMenuExpanded ? 'expanded' : ''}`} />
-            )}
+            {hasSubmenu && <FaAngleDown className={`submenu-arrow ms-2 ${isMenuExpanded ? 'expanded' : ''}`} />}
           </div>
         )}
       </div>
@@ -176,7 +160,7 @@ const Sidebar = ({ show, isDarkMode }) => {
     if (hasSubmenu) {
       return (
         <div key={item.title} className={`nav-item-wrapper ${isSubmenuActive ? 'active-submenu' : ''}`}>
-          <div 
+          <div
             className={`nav-link ${isMenuExpanded ? 'expanded' : ''} ${isSubmenuActive ? 'active' : ''}`}
             onClick={() => toggleSubmenu(item.title)}
             style={{ cursor: 'pointer' }}
@@ -184,7 +168,7 @@ const Sidebar = ({ show, isDarkMode }) => {
             {menuContent}
           </div>
           <div className={`submenu ${isMenuExpanded && isExpanded ? 'show' : ''}`}>
-            {item.submenu.map(subItem => renderMenuItem(subItem))}
+            {item.submenu.filter(subItem => !subItem.hidden).map(subItem => renderMenuItem(subItem))}
           </div>
         </div>
       );
@@ -202,9 +186,7 @@ const Sidebar = ({ show, isDarkMode }) => {
     );
   };
 
-  const filteredMenuItems = menuItems.filter(item =>
-    item.title.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredMenuItems = menuItems.filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
     <div 
@@ -217,62 +199,28 @@ const Sidebar = ({ show, isDarkMode }) => {
         borderRight: `1px solid var(${isDarkMode ? '--dark-border' : '--light-border'})`
       }}
     >
-      <div 
-        className="sidebar-header p-3 border-bottom"
-        style={{ 
-          borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`,
-          backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`
-        }}
-      >
+      <div className="sidebar-header p-3 border-bottom" style={{ borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})` }}>
         <div className="d-flex justify-content-between align-items-center mb-3">
           {isExpanded ? (
-            <h5 
-              className="mb-0 fw-bold"
-              style={{ color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}
-            >
-              Admin Panel
-            </h5>
+            <h5 className="mb-0 fw-bold" style={{ color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}>Admin Panel</h5>
           ) : (
-            <div 
-              className="mb-0 fw-bold text-center w-100"
-              style={{ color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}
-            >
+            <div className="mb-0 fw-bold text-center w-100" style={{ color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}>
               <FaBars size={20} />
             </div>
           )}
           {isExpanded && (
-            <div className="d-flex align-items-center">
-              <FaBell 
-                style={{ 
-                  cursor: 'pointer',
-                  color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` 
-                }} 
-              />
-            </div>
+            <FaBell style={{ cursor: 'pointer', color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }} />
           )}
         </div>
         {isExpanded && (
           <InputGroup>
-            <InputGroup.Text 
-              style={{ 
-                backgroundColor: 'transparent',
-                borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`,
-                color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` 
-              }}
-            >
+            <InputGroup.Text style={{ backgroundColor: 'transparent', borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`, color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}>
               <FaSearch size={14} />
             </InputGroup.Text>
             <Form.Control
               type="text"
               placeholder="Search menu..."
-              style={{ 
-                backgroundColor: 'transparent',
-                borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`,
-                color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
-                '::placeholder': {
-                  color: `var(${isDarkMode ? '--dark-text-secondary' : '--light-text-secondary'})`
-                }
-              }}
+              style={{ backgroundColor: 'transparent', borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`, color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
@@ -281,14 +229,12 @@ const Sidebar = ({ show, isDarkMode }) => {
       </div>
       <Nav className="flex-column py-2">
         {filteredMenuItems.map(item => (
-          <div 
-            key={item.title} 
+          <div
+            key={item.title}
             className="nav-item"
             style={{
-              backgroundColor: location.pathname === item.path ? 
-                `var(${isDarkMode ? '--dark-border' : '--light-border'})` : 'transparent',
-              borderLeft: `3px solid ${location.pathname === item.path ? 
-                'var(--accent-color)' : 'transparent'}`
+              backgroundColor: location.pathname === item.path ? `var(${isDarkMode ? '--dark-border' : '--light-border'})` : 'transparent',
+              borderLeft: `3px solid ${location.pathname === item.path ? 'var(--accent-color)' : 'transparent'}`
             }}
           >
             {renderMenuItem(item)}

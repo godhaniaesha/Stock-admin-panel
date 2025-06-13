@@ -10,3 +10,4 @@ module.exports.orderController = require('./order.controller');
 module.exports.paymentController = require('./payment.controller');
 module.exports.registerController = require('./Register.controller');
 module.exports.forgotpasswordController = require('./ForgotPassword.controller');
+module.exports.dashboardController = require('./dashboard.controller');

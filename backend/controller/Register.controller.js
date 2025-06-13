@@ -3,6 +3,7 @@ const bcrypt = require('bcrypt');
 const jwt = require("jsonwebtoken");
 const fs = require('fs');
 const path = require('path');
+const twilioConfig = require('../config/twilio.config');
 
 const generateTokens = async (id) => {
     console.log("id", id);
@@ -498,66 +499,301 @@ const createUser = async (req, res) => {
 
 const verifyGST = async (req, res) => {
     try {
-        const { gstNumber } = req.body;
+        const { gstNumber, userId } = req.body;
+        
+        if (!userId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "User ID is required" 
+            });
+        }
+
         // Here you would typically call a GST verification service
         // For now, we'll just simulate a successful verification
         const isValid = true; // Replace with actual verification logic
 
         if (isValid) {
-            res.status(200).json({ success: true, message: "GST number verified successfully" });
+            // Update user's GST verification status
+            const updatedUser = await Register.findByIdAndUpdate(
+                userId,
+                { 
+                    $set: { 
+                        'sellerInfo.gstVerified': true,
+                        'sellerInfo.gstNumber': gstNumber
+                    }
+                },
+                { new: true }
+            );
+
+            if (!updatedUser) {
+                return res.status(404).json({ 
+                    success: false, 
+                    message: "User not found" 
+                });
+            }
+
+            res.status(200).json({ 
+                success: true, 
+                message: "GST number verified successfully",
+                data: updatedUser
+            });
         } else {
-            res.status(400).json({ success: false, message: "Invalid GST number" });
+            res.status(400).json({ 
+                success: false, 
+                message: "Invalid GST number" 
+            });
         }
     } catch (error) {
-        res.status(500).json({ success: false, message: "GST verification failed", error: error.message });
+        res.status(500).json({ 
+            success: false, 
+            message: "GST verification failed", 
+            error: error.message 
+        });
     }
 };
 
 const addBusinessDetails = async (req, res) => {
     try {
         const { userId, gstDetails, businessName, panNumber, businessType, registeredBusinessAddress } = req.body;
-        const updatedUser = await Register.findByIdAndUpdate(userId, 
-            { $set: { 
-                'sellerInfo.gstDetails': gstDetails,
-                'sellerInfo.businessName': businessName,
-                'sellerInfo.panNumber': panNumber,
-                'sellerInfo.businessType': businessType,
-                'sellerInfo.registeredBusinessAddress': registeredBusinessAddress
-            }},
-            { new: true }
-        );
-        res.status(200).json({ success: true, data: updatedUser, message: "Business details added successfully" });
+        console.log("Request body:", req.body); // Add logging to debug
+
+        // Check if userId is provided
+        if (!userId) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "User ID is required" 
+            });
+        }
+
+        // Check if user exists
+        const user = await Register.findById(userId);
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "User not found" 
+            });
+        }
+
+        // Create sellerInfo object if it doesn't exist
+        const updateData = {
+            sellerInfo: {
+                gstDetails,
+                businessName,
+                panNumber,
+                businessType,
+                registeredBusinessAddress
+            }
+        };
+
+        // Update user with business details
+        const updatedUser = await Register.findByIdAndUpdate(
+            userId,
+            { $set: updateData },
+            { 
+                new: true,
+                runValidators: true
+            }
+        ).select('-password -refreshToken'); // Exclude sensitive data
+
+        if (!updatedUser) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "Failed to update user" 
+            });
+        }
+
+        res.status(200).json({ 
+            success: true, 
+            data: updatedUser, 
+            message: "Business details added successfully" 
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: "Failed to add business details", error: error.message });
+        console.error("Error in addBusinessDetails:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to add business details", 
+            error: error.message 
+        });
     }
 };
 
 const sendOTP = async (req, res) => {
     try {
-        const { phoneNumber } = req.body;
-        // Here you would use Twilio to send an OTP
-        // For now, we'll just simulate sending an OTP
+        const { userId } = req.body;
+        
+        // Find user by ID to get their phone number
+        const user = await Register.findById(userId);
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "User not found" 
+            });
+        }
+
+        const phoneNumber = user.phone;
+        if (!phoneNumber) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Phone number not found for user" 
+            });
+        }
+
+        // Validate and format phone number
+        let formattedPhone = phoneNumber.replace(/\D/g, ''); // Remove all non-digits
+        if (formattedPhone.length === 10) {
+            formattedPhone = `+91${formattedPhone}`; // Add India country code
+        } else if (formattedPhone.length === 12 && formattedPhone.startsWith('91')) {
+            formattedPhone = `+${formattedPhone}`; // Add + if missing
+        } else {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid phone number format. Please provide a valid 10-digit Indian phone number."
+            });
+        }
+
+        // Generate OTP
         const otp = Math.floor(100000 + Math.random() * 900000);
-        // Save OTP to user document or a separate OTP collection
-        res.status(200).json({ success: true, message: "OTP sent successfully", otp });
+        console.log(otp,"otp");
+        
+        // Save OTP to user document with expiry (5 minutes)
+        const otpExpiry = new Date(Date.now() + 5 * 60 * 1000); // 5 minutes from now
+        await Register.findByIdAndUpdate(userId, {
+            $set: {
+                'sellerInfo.otp': otp,
+                'sellerInfo.otpExpiry': otpExpiry
+            }
+        });
+
+        try {
+            // Get Twilio client using the config
+            const client = twilioConfig.getClient();
+            
+            // Send SMS using Twilio
+            const message = await client.messages.create({
+                body: `Your FastKart verification code is: ${otp}. Valid for 5 minutes.`,
+                to: formattedPhone,
+                from: twilioConfig.phoneNumber
+            });
+
+            console.log("SMS sent successfully:", {
+                messageSid: message.sid,
+                status: message.status,
+                to: message.to
+            });
+
+            res.status(200).json({ 
+                success: true, 
+                message: "OTP sent successfully to your registered mobile number" 
+            });
+        } catch (twilioError) {
+            console.error("Twilio Error:", {
+                code: twilioError.code,
+                message: twilioError.message
+            });
+            
+            // Handle specific Twilio error codes
+            const errorMessages = {
+                20003: "Twilio authentication failed. Please check your Account SID and Auth Token.",
+                21211: "Invalid phone number format. Please check the recipient's phone number.",
+                21214: "Invalid Twilio phone number. Please check your Twilio phone number configuration."
+            };
+            
+            const errorMessage = errorMessages[twilioError.code] || "Failed to send SMS";
+            
+            return res.status(500).json({
+                success: false,
+                message: errorMessage,
+                error: twilioError.message
+            });
+        }
     } catch (error) {
-        res.status(500).json({ success: false, message: "Failed to send OTP", error: error.message });
+        console.error("Send OTP error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "Failed to send OTP", 
+            error: error.message 
+        });
     }
 };
 
 const verifyOTP = async (req, res) => {
     try {
         const { userId, otp } = req.body;
-        // Here you would verify the OTP
-        // For now, we'll just simulate a successful verification
-        const isValid = true; // Replace with actual verification logic
-        if (isValid) {
-            res.status(200).json({ success: true, message: "OTP verified successfully" });
-        } else {
-            res.status(400).json({ success: false, message: "Invalid OTP" });
+
+        if (!userId || !otp) {
+            return res.status(400).json({
+                success: false,
+                message: "User ID and OTP are required"
+            });
         }
+
+        // Find user and check OTP
+        const user = await Register.findById(userId);
+        if (!user) {
+            return res.status(404).json({ 
+                success: false, 
+                message: "User not found" 
+            });
+        }
+
+        // Check if sellerInfo exists
+        if (!user.sellerInfo) {
+            return res.status(400).json({
+                success: false,
+                message: "Seller information not found"
+            });
+        }
+
+        // Check if OTP exists and is not expired
+        const storedOTP = user.sellerInfo.otp;
+        const otpExpiry = user.sellerInfo.otpExpiry;
+
+        if (!storedOTP || !otpExpiry) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "No OTP found. Please request a new OTP." 
+            });
+        }
+
+        // Check if OTP is expired
+        if (new Date() > new Date(otpExpiry)) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "OTP has expired. Please request a new OTP." 
+            });
+        }
+
+        // Convert both OTPs to strings for comparison
+        const inputOTP = otp.toString();
+        const storedOTPString = storedOTP.toString();
+
+        // Verify OTP
+        if (inputOTP !== storedOTPString) {
+            return res.status(400).json({ 
+                success: false, 
+                message: "Invalid OTP" 
+            });
+        }
+
+        // Clear OTP after successful verification
+        await Register.findByIdAndUpdate(userId, {
+            $set: {
+                'sellerInfo.otp': null,
+                'sellerInfo.otpExpiry': null
+            }
+        });
+
+        res.status(200).json({ 
+            success: true, 
+            message: "OTP verified successfully" 
+        });
     } catch (error) {
-        res.status(500).json({ success: false, message: "OTP verification failed", error: error.message });
+        console.error("Verify OTP error:", error);
+        res.status(500).json({ 
+            success: false, 
+            message: "OTP verification failed", 
+            error: error.message 
+        });
     }
 };
 

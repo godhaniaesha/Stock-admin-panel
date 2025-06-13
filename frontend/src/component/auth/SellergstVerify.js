@@ -1,16 +1,37 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { Container } from 'react-bootstrap';
-import Stepper from 'react-stepper-horizontal';
-import '../../styles/seller.css';
+import { useDispatch, useSelector } from 'react-redux';
+import { 
+  verifyGST, 
+  addBusinessDetails, 
+  sendOTP, 
+  verifyOTP,
+  addStoreDetails,
+  addBankDetails,
+  addPickupAddress,
+  acceptTermsAndConditions 
+} from '../../redux/slice/auth.slice';
 import CustomStepper from '../CustomStepper';
+import '../../styles/seller.css';
 
 function SellergstVerify() {
-    // const [showGstVerification, setShowGstVerification] = useState(true);
-    // const [showOtp, setShowOtp] = useState(false);
-    // const [showBrandDetails, setShowBrandDetails] = useState(false);
-    // const [showBankDetails, setShowBankDetails] = useState(false);
-    // const [showPickupAddress, setShowPickupAddress] = useState(false);
-    // const [showSubscription, setShowSubscription] = useState(false);
+    const dispatch = useDispatch();
+    const { 
+      loading, 
+      error, 
+      success, 
+      message,
+      gstVerified,
+      businessDetailsAdded,
+      otpSent,
+      otpVerified,
+      storeDetailsAdded,
+      bankDetailsAdded,
+      pickupAddressAdded,
+      termsAccepted
+    } = useSelector((state) => state.auth);
+
+    // Form states
     const [gstNumber, setGstNumber] = useState('');
     const [otp, setOtp] = useState(['', '', '', '', '', '']);
     const inputsRef = useRef([]);
@@ -28,18 +49,36 @@ function SellergstVerify() {
     const [state, setState] = useState("");
     const [currentUser, setCurrentUser] = useState({ filledSteps: 0 });
     const [gstDetails, setGstDetails] = useState({
-        gstNumber: "09AAACH7409R1ZZ",
-        panNumber: "BAJPC4350M",
-        businessType: "Wholesale Business, Retail Business",
-        businessAddress: "4517 Washington Ave. Manchester, Kentucky 39495"
+        gstNumber: "",
+        panNumber: "",
+        businessType: "",
+        businessAddress: ""
     });
-    const [currentStep, setCurrentStep] = useState(0);
+
+    // Validation states
+    const [errors, setErrors] = useState({});
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const [otpTimer, setOtpTimer] = useState(0);
+    const [canResendOtp, setCanResendOtp] = useState(false);
+
+    // View states
     const [showGstVerification, setShowGstVerification] = useState(true);
     const [showOtp, setShowOtp] = useState(false);
     const [showBrandDetails, setShowBrandDetails] = useState(false);
     const [showBankDetails, setShowBankDetails] = useState(false);
     const [showPickupAddress, setShowPickupAddress] = useState(false);
     const [showSubscription, setShowSubscription] = useState(false);
+
+    // Progress state
+    const [userProgress, setUserProgress] = useState({
+        currentStep: 0,
+        showGstVerification: true,
+        showOtp: false,
+        showBrandDetails: false,
+        showBankDetails: false,
+        showPickupAddress: false,
+        showSubscription: false
+    });
 
     const steps = [
         { label: "Account Creation", title: "Account Creation" },
@@ -67,44 +106,343 @@ function SellergstVerify() {
         }
     };
 
-    const handleGstVerify = (e) => {
-        e.preventDefault();
-        setShowGstVerification(false);
-        setShowOtp(false);
-        setShowBrandDetails(false);
-        setShowBankDetails(false);
-        setShowPickupAddress(false);
-        setShowSubscription(false);
-        setCurrentUser(prev => ({ ...prev, filledSteps: 1 }));
+    // Validation functions
+    const validateGSTNumber = (gst) => {
+        const gstRegex = /^[0-9]{2}[A-Z]{5}[0-9]{4}[A-Z]{1}[1-9A-Z]{1}Z[0-9A-Z]{1}$/;
+        return gstRegex.test(gst);
     };
 
-    const handleSubmit = (e) => {
-        e.preventDefault();
-        setShowBrandDetails(true);
-        setCurrentUser(prev => ({ ...prev, filledSteps: 2 }));
+    const validatePANNumber = (pan) => {
+        const panRegex = /^[A-Z]{5}[0-9]{4}[A-Z]{1}$/;
+        return panRegex.test(pan);
     };
 
-    const handleResend = (e) => {
-        e.preventDefault();
-        // Add resend logic here
+    const validateIFSC = (ifsc) => {
+        const ifscRegex = /^[A-Z]{4}0[A-Z0-9]{6}$/;
+        return ifscRegex.test(ifsc);
     };
 
-    const handleBrandSubmit = (e) => {
-        e.preventDefault();
-        setShowBankDetails(true);
-        setCurrentUser(prev => ({ ...prev, filledSteps: 3 }));
+    const validatePincode = (pincode) => {
+        const pincodeRegex = /^[1-9][0-9]{5}$/;
+        return pincodeRegex.test(pincode);
     };
 
-    const handleBankSubmit = (e) => {
-        e.preventDefault();
-        setShowPickupAddress(true);
-        setCurrentUser(prev => ({ ...prev, filledSteps: 4 }));
+    const validateBankAccount = (account) => {
+        return account.length >= 9 && account.length <= 18 && /^\d+$/.test(account);
     };
 
-    const handlePickupSubmit = (e) => {
+    // Timer for OTP resend
+    useEffect(() => {
+        let timer;
+        if (otpTimer > 0) {
+            timer = setInterval(() => {
+                setOtpTimer((prev) => prev - 1);
+            }, 1000);
+        } else {
+            setCanResendOtp(true);
+        }
+        return () => clearInterval(timer);
+    }, [otpTimer]);
+
+    // Function to save progress to localStorage
+    const saveProgress = (progress) => {
+        localStorage.setItem('sellerRegistrationProgress', JSON.stringify(progress));
+    };
+
+    // Function to load progress from localStorage
+    const loadProgress = () => {
+        const savedProgress = localStorage.getItem('sellerRegistrationProgress');
+        if (savedProgress) {
+            const progress = JSON.parse(savedProgress);
+            setUserProgress(progress);
+            
+            // Update view states based on saved progress
+            setShowGstVerification(progress.showGstVerification);
+            setShowOtp(progress.showOtp);
+            setShowBrandDetails(progress.showBrandDetails);
+            setShowBankDetails(progress.showBankDetails);
+            setShowPickupAddress(progress.showPickupAddress);
+            setShowSubscription(progress.showSubscription);
+            setCurrentUser(prev => ({ ...prev, filledSteps: progress.currentStep }));
+        }
+    };
+
+    // Load progress when component mounts
+    useEffect(() => {
+        loadProgress();
+    }, []);
+
+    // Update progress whenever relevant states change
+    useEffect(() => {
+        const progress = {
+            currentStep: currentUser.filledSteps,
+            showGstVerification,
+            showOtp,
+            showBrandDetails,
+            showBankDetails,
+            showPickupAddress,
+            showSubscription
+        };
+        setUserProgress(progress);
+        saveProgress(progress);
+    }, [
+        currentUser.filledSteps,
+        showGstVerification,
+        showOtp,
+        showBrandDetails,
+        showBankDetails,
+        showPickupAddress,
+        showSubscription
+    ]);
+
+    const handleGstVerify = async (e) => {
         e.preventDefault();
-        setShowSubscription(true);
-        setCurrentUser(prev => ({ ...prev, filledSteps: 5 }));
+        setIsSubmitting(true);
+        setErrors({});
+
+        if (!gstNumber) {
+            setErrors(prev => ({ ...prev, gstNumber: 'GST number is required' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!validateGSTNumber(gstNumber)) {
+            setErrors(prev => ({ ...prev, gstNumber: 'Invalid GST number format' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            const userId = localStorage.getItem('user');
+            const result = await dispatch(verifyGST({ gstNumber, userId })).unwrap();
+            if (result.success) {
+                try {
+                    const otpResult = await dispatch(sendOTP(userId)).unwrap();
+                    if (otpResult.success) {
+                        setShowGstVerification(false);
+                        setShowOtp(true);
+                        setCurrentUser(prev => ({ ...prev, filledSteps: 1 }));
+                        setOtpTimer(30);
+                        setCanResendOtp(false);
+                        alert('OTP has been sent to your registered mobile number');
+                    }
+                } catch (otpError) {
+                    console.error('Failed to send OTP:', otpError);
+                    setErrors(prev => ({ ...prev, otp: 'Failed to send OTP. Please try again.' }));
+                }
+            }
+        } catch (error) {
+            console.error('GST verification failed:', error);
+            setErrors(prev => ({ ...prev, gstNumber: error.message || 'GST verification failed. Please try again.' }));
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setErrors({});
+
+        const otpString = otp.join('');
+        
+        if (otpString.length !== 6) {
+            setErrors(prev => ({ ...prev, otp: 'Please enter complete 6-digit OTP' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            const userId = localStorage.getItem('user');
+            const result = await dispatch(verifyOTP({ userId, otp: otpString })).unwrap();
+            if (result.success) {
+                setShowOtp(false);
+                setShowBrandDetails(true);
+                setCurrentUser(prev => ({ ...prev, filledSteps: 2 }));
+            }
+        } catch (error) {
+            console.error('OTP verification failed:', error);
+            setErrors(prev => ({ ...prev, otp: error.message || 'OTP verification failed. Please try again.' }));
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleResend = async (e) => {
+        e.preventDefault();
+        if (!canResendOtp) return;
+
+        setIsSubmitting(true);
+        setErrors({});
+
+        try {
+            const userId = localStorage.getItem('user');
+            const result = await dispatch(sendOTP(userId)).unwrap();
+            if (result.success) {
+                setOtp(['', '', '', '', '', '']);
+                setOtpTimer(30);
+                setCanResendOtp(false);
+                if (inputsRef.current[0]) {
+                    inputsRef.current[0].focus();
+                }
+                alert('New OTP has been sent to your registered mobile number');
+            }
+        } catch (error) {
+            console.error('Failed to resend OTP:', error);
+            setErrors(prev => ({ ...prev, otp: error.message || 'Failed to resend OTP. Please try again.' }));
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleBrandSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setErrors({});
+
+        if (!storeName.trim()) {
+            setErrors(prev => ({ ...prev, storeName: 'Store name is required' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!ownerName.trim()) {
+            setErrors(prev => ({ ...prev, ownerName: 'Owner name is required' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            const userId = localStorage.getItem('user');
+            const storeDetails = {
+                userId,
+                storeName,
+                ownerName
+            };
+            const result = await dispatch(addStoreDetails(storeDetails)).unwrap();
+            if (result.success) {
+                setShowBrandDetails(false);
+                setShowBankDetails(true);
+                setCurrentUser(prev => ({ ...prev, filledSteps: 3 }));
+            }
+        } catch (error) {
+            console.error('Failed to add store details:', error);
+            setErrors(prev => ({ ...prev, form: error.message || 'Failed to add store details. Please try again.' }));
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handleBankSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setErrors({});
+
+        if (!bankName.trim()) {
+            setErrors(prev => ({ ...prev, bankName: 'Bank name is required' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!validateBankAccount(accountNumber)) {
+            setErrors(prev => ({ ...prev, accountNumber: 'Invalid account number' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (accountNumber !== confirmAccountNumber) {
+            setErrors(prev => ({ ...prev, confirmAccountNumber: 'Account numbers do not match' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!validateIFSC(ifscCode)) {
+            setErrors(prev => ({ ...prev, ifscCode: 'Invalid IFSC code' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            const userId = localStorage.getItem('user');
+            const bankDetails = {
+                userId,
+                bankName,
+                accountNumber,
+                confirmAccountNumber,
+                ifscCode
+            };
+            const result = await dispatch(addBankDetails(bankDetails)).unwrap();
+            if (result.success) {
+                setShowBankDetails(false);
+                setShowPickupAddress(true);
+                setCurrentUser(prev => ({ ...prev, filledSteps: 4 }));
+            }
+        } catch (error) {
+            console.error('Failed to add bank details:', error);
+            setErrors(prev => ({ ...prev, form: error.message || 'Failed to add bank details. Please try again.' }));
+        } finally {
+            setIsSubmitting(false);
+        }
+    };
+
+    const handlePickupSubmit = async (e) => {
+        e.preventDefault();
+        setIsSubmitting(true);
+        setErrors({});
+
+        if (!roomNumber.trim()) {
+            setErrors(prev => ({ ...prev, roomNumber: 'Room/Floor/Building number is required' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!street.trim()) {
+            setErrors(prev => ({ ...prev, street: 'Street/Locality is required' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!validatePincode(pincode)) {
+            setErrors(prev => ({ ...prev, pincode: 'Invalid pincode' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!city.trim()) {
+            setErrors(prev => ({ ...prev, city: 'City is required' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        if (!state.trim()) {
+            setErrors(prev => ({ ...prev, state: 'State is required' }));
+            setIsSubmitting(false);
+            return;
+        }
+
+        try {
+            const userId = localStorage.getItem('user');
+            const addressDetails = {
+                userId,
+                buildingNumber: roomNumber,
+                street,
+                landmark,
+                pincode,
+                city,
+                state
+            };
+            const result = await dispatch(addPickupAddress(addressDetails)).unwrap();
+            if (result.success) {
+                setShowPickupAddress(false);
+                setShowSubscription(true);
+                setCurrentUser(prev => ({ ...prev, filledSteps: 5 }));
+            }
+        } catch (error) {
+            console.error('Failed to add pickup address:', error);
+            setErrors(prev => ({ ...prev, form: error.message || 'Failed to add pickup address. Please try again.' }));
+        } finally {
+            setIsSubmitting(false);
+        }
     };
 
     const handleGstDetailsChange = (e, field) => {
@@ -114,38 +452,15 @@ function SellergstVerify() {
         });
     };
 
+    // Add function to clear progress (call this when registration is complete)
+    const clearProgress = () => {
+        localStorage.removeItem('sellerRegistrationProgress');
+    };
+
     return (
         <>
             <div className='d_auth_container'>
                 <section className="Z_container">
-                    {/* <Container>
-                        <div className="overflow-auto">
-                            <Stepper
-                                steps={[
-                                    { label: "Account Creation", title: "Account Creation" },
-                                    { label: "Seller Details", title: "Seller Details" },
-                                    { label: "Brand Details", title: "Brand Details" },
-                                    { label: "Bank Details", title: "Bank Details" },
-                                    { label: "Pickup Address", title: "Pickup Address" },
-                                    { label: "Verify & Submit", title: "Verify & Submit" },
-                                ]}
-                                className="k-steper"
-                                activeStep={currentUser?.filledSteps}
-                                connectorStateColors
-                                titleFontSize={14}
-                                circleFontSize={14}
-                                size={40}
-                                circleTop={0}
-                                titleBottom={10}
-                                activeTitleColor="#ffffff"
-                                activeColor="#84a98c"
-                                completeTitleColor="#ffffff"
-                                completeColor="#84a98c"
-                                defaultTitleColor="#666666"
-                                defaultColor="#666666"
-                            />
-                        </div>
-                    </Container> */}
                     <style jsx>{`
         .stepper-container {
           width: 100%;
@@ -317,72 +632,23 @@ function SellergstVerify() {
                                             placeholder="Enter GST number"
                                             value={gstNumber}
                                             onChange={(e) => setGstNumber(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.gstNumber ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.gstNumber && <div className="error-message">{errors.gstNumber}</div>}
                                     </div>
                                     <div className='d-flex justify-content-center'>
-                                        <button type="submit" className="Z_btn Z_verify-btn">Verify</button>
+                                        <button 
+                                            type="submit" 
+                                            className="Z_btn Z_verify-btn"
+                                            disabled={isSubmitting}
+                                        >
+                                            {isSubmitting ? 'Verifying...' : 'Verify'}
+                                        </button>
                                     </div>
                                 </div>
                             </form>
                         </div>
-                    ) : !showOtp && !showBrandDetails && !showBankDetails && !showPickupAddress && !showSubscription ? (
-                        <div className="Z_card">
-                            <h2>Seller Details</h2>
-                            <p className="Z_subtext">Enter the primary GST of your Business</p>
-                            <div className="Z_row">
-                                <label>GST Details</label>
-                                <div className="Z_input-verified">
-                                    <input
-                                        type="text"
-                                        value={gstDetails.gstNumber}
-                                        onChange={(e) => handleGstDetailsChange(e, 'gstNumber')}
-                                        placeholder="Enter GST number"
-                                        className="Z_input"
-                                    />
-                                </div>
-                            </div>
-                            <div className="Z_row">
-                                <label>PAN Number</label>
-                                <div className="Z_input-verified">
-                                    <input
-                                        type="text"
-                                        value={gstDetails.panNumber}
-                                        onChange={(e) => handleGstDetailsChange(e, 'panNumber')}
-                                        placeholder="Enter PAN number"
-                                        className="Z_input"
-                                    />
-                                </div>
-                            </div>
-                            <div className="Z_row">
-                                <label>Business Type</label>
-                                <div className="Z_input-verified">
-                                    <input
-                                        type="text"
-                                        value={gstDetails.businessType}
-                                        onChange={(e) => handleGstDetailsChange(e, 'businessType')}
-                                        placeholder="Enter business type"
-                                        className="Z_input"
-                                    />
-                                </div>
-                            </div>
-                            <div className="Z_row">
-                                <label>Registered Business Address</label>
-                                <div className="Z_input-verified">
-                                    <input
-                                        type="text"
-                                        value={gstDetails.businessAddress}
-                                        onChange={(e) => handleGstDetailsChange(e, 'businessAddress')}
-                                        placeholder="Enter business address"
-                                        className="Z_input"
-                                    />
-                                </div>
-                            </div>
-                            <div className='d-flex justify-content-center'>
-                                <button className="Z_btn" onClick={() => setShowOtp(true)}>Verify OTP</button>
-                            </div>
-                        </div>
-                    ) : showOtp && !showBrandDetails && !showBankDetails && !showPickupAddress && !showSubscription ? (
+                    ) : showOtp ? (
                         <div className="otp-card Z_card">
                             <h2>Verify your GST</h2>
                             <p className="otp-subtext">We have sent a 6-digit verification code to</p>
@@ -400,21 +666,32 @@ function SellergstVerify() {
                                             onChange={e => handleOtpChange(e, idx)}
                                             onKeyDown={e => handleOtpKeyDown(e, idx)}
                                             ref={el => (inputsRef.current[idx] = el)}
-                                            className="Z_input otp-input"
+                                            className={`Z_input otp-input ${errors.otp ? 'is-invalid' : ''}`}
                                             inputMode="numeric"
                                             autoComplete="one-time-code"
                                         />
                                     ))}
                                 </div>
+                                {errors.otp && <div className="error-message">{errors.otp}</div>}
                                 <div className='d-flex justify-content-center mb-3'>
-                                    <button className="Z_btn" type="submit">Submit</button>
+                                    <button 
+                                        className="Z_btn" 
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Verifying...' : 'Submit'}
+                                    </button>
                                 </div>
                             </form>
                             <div className="otp-resend">
-                                Didn't received code? <a href="#" onClick={handleResend}>Resend</a>
+                                {canResendOtp ? (
+                                    <a href="#" onClick={handleResend}>Resend OTP</a>
+                                ) : (
+                                    <span>Resend OTP in {otpTimer}s</span>
+                                )}
                             </div>
                         </div>
-                    ) : showBrandDetails && !showBankDetails && !showPickupAddress && !showSubscription ? (
+                    ) : showBrandDetails ? (
                         <div className="brand-card Z_card">
                             <h2 className="brand-title">Brand Details</h2>
                             <p className="brand-subtext">Your store name will be visible to all buyers of FastKart</p>
@@ -428,8 +705,9 @@ function SellergstVerify() {
                                             placeholder="Enter store name"
                                             value={storeName}
                                             onChange={e => setStoreName(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.storeName ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.storeName && <div className="error-message">{errors.storeName}</div>}
                                     </div>
                                     <div className="brand-helper">E.g. Business Name, Trade Name, Etc.</div>
                                 </div>
@@ -442,16 +720,24 @@ function SellergstVerify() {
                                             placeholder="Enter owner name"
                                             value={ownerName}
                                             onChange={e => setOwnerName(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.ownerName ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.ownerName && <div className="error-message">{errors.ownerName}</div>}
                                     </div>
                                 </div>
+                                {errors.form && <div className="error-message">{errors.form}</div>}
                                 <div className='d-flex justify-content-center'>
-                                    <button className="Z_btn" type="submit">Submit</button>
+                                    <button 
+                                        className="Z_btn" 
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Submit'}
+                                    </button>
                                 </div>
                             </form>
                         </div>
-                    ) : showBankDetails && !showPickupAddress && !showSubscription ? (
+                    ) : showBankDetails ? (
                         <div className="bank-card Z_card">
                             <h2 className="bank-title">Bank Details</h2>
                             <p className="bank-subtext">Bank account should be in the name of<br />registered business name or trade name as per GSTIN.</p>
@@ -465,8 +751,9 @@ function SellergstVerify() {
                                             placeholder="Enter bank name"
                                             value={bankName}
                                             onChange={e => setBankName(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.bankName ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.bankName && <div className="error-message">{errors.bankName}</div>}
                                     </div>
                                 </div>
                                 <div className="Z_row">
@@ -478,8 +765,9 @@ function SellergstVerify() {
                                             placeholder="Enter account number"
                                             value={accountNumber}
                                             onChange={e => setAccountNumber(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.accountNumber ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.accountNumber && <div className="error-message">{errors.accountNumber}</div>}
                                     </div>
                                 </div>
                                 <div className="Z_row">
@@ -491,8 +779,9 @@ function SellergstVerify() {
                                             placeholder="Confirm account number"
                                             value={confirmAccountNumber}
                                             onChange={e => setConfirmAccountNumber(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.confirmAccountNumber ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.confirmAccountNumber && <div className="error-message">{errors.confirmAccountNumber}</div>}
                                     </div>
                                 </div>
                                 <div className="Z_row">
@@ -504,16 +793,24 @@ function SellergstVerify() {
                                             placeholder="Enter IFSC code"
                                             value={ifscCode}
                                             onChange={e => setIfscCode(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.ifscCode ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.ifscCode && <div className="error-message">{errors.ifscCode}</div>}
                                     </div>
                                 </div>
+                                {errors.form && <div className="error-message">{errors.form}</div>}
                                 <div className='d-flex justify-content-center'>
-                                    <button className="Z_btn" type="submit">Verify Bank Details</button>
+                                    <button 
+                                        className="Z_btn" 
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Verifying...' : 'Verify Bank Details'}
+                                    </button>
                                 </div>
                             </form>
                         </div>
-                    ) : showPickupAddress && !showSubscription ? (
+                    ) : showPickupAddress ? (
                         <div className="pickup-card Z_card">
                             <h2 className="pickup-title">Pickup Address</h2>
                             <p className="pickup-subtext">Products will be picked up from this location for delivery.</p>
@@ -527,8 +824,9 @@ function SellergstVerify() {
                                             placeholder="Enter room/floor/building number"
                                             value={roomNumber}
                                             onChange={e => setRoomNumber(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.roomNumber ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.roomNumber && <div className="error-message">{errors.roomNumber}</div>}
                                     </div>
                                 </div>
                                 <div className="Z_row">
@@ -540,8 +838,9 @@ function SellergstVerify() {
                                             placeholder="Enter street/locality"
                                             value={street}
                                             onChange={e => setStreet(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.street ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.street && <div className="error-message">{errors.street}</div>}
                                     </div>
                                 </div>
                                 <div className="Z_row">
@@ -567,8 +866,9 @@ function SellergstVerify() {
                                                 placeholder="Enter pincode"
                                                 value={pincode}
                                                 onChange={e => setPincode(e.target.value)}
-                                                className="Z_input"
+                                                className={`Z_input ${errors.pincode ? 'is-invalid' : ''}`}
                                             />
+                                            {errors.pincode && <div className="error-message">{errors.pincode}</div>}
                                         </div>
                                     </div>
                                     <div className="pickup-col">
@@ -580,8 +880,9 @@ function SellergstVerify() {
                                                 placeholder="Enter city"
                                                 value={city}
                                                 onChange={e => setCity(e.target.value)}
-                                                className="Z_input"
+                                                className={`Z_input ${errors.city ? 'is-invalid' : ''}`}
                                             />
+                                            {errors.city && <div className="error-message">{errors.city}</div>}
                                         </div>
                                     </div>
                                 </div>
@@ -594,12 +895,20 @@ function SellergstVerify() {
                                             placeholder="Enter state"
                                             value={state}
                                             onChange={e => setState(e.target.value)}
-                                            className="Z_input"
+                                            className={`Z_input ${errors.state ? 'is-invalid' : ''}`}
                                         />
+                                        {errors.state && <div className="error-message">{errors.state}</div>}
                                     </div>
                                 </div>
+                                {errors.form && <div className="error-message">{errors.form}</div>}
                                 <div className='d-flex justify-content-center'>
-                                    <button className="Z_btn" type="submit">Continue</button>
+                                    <button 
+                                        className="Z_btn" 
+                                        type="submit"
+                                        disabled={isSubmitting}
+                                    >
+                                        {isSubmitting ? 'Submitting...' : 'Continue'}
+                                    </button>
                                 </div>
                             </form>
                         </div>

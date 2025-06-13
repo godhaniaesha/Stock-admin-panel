@@ -166,12 +166,12 @@ export const updateProfile = createAsyncThunk('auth/updateProfile', async ({ id,
   }
 });
 
-export const verifyGST = createAsyncThunk('auth/verifyGST', async (gstNumber, { rejectWithValue }) => {
+export const verifyGST = createAsyncThunk('auth/verifyGST', async ({ gstNumber, userId }, { rejectWithValue }) => {
   try {
     const response = await fetch(`${BASE_URL}/register/verify-gst`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ gstNumber })
+      body: JSON.stringify({ gstNumber, userId })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'GST verification failed');
@@ -181,12 +181,12 @@ export const verifyGST = createAsyncThunk('auth/verifyGST', async (gstNumber, { 
   }
 });
 
-export const addBusinessDetails = createAsyncThunk('auth/addBusinessDetails', async (businessDetails, { rejectWithValue }) => {
+export const addBusinessDetails = createAsyncThunk('auth/addBusinessDetails', async ({ userId, ...businessDetails }, { rejectWithValue }) => {
   try {
     const response = await fetch(`${BASE_URL}/register/add-business-details`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(businessDetails)
+      body: JSON.stringify({ userId, ...businessDetails })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Failed to add business details');
@@ -196,12 +196,12 @@ export const addBusinessDetails = createAsyncThunk('auth/addBusinessDetails', as
   }
 });
 
-export const sendOTP = createAsyncThunk('auth/sendOTP', async (phoneNumber, { rejectWithValue }) => {
+export const sendOTP = createAsyncThunk('auth/sendOTP', async (userId, { rejectWithValue }) => {
   try {
     const response = await fetch(`${BASE_URL}/register/send-otp`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ phoneNumber })
+      body: JSON.stringify({ userId })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Failed to send OTP');
@@ -226,12 +226,12 @@ export const verifyOTP = createAsyncThunk('auth/verifyOTP', async ({ userId, otp
   }
 });
 
-export const addStoreDetails = createAsyncThunk('auth/addStoreDetails', async (storeDetails, { rejectWithValue }) => {
+export const addStoreDetails = createAsyncThunk('auth/addStoreDetails', async ({ userId, ...storeDetails }, { rejectWithValue }) => {
   try {
     const response = await fetch(`${BASE_URL}/register/add-store-details`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(storeDetails)
+      body: JSON.stringify({ userId, ...storeDetails })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Failed to add store details');
@@ -241,12 +241,12 @@ export const addStoreDetails = createAsyncThunk('auth/addStoreDetails', async (s
   }
 });
 
-export const addBankDetails = createAsyncThunk('auth/addBankDetails', async (bankDetails, { rejectWithValue }) => {
+export const addBankDetails = createAsyncThunk('auth/addBankDetails', async ({ userId, ...bankDetails }, { rejectWithValue }) => {
   try {
     const response = await fetch(`${BASE_URL}/register/add-bank-details`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(bankDetails)
+      body: JSON.stringify({ userId, ...bankDetails })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Failed to add bank details');
@@ -256,12 +256,12 @@ export const addBankDetails = createAsyncThunk('auth/addBankDetails', async (ban
   }
 });
 
-export const addPickupAddress = createAsyncThunk('auth/addPickupAddress', async (addressDetails, { rejectWithValue }) => {
+export const addPickupAddress = createAsyncThunk('auth/addPickupAddress', async ({ userId, ...addressDetails }, { rejectWithValue }) => {
   try {
     const response = await fetch(`${BASE_URL}/register/add-pickup-address`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(addressDetails)
+      body: JSON.stringify({ userId, ...addressDetails })
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.message || 'Failed to add pickup address');

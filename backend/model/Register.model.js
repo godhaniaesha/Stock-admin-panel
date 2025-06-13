@@ -71,8 +71,18 @@ const RegisterSchema = new mongoose.Schema({
         gstNumber: {
             type: String,
         },
+        otp:{
+            type:Number
+        },
+        otpExpiry:{
+            type:Date
+        },
         gstDetails: {
             type: String,
+        },
+        gstVerified: {
+            type: Boolean,
+            default: false
         },
         businessName: {
             type: String,

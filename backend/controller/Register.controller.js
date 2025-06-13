@@ -863,7 +863,50 @@ const acceptTermsAndConditions = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to accept terms and conditions", error: error.message });
     }
 };
+// In Register.controller.js, add this new function:
 
+const checkSellerRegistrationStatus = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        
+        const user = await Register.findById(userId);
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "User not found"
+            });
+        }
+
+        // Check all required seller registration fields
+        const sellerInfo = user.sellerInfo || {};
+        const registrationStatus = {
+            gstVerified: !!sellerInfo.gstVerified,
+            businessDetailsAdded: !!(sellerInfo.businessName && sellerInfo.panNumber),
+            storeDetailsAdded: !!(sellerInfo.storeName && sellerInfo.ownerName),
+            bankDetailsAdded: !!(sellerInfo.bankName && sellerInfo.accountNumber && sellerInfo.ifscCode),
+            pickupAddressAdded: !!(sellerInfo.pickupAddress),
+            termsAccepted: !!sellerInfo.termsAccepted
+        };
+
+        // Calculate completed steps
+        const completedSteps = Object.values(registrationStatus).filter(Boolean).length;
+
+        res.status(200).json({
+            success: true,
+            data: {
+                registrationStatus,
+                completedSteps,
+                isRegistrationComplete: completedSteps === 6 // Total number of steps
+            }
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to check registration status",
+            error: error.message
+        });
+    }
+};
 module.exports = {
     RegisterUser,
     login,
@@ -883,5 +926,6 @@ module.exports = {
     addStoreDetails,
     addBankDetails,
     addPickupAddress,
-    acceptTermsAndConditions
+    acceptTermsAndConditions,
+    checkSellerRegistrationStatus
 };

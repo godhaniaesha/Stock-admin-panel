@@ -285,7 +285,16 @@ export const acceptTermsAndConditions = createAsyncThunk('auth/acceptTerms', asy
     return rejectWithValue(err.message);
   }
 });
-
+export const checkSellerStatus = createAsyncThunk('auth/checkSellerStatus', async (userId, { rejectWithValue }) => {
+  try {
+      const response = await fetch(`${BASE_URL}/register/check-seller-status/${userId}`);
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.message || 'Failed to check seller status');
+      return data;
+  } catch (err) {
+      return rejectWithValue(err.message);
+  }
+});
 // ========== SLICE ========== //
 
 const authSlice = createSlice({
@@ -547,7 +556,17 @@ const authSlice = createSlice({
       .addCase(acceptTermsAndConditions.fulfilled, (state, action) => {
         state.termsAccepted = true;
         state.user = action.payload.data;
-      });
+      })
+      .addCase(checkSellerStatus.fulfilled, (state, action) => {
+        const { registrationStatus, completedSteps, isRegistrationComplete } = action.payload.data;
+        state.gstVerified = registrationStatus.gstVerified;
+        state.businessDetailsAdded = registrationStatus.businessDetailsAdded;
+        state.storeDetailsAdded = registrationStatus.storeDetailsAdded;
+        state.bankDetailsAdded = registrationStatus.bankDetailsAdded;
+        state.pickupAddressAdded = registrationStatus.pickupAddressAdded;
+        state.termsAccepted = registrationStatus.termsAccepted;
+        state.currentStep = completedSteps;
+    });
   }
 });
 

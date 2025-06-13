@@ -9,7 +9,8 @@ import {
   addStoreDetails,
   addBankDetails,
   addPickupAddress,
-  acceptTermsAndConditions 
+  acceptTermsAndConditions, 
+  checkSellerStatus
 } from '../../redux/slice/auth.slice';
 import CustomStepper from '../CustomStepper';
 import '../../styles/seller.css';
@@ -130,7 +131,55 @@ function SellergstVerify() {
     const validateBankAccount = (account) => {
         return account.length >= 9 && account.length <= 18 && /^\d+$/.test(account);
     };
-
+    useEffect(() => {
+        const checkRegistrationStatus = async () => {
+            const userId = localStorage.getItem('user');
+            if (userId) {
+                try {
+                    const result = await dispatch(checkSellerStatus(userId)).unwrap();
+                    if (result.success) {
+                        const { registrationStatus, completedSteps, isRegistrationComplete } = result.data;
+                        
+                        // If registration is complete, redirect to dashboard or home
+                        if (isRegistrationComplete) {
+                            // Add your navigation logic here
+                            return;
+                        }
+    
+                        // Set the current step based on completed steps
+                        setCurrentUser(prev => ({ ...prev, filledSteps: completedSteps }));
+    
+                        // Reset all form visibility states to false
+                        setShowGstVerification(false);
+                        setShowOtp(false);
+                        setShowBrandDetails(false);
+                        setShowBankDetails(false);
+                        setShowPickupAddress(false);
+                        setShowSubscription(false);
+    
+                        // Show only the next incomplete step
+                        if (!registrationStatus.gstVerified) {
+                            setShowGstVerification(true);
+                        } else if (!registrationStatus.businessDetailsAdded) {
+                            setShowOtp(true);
+                        } else if (!registrationStatus.storeDetailsAdded) {
+                            setShowBrandDetails(true);
+                        } else if (!registrationStatus.bankDetailsAdded) {
+                            setShowBankDetails(true);
+                        } else if (!registrationStatus.pickupAddressAdded) {
+                            setShowPickupAddress(true);
+                        } else if (!registrationStatus.termsAccepted) {
+                            setShowSubscription(true);
+                        }
+                    }
+                } catch (error) {
+                    console.error('Failed to check registration status:', error);
+                }
+            }
+        };
+    
+        checkRegistrationStatus();
+    }, [dispatch]);
     // Timer for OTP resend
     useEffect(() => {
         let timer;

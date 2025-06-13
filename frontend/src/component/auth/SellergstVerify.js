@@ -9,7 +9,8 @@ import {
     addStoreDetails,
     addBankDetails,
     addPickupAddress,
-    acceptTermsAndConditions
+    acceptTermsAndConditions,
+    checkSellerStatus
 } from '../../redux/slice/auth.slice';
 import CustomStepper from '../CustomStepper';
 import '../../styles/seller.css';

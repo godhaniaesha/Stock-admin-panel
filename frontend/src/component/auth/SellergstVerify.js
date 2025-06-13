@@ -619,7 +619,7 @@ function SellergstVerify() {
         }
       `}</style>
                     <CustomStepper steps={steps} activeStep={currentUser.filledSteps} />
-                    {showGstVerification ? (
+                   {showGstVerification && (
                         <div className="Z_card">
                             <h2>Seller Details</h2>
                             <p className="Z_subtext">Enter the primary GST of your Business</p>
@@ -648,7 +648,8 @@ function SellergstVerify() {
                                 </div>
                             </form>
                         </div>
-                    ) : showOtp ? (
+                   )}
+                   {showOtp && (
                         <div className="otp-card Z_card">
                             <h2>Verify your GST</h2>
                             <p className="otp-subtext">We have sent a 6-digit verification code to</p>
@@ -691,7 +692,8 @@ function SellergstVerify() {
                                 )}
                             </div>
                         </div>
-                    ) : showBrandDetails ? (
+                   )}
+                     {showBrandDetails && (
                         <div className="brand-card Z_card">
                             <h2 className="brand-title">Brand Details</h2>
                             <p className="brand-subtext">Your store name will be visible to all buyers of FastKart</p>
@@ -737,7 +739,8 @@ function SellergstVerify() {
                                 </div>
                             </form>
                         </div>
-                    ) : showBankDetails ? (
+                     )}
+                      {showBankDetails && (
                         <div className="bank-card Z_card">
                             <h2 className="bank-title">Bank Details</h2>
                             <p className="bank-subtext">Bank account should be in the name of<br />registered business name or trade name as per GSTIN.</p>
@@ -810,7 +813,8 @@ function SellergstVerify() {
                                 </div>
                             </form>
                         </div>
-                    ) : showPickupAddress ? (
+                      )}
+                     {showPickupAddress && (
                         <div className="pickup-card Z_card">
                             <h2 className="pickup-title">Pickup Address</h2>
                             <p className="pickup-subtext">Products will be picked up from this location for delivery.</p>
@@ -912,7 +916,8 @@ function SellergstVerify() {
                                 </div>
                             </form>
                         </div>
-                    ) : showSubscription ? (
+                     )}
+                    {showSubscription && (
                         <div className="Z_card_wide">
                             <div className="subscription-card-dark">
                                 <h2 className="subscription-title-dark">Choose a plan</h2>
@@ -948,7 +953,7 @@ function SellergstVerify() {
                                 </div>
                             </div>
                         </div>
-                    ) : null}
+                    )}
                 </section>
             </div>
         </>

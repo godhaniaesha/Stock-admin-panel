@@ -6,7 +6,7 @@ const auth = (roles = []) => (req, res, next) => {
     console.log("aaa", roles);
 
     try {
-        const token = req.cookies.assesToken || req.header('authorization');
+        let token = req.cookies.assesToken || req.header('authorization');
         console.log("Tokens", token);
 
         if (!token) {
@@ -17,12 +17,17 @@ const auth = (roles = []) => (req, res, next) => {
                 })
         }
 
+        // If token is from header, remove "Bearer " prefix
+        if (token.startsWith('Bearer ')) {
+            token = token.slice(7, token.length);
+        }
+
         jwt.verify(token, process.env.ACCESS_TOKEN_KEY, async function (err, decoded) {
             if (err) {
                 return res.status(400)
                     .json({
                         success: false,
-                        message: "Token invalid"
+                        message: err.message
                     })
             }
 

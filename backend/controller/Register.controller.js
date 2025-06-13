@@ -863,7 +863,36 @@ const acceptTermsAndConditions = async (req, res) => {
         res.status(500).json({ success: false, message: "Failed to accept terms and conditions", error: error.message });
     }
 };
+const getSellerRegistrationProgress = async (req, res) => {
+    try {
+        const { userId } = req.params;
+        const user = await Register.findById(userId);
 
+        if (!user) {
+            return res.status(404).json({ success: false, message: "User not found" });
+        }
+
+        // Default to step 0
+        let step = 0;
+
+        // Check GST verification
+        if (user.sellerInfo && user.sellerInfo.gstVerified) step = 1;
+        // Check OTP verified (you may want to store a flag for this, here we check if OTP is cleared)
+        if (user.sellerInfo && user.sellerInfo.gstVerified && !user.sellerInfo.otp) step = 2;
+        // Check Brand Details (businessName and panNumber as example)
+        if (user.sellerInfo && user.sellerInfo.businessName && user.sellerInfo.panNumber) step = 3;
+        // Check Bank Details
+        if (user.sellerInfo && user.sellerInfo.bankName && user.sellerInfo.accountNumber && user.sellerInfo.ifscCode) step = 4;
+        // Check Pickup Address
+        if (user.sellerInfo && user.sellerInfo.pickupAddress && user.sellerInfo.pickupAddress.pincode) step = 5;
+        // Check Terms Accepted
+        if (user.sellerInfo && user.sellerInfo.termsAccepted) step = 6;
+
+        return res.status(200).json({ success: true, step });
+    } catch (error) {
+        return res.status(500).json({ success: false, message: "Failed to get registration progress", error: error.message });
+    }
+};
 module.exports = {
     RegisterUser,
     login,
@@ -883,5 +912,6 @@ module.exports = {
     addStoreDetails,
     addBankDetails,
     addPickupAddress,
-    acceptTermsAndConditions
+    acceptTermsAndConditions,
+    getSellerRegistrationProgress
 };

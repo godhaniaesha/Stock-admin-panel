@@ -4,6 +4,7 @@ const express = require('express');
 console.log("express");
 
 const path = require('path')
+const cookieParser = require('cookie-parser');
 const app = express();
 const cors = require('cors')
 const passport = require('passport');
@@ -20,7 +21,7 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
 }));
-
+app.use(cookieParser());
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.json());

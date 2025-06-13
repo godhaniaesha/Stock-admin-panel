@@ -16,6 +16,7 @@ const register = require("./Register");
 const forgotPassword = require("./forgotPassword.route");
 
 
+
 router.use("/user", user); 
 router.use('/category', category); 
 router.use('/subcategory', subcategory); 

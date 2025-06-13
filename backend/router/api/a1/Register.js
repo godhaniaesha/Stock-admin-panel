@@ -89,6 +89,5 @@ router.post("/add-store-details", registerController.addStoreDetails);
 router.post("/add-bank-details", registerController.addBankDetails);
 router.post("/add-pickup-address", registerController.addPickupAddress);
 router.post("/accept-terms", registerController.acceptTermsAndConditions);
-router.get("/check-seller-status/:userId", registerController.checkSellerRegistrationStatus);
-
+router.get('/register/registration-progress/:userId', registerController.getSellerRegistrationProgress);
 module.exports = router

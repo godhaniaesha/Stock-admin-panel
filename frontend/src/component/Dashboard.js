@@ -48,6 +48,7 @@ import { FaUserTie, FaUserCog, FaUserNinja, FaUserCheck } from 'react-icons/fa';
 import { MdMeetingRoom, MdLaunch, MdCall } from 'react-icons/md';
 import './Dashboard.css';
 import { useOutletContext } from 'react-router-dom';
+import { BiRightArrow } from 'react-icons/bi';
 
 
 const Dashboard = () => {
@@ -82,9 +83,9 @@ const Dashboard = () => {
     };
 
     const pieData = [
-        { name: 'Desktop', value: 45, color: 'var(--accent-color)', icon: <FaDesktop /> },
-        { name: 'Mobile', value: 35, color: '#8BBEA8', icon: <FaMobileAlt /> },
-        { name: 'Tablet', value: 20, color: '#A8D5BA', icon: <FaTabletAlt /> },
+        { name: 'category1', value: 45, color: 'var(--accent-color)', icon: <FaDesktop /> },
+        { name: 'category2', value: 35, color: '#8BBEA8', icon: <FaMobileAlt /> },
+        { name: 'category3', value: 20, color: '#A8D5BA', icon: <FaTabletAlt /> },
     ];
 
     const recentActivities = [
@@ -109,9 +110,11 @@ const Dashboard = () => {
     ];
 
     const upcomingEvents = [
-        { id: 1, title: 'Team Meeting', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
-        { id: 2, title: 'Product Launch', time: '2:00 PM', date: 'Tomorrow', type: 'launch', icon: <MdLaunch /> },
-        { id: 3, title: 'Client Call', time: '4:30 PM', date: 'Today', type: 'call', icon: <MdCall /> },
+        { id: 1, title: 'product1', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
+        { id: 2, title: 'product2', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
+        { id: 3, title: 'product3', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
+        { id: 4, title: 'product4', time: '2:00 PM', date: 'Tomorrow', type: 'launch', icon: <MdLaunch /> },
+        { id: 5, title: 'product5', time: '4:30 PM', date: 'Today', type: 'call', icon: <MdCall /> },
     ];
     const toggleTheme = () => {
         // This function should be handled by the parent component
@@ -227,7 +230,7 @@ const Dashboard = () => {
                   
                 </div>
                 <h3 className="h4 fw-bold mb-1">1,429</h3>
-                <p className="mb-2 opacity-75">Active Users</p>
+                <p className="mb-2 opacity-75">Total Products</p>
                 <div className="d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-center gap-1">
                     <ArrowUp size={16} className="d_metric-positive" />
@@ -252,7 +255,7 @@ const Dashboard = () => {
                   
                 </div>
                 <h3 className="h4 fw-bold mb-1">856</h3>
-                <p className="mb-2 opacity-75">Orders</p>
+                <p className="mb-2 opacity-75">Confirm Order</p>
                 <div className="d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-center gap-1">
                     <ArrowDown size={16} className="d_metric-negative" />
@@ -277,7 +280,8 @@ const Dashboard = () => {
                   
                 </div>
                 <h3 className="h4 fw-bold mb-1">94.2%</h3>
-                <p className="mb-2 opacity-75">Conversion Rate</p>
+                {/* // total stock quantity compare to total sold quantity */}
+                <p className="mb-2 opacity-75">Selling rate</p>  
                 <div className="d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-center gap-1">
                     <ArrowUp size={16} className="d_metric-positive" />
@@ -435,9 +439,9 @@ const Dashboard = () => {
               <div className="d_card" style={{ height: "100%" }}>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <div>
-                    <h5 className="fw-bold mb-0">Traffic Sources</h5>
+                    <h5 className="fw-bold mb-0">Category Wise Products</h5>
                     <p className="mb-0 opacity-75 small">
-                      Where your visitors come from
+                    Product Distribution by Category
                     </p>
                   </div>
                   <button className="d_btn-ghost btn-sm">
@@ -508,9 +512,9 @@ const Dashboard = () => {
               <div className="d_card">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <div>
-                    <h5 className="fw-bold mb-0">Recent Activities</h5>
+                    <h5 className="fw-bold mb-0">Recent Order</h5>
                     <p className="mb-0 opacity-75 small">
-                      Latest user interactions and system events
+                    Latest Orders and Transactions
                     </p>
                   </div>
                   <div className="d-flex gap-2">
@@ -596,9 +600,9 @@ const Dashboard = () => {
               <div className="d_card mb-4">
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <div>
-                    <h5 className="fw-bold mb-0">Upcoming Events</h5>
+                    <h5 className="fw-bold mb-0">Low stocks</h5>
                     <p className="mb-0 opacity-75 small">
-                      Your schedule for today
+                    Items running low in inventory
                     </p>
                   </div>
                   <button className="d_btn-ghost btn-sm">
@@ -655,58 +659,12 @@ const Dashboard = () => {
                   ))}
                 </div>
                 <button className="d_btn-primary w-100 mt-2">
-                  <Plus size={16} className="me-1" />
-                  Add Event
+                  <BiRightArrow size={16} className="me-1" />
+                 View All
                 </button>
               </div>
 
-              {/* Quick Stats Mini Cards */}
-              <div className="row g-3">
-                <div className="col-6">
-                  <div className="d_card text-center p-3">
-                    <Globe
-                      size={24}
-                      className="mx-auto mb-2"
-                      style={{ color: "var(--accent-color)" }}
-                    />
-                    <div className="fw-bold">23</div>
-                    <div className="small opacity-75">Countries</div>
-                  </div>
-                </div>
-                <div className="col-6">
-                  <div className="d_card text-center p-3">
-                    <Zap
-                      size={24}
-                      className="mx-auto mb-2"
-                      style={{ color: "var(--accent-color)" }}
-                    />
-                    <div className="fw-bold">98.9%</div>
-                    <div className="small opacity-75">Uptime</div>
-                  </div>
-                </div>
-                <div className="col-6">
-                  <div className="d_card text-center p-3">
-                    <Target
-                      size={24}
-                      className="mx-auto mb-2"
-                      style={{ color: "var(--accent-color)" }}
-                    />
-                    <div className="fw-bold">847</div>
-                    <div className="small opacity-75">Goals</div>
-                  </div>
-                </div>
-                <div className="col-6">
-                  <div className="d_card text-center p-3">
-                    <Star
-                      size={24}
-                      className="mx-auto mb-2"
-                      style={{ color: "var(--accent-color)" }}
-                    />
-                    <div className="fw-bold">4.9</div>
-                    <div className="small opacity-75">Rating</div>
-                  </div>
-                </div>
-              </div>
+           
             </div>
           </div>
         </div>

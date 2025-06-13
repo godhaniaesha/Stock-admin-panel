@@ -48,6 +48,7 @@ import { FaUserTie, FaUserCog, FaUserNinja, FaUserCheck } from 'react-icons/fa';
 import { MdMeetingRoom, MdLaunch, MdCall } from 'react-icons/md';
 import './Dashboard.css';
 import { useOutletContext } from 'react-router-dom';
+import { getAxios } from '../utils/axios';
 
 
 const Dashboard = () => {
@@ -57,6 +58,23 @@ const Dashboard = () => {
     const [activeChart, setActiveChart] = useState('line');
     const [isLoading, setIsLoading] = useState(false);
     const [selectedPeriod, setSelectedPeriod] = useState('7d');
+    const [dashboardData, setDashboardData] = useState({
+        userRevenue: 0,
+        overallRevenue: 0
+    });
+
+    useEffect(() => {
+        const fetchDashboardData = async () => {
+            try {
+                const { data } = await getAxios().get('/dashboard/get');
+                setDashboardData(data);
+            } catch (error) {
+                console.error('Error fetching dashboard data:', error);
+            }
+        };
+
+        fetchDashboardData();
+    }, []);
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);

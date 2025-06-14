@@ -138,7 +138,24 @@ const AddCategory = () => {
                             />
                             <div className="x_upload_content">
                                 {categoryImage ? (
-                                    <img src={categoryImage.url} alt="Category preview" className="x_preview_image" />
+                                    <div className="x_image_preview">
+                                        <img 
+                                            src={categoryImage.url} 
+                                            alt="Category preview" 
+                                            className="x_preview_image" 
+                                        />
+                                        <button 
+                                            className="x_remove_image"
+                                            onClick={(e) => {
+                                                e.stopPropagation();
+                                                setCategoryImage(null);
+                                                setFileError('');
+                                                setFormErrors(prev => ({ ...prev, image: null }));
+                                            }}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
                                 ) : (
                                     <>
                                         <div className="x_upload_icon">

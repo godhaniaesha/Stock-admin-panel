@@ -34,7 +34,6 @@ import UserRoles from '../pages/UserRoles';
 import Wishlist from '../pages/Wishlist';
 import SalesReport from '../pages/SalesReport';
 import InventoryReport from '../pages/InventoryReport';
-import Settings from '../pages/Settings';
 import EditUser from '../pages/EditUser';
 import StockAlert from '../component/StockAlert';
 import ListCoupons from '../component/ListCoupons';
@@ -124,7 +123,6 @@ function UserRoutes() {
                     <Route path="inventory-report" element={<InventoryReport />} />
 
                     <Route path="paymentList" element={<PaymentList />} />
-                    <Route path="settings" element={<Settings />} />
                     <Route path="Calendar" element={<Calendar />} />
                     <Route path="FAQs" element={<FAQs />} />
                     <Route path="tearmsconditions" element={<TeamsNDConditions />} />

@@ -139,11 +139,11 @@ const Sidebar = ({ show, isDarkMode }) => {
         { title: 'Inventory Report', path: '/inventory-report', icon: <FaChartPie size={16} /> }
       ]
     },
-    {
-      title: 'Settings',
-      path: '/settings',
-      icon: <FaCog size={18} />
-    }
+    // {
+    //   title: 'Settings',
+    //   path: '/settings',
+    //   icon: <FaCog size={18} />
+    // }
   ];
 
   const renderMenuItem = (item) => {

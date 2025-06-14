@@ -7,6 +7,7 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts, deleteProduct } from '../redux/slice/product.slice';
 import { fetchCategories } from '../redux/slice/category.slice';
+import { FaCaretDown } from 'react-icons/fa';
 
 function ProductList() {
     const { isDarkMode } = useOutletContext();
@@ -113,11 +114,14 @@ function ProductList() {
                         <h4>All Product List</h4>
                         <div className="Z_table_actions">
                             <button className="Z_add_product_btn" onClick={handleAddProduct}>Add Product</button>
-                            <select className="Z_time_filter" value={timeFilter} onChange={handleTimeFilterChange}>
-                                <option value="thisMonth">This Month</option>
-                                <option value="lastMonth">Last Month</option>
-                                <option value="last3Months">Last 3 Months</option>
-                            </select>
+                            <div className='Z_select_wrapper'>
+                                <select className="Z_time_filter" value={timeFilter} onChange={handleTimeFilterChange}>
+                                    <option value="thisMonth">This Month</option>
+                                    <option value="lastMonth">Last Month</option>
+                                    <option value="last3Months">Last 3 Months</option>
+                                </select>
+                                <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
+                            </div>
                             {selectedProducts.length > 0 && (
                                 <button className="Z_add_product_btn" onClick={() => setShowBulkDeleteModal(true)}>
                                     Delete Selected

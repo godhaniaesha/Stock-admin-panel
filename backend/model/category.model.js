@@ -1,8 +1,5 @@
-
-se.model('Category', CategorySchema);
-//  module.exports  = CategoryModel
-
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const CategorySchema = new mongoose.Schema({
     title: {

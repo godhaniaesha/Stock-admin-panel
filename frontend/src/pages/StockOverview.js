@@ -6,6 +6,7 @@ import '../styles/Z_styles.css';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchInventories } from '../redux/slice/inventory.Slice';
+import { FaCaretDown } from 'react-icons/fa';
 
 const StockOverview = () => {
   const { isDarkMode } = useOutletContext();
@@ -28,11 +29,14 @@ const StockOverview = () => {
           <h4>Stock Overview</h4>
           <div className="Z_table_actions">
             <button className="Z_add_product_btn" onClick={() => navigate('/stock/add')}>Add Stock</button>
-            <select className="Z_time_filter">
-              <option>This Month</option>
-              <option>Last Month</option>
-              <option>Last 3 Months</option>
-            </select>
+            <div className="Z_select_wrapper d-flex">
+              <select className="Z_time_filter">
+                <option>This Month</option>
+                <option>Last Month</option>
+                <option>Last 3 Months</option>
+              </select>
+              <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
+            </div>
           </div>
         </div>
 

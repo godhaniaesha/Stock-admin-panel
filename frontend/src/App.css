@@ -49,3 +49,25 @@ input:focus-visible,.nav-item:focus-visible{
 .btn:hover{
   border: none !important;
 }
+
+.Z_select_wrapper {
+  position: relative;
+  display: inline-block;
+}
+
+.Z_time_filter {
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  padding-right: 30px;
+}
+
+.Z_select_caret {
+  position: absolute;
+  right: 10px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  font-size: 12px;
+  color: #666;
+}

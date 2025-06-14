@@ -3,7 +3,7 @@ import '../styles/Z_styles.css';
 import { Table, Modal, Button, Spinner } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import { FaAngleLeft, FaAngleRight, FaCaretDown } from 'react-icons/fa';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSubcategories, deleteSubcategory } from '../redux/slice/subCategory.slice';
@@ -100,7 +100,7 @@ function SubcategoryList() {
     const getPageNumbers = () => {
         const pageNumbers = [];
         const maxVisiblePages = 3;
-        
+
         if (totalPages <= maxVisiblePages) {
             for (let i = 1; i <= totalPages; i++) {
                 pageNumbers.push(i);
@@ -176,15 +176,18 @@ function SubcategoryList() {
                         <h4>All Subcategory List</h4>
                         <div className="Z_table_actions">
                             <button className="Z_add_product_btn" onClick={handleAddSubcategory}>Add Subcategory</button>
-                            <select 
-                                className="Z_time_filter" 
-                                value={timeFilter}
-                                onChange={handleTimeFilterChange}
-                            >
-                                <option value="thisMonth">This Month</option>
-                                <option value="lastMonth">Last Month</option>
-                                <option value="last3Months">Last 3 Months</option>
-                            </select>
+                            <div className='Z_select_wrapper'>
+                                <select
+                                    className="Z_time_filter"
+                                    value={timeFilter}
+                                    onChange={handleTimeFilterChange}
+                                >
+                                    <option value="thisMonth">This Month</option>
+                                    <option value="lastMonth">Last Month</option>
+                                    <option value="last3Months">Last 3 Months</option>
+                                </select>
+                                <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
+                            </div>
                             {selectedSubcategories.length > 0 && (
                                 <button
                                     className="Z_btn Z_btn_delete"
@@ -202,9 +205,9 @@ function SubcategoryList() {
                                 <tr>
                                     <th>
                                         <div className="Z_custom_checkbox">
-                                            <input 
-                                                type="checkbox" 
-                                                id="selectAll" 
+                                            <input
+                                                type="checkbox"
+                                                id="selectAll"
                                                 className="Z_checkbox_input"
                                                 checked={selectedSubcategories.length === currentSubcategories.length && currentSubcategories.length > 0}
                                                 onChange={handleSelectAll}
@@ -245,12 +248,12 @@ function SubcategoryList() {
                                         </td>
                                         <td>
                                             <div className="Z_subcategory_details_cell">
-                                                <img 
+                                                <img
                                                     src={`http://localhost:2221/${subcategory.image}`}
-                                                    alt={subcategory.subcategoryTitle} 
-                                                    className="Z_table_subcategory_img" 
-                                                    width={60} 
-                                                    height={60} 
+                                                    alt={subcategory.subcategoryTitle}
+                                                    className="Z_table_subcategory_img"
+                                                    width={60}
+                                                    height={60}
                                                 />
                                                 <div className="Z_table_subcategory_name">{subcategory.subcategoryTitle}</div>
                                             </div>
@@ -265,13 +268,13 @@ function SubcategoryList() {
                                                 {/* <button className="Z_action_btn Z_view_btn">
                                                     <TbEye size={22} />
                                                 </button> */}
-                                                <button 
+                                                <button
                                                     className="Z_action_btn Z_edit_btn"
                                                     onClick={() => handleEdit(subcategory)}
                                                 >
                                                     <TbEdit size={22} />
                                                 </button>
-                                                <button 
+                                                <button
                                                     className="Z_action_btn Z_delete_btn"
                                                     onClick={() => handleDeleteClick(subcategory)}
                                                 >
@@ -280,20 +283,20 @@ function SubcategoryList() {
                                             </div>
                                         </td>
                                     </tr>
-                                ))} 
+                                ))}
                             </tbody>
                         </Table>
                     </div>
                     <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
-                        <button 
-                            className="Z_page_btn" 
+                        <button
+                            className="Z_page_btn"
                             disabled={currentPage === 1}
                             onClick={() => handlePageChange(currentPage - 1)}
                         >
                             <FaAngleLeft />
                         </button>
                         {getPageNumbers().map((pageNum) => (
-                            <button 
+                            <button
                                 key={pageNum}
                                 className={`Z_page_btn ${currentPage === pageNum ? 'active' : ''}`}
                                 onClick={() => handlePageChange(pageNum)}
@@ -301,7 +304,7 @@ function SubcategoryList() {
                                 {pageNum}
                             </button>
                         ))}
-                        <button 
+                        <button
                             className="Z_page_btn"
                             disabled={currentPage === totalPages}
                             onClick={() => handlePageChange(currentPage + 1)}

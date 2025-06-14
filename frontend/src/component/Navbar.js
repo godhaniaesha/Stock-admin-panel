@@ -149,15 +149,13 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
                     alignItems: 'center',
                     width: '100%',
                     padding: '8px 16px',
-                    border: 'none',
-                    borderBottom: `1px solid var(${isDarkMode ? '--dark-border' : '--light-border'})`,
-                    borderRadius: '4px',
                     backgroundColor: 'transparent',
                     color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
                     marginBottom: '4px',
-                    textAlign: 'left'
+                    textAlign: 'left',
+                    border:'none'
                   }}
                 >
                   <FaUserCircle 
@@ -167,7 +165,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
                   />
                   Profile
                 </button>
-                <button 
+                {/* <button 
                   className="custom-dropdown-item"
                   onClick={() => console.log('Settings clicked')}
                   style={{
@@ -192,7 +190,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
                     style={{ color: `var(--accent-color)` }} 
                   />
                   Settings
-                </button>
+                </button> */}
                 <button 
                   className="custom-dropdown-item d-md-none"
                   onClick={toggleDarkMode}

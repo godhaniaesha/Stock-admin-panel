@@ -852,3 +852,15 @@
 .x_remove_image:hover {
     background: rgba(0, 0, 0, 0.7);
 }
+
+@media (max-width: 576px) {
+    .x_product_page_container .x_add_product_container {
+        padding: 0;
+    }
+    .x_product_page_container .x_dropdown_header,.x_product_page_container  .x_input,.x_product_page_container .x_textarea {
+        width: 90%;
+    }
+    .x_password_toggle {
+        right: 13%;
+    }    
+}

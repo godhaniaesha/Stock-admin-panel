@@ -95,7 +95,6 @@ const createProduct = async (req, res) => {
     }
 };
 
-
 // Get all products
 const getAllProducts = async (req, res) => {
     try {
@@ -144,7 +143,6 @@ const getProductById = async (req, res) => {
                 message: 'Product not found'
             });
         }
-
         res.status(200).json({
             success: true,
             message: 'Product retrieved successfully',

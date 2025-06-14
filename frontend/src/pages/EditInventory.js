@@ -181,7 +181,7 @@ const EditInventory = () => {
     const isLoading = inventoryLoading || categoriesLoading || subcategoriesLoading || productsLoading;
 
     return (
-        <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+        <div className={`x_product_page_container Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'}`}>
             <div className="x_add_product_container">
                 <div className="x_product_form">
                     <div className="x_product_info">

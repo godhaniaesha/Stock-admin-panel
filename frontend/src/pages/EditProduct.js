@@ -285,7 +285,7 @@ const EditProduct = () => {
     // Loading state
     if (isLoading && !currentProduct) {
         return (
-            <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+            <div className={`x_product_page_container Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <div className="text-center p-5">
                     <h3>Loading product data...</h3>
                 </div>
@@ -296,7 +296,7 @@ const EditProduct = () => {
     // Error state
     if (error && !currentProduct) {
         return (
-            <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+            <div className={`x_product_page_container Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <div className="text-center p-5">
                     <h3 className="text-danger">Error loading product: {error}</h3>
                     <button onClick={() => navigate(-1)} className="btn btn-secondary mt-3">
@@ -308,7 +308,7 @@ const EditProduct = () => {
     }
 
     return (
-        <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+        <div className={`x_product_page_container Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'}`}>
             <form onSubmit={handleSubmit}>
                 <div className="x_add_product_container">
 

@@ -16,6 +16,7 @@ const register = require("./Register");
 const forgotPassword = require("./forgotPassword.route");
 const dashboard = require("./dashboard")
 
+const saless = require("./sales");
 
 
 router.use("/user", user); 
@@ -31,6 +32,8 @@ router.use("/wishlist", wishlist);
 router.use("/order", order); 
 router.use("/payment", payment);
 router.use("/dashboard", dashboard);
+router.use("/payment", payment); 
+router.use("/sales", saless); 
 
 
 

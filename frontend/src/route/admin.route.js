@@ -49,6 +49,7 @@ import UserDetail from '../pages/UserDetail';
 import Seller from '../component/auth/Seller';
 import SellergstVerify from '../component/auth/SellergstVerify';
 import OrderDetailPage from '../component/OrderDetailPage';
+import RoleCheck from '../component/RoleCheck';
 
 function UserRoutes() {
     return (
@@ -97,11 +98,27 @@ function UserRoutes() {
                     <Route path="checkout" element={<CheckoutPage />} />
                     <Route path="orderdetail/:id" element={<OrderDetailPage />} />
 
-                    <Route path="users" element={<UserList />} />
+                    <Route path="users" element={
+                        <RoleCheck allowedRoles={['admin']}>
+                            <UserList />
+                        </RoleCheck>
+                    } />
                     <Route path="user-roles" element={<UserRoles />} />
-                    <Route path="add-user" element={<AddUser />} />
-                    <Route path="userdetail/:id" element={<UserDetail />} />
-                    <Route path="edit-user/:id" element={<EditUser />} />
+                    <Route path="add-user" element={
+                        <RoleCheck allowedRoles={['admin']}>
+                            <AddUser />
+                        </RoleCheck>
+                    } />
+                    <Route path="userdetail/:id" element={
+                        <RoleCheck allowedRoles={['admin']}>
+                            <UserDetail />
+                        </RoleCheck>
+                    } />
+                    <Route path="edit-user/:id" element={
+                        <RoleCheck allowedRoles={['admin']}>
+                            <EditUser />
+                        </RoleCheck>
+                    } />
 
                     <Route path="sales-report" element={<SalesReport />} />
                     <Route path="inventory-report" element={<InventoryReport />} />

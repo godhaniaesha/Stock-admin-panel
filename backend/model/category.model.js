@@ -1,21 +1,5 @@
-// const mongoose = require('mongoose');
 
-// const CategorySchema = new mongoose.Schema({
-//     title: {
-//         type: String,
-//         required: true,
-//         trim: true,
-//         unique: true
-//     },
-//     description:  {
-//         type: String,
-//     },
-//     image:  {
-//         type: String
-//     },
-// }, { timestamps: true });
-
-//  const CategoryModel = mongoose.model('Category', CategorySchema);
+se.model('Category', CategorySchema);
 //  module.exports  = CategoryModel
 
 const mongoose = require('mongoose');
@@ -26,6 +10,11 @@ const CategorySchema = new mongoose.Schema({
         required: true,
         trim: true,
         unique: true
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Register',
+        required: true
     },
     description: String,
     image: String,

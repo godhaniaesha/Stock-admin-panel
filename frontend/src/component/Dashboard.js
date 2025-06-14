@@ -50,9 +50,12 @@ import './Dashboard.css';
 import { useOutletContext } from 'react-router-dom';
 import { BiRightArrow } from 'react-icons/bi';
 import { getAxios } from '../utils/axios';
+import { useDispatch, useSelector } from 'react-redux';
+import { Sales_Performance,getHeaderdata,getAllSellerOrder } from '../redux/slice/dashboard.slice';
 
 
 const Dashboard = () => {
+    const dispatch = useDispatch();
     const { isDarkMode } = useOutletContext();
     const [currentTime, setCurrentTime] = useState(new Date());
     const [notifications, setNotifications] = useState(5);
@@ -64,23 +67,33 @@ const Dashboard = () => {
         overallRevenue: 0
     });
 
-    useEffect(() => {
-        const fetchDashboardData = async () => {
-            try {
-                const { data } = await getAxios().get('/dashboard/get');
-                setDashboardData(data);
-            } catch (error) {
-                console.error('Error fetching dashboard data:', error);
-            }
-        };
+    const {dashboardHeader,dashboardSales,recentOrder} = useSelector(state => state.dashboard)
 
-        fetchDashboardData();
-    }, []);
+    // useEffect(() => {
+    //     const fetchDashboardData = async () => {
+    //         try {
+    //             const { data } = await getAxios().get('/dashboard/get');
+    //             setDashboardData(data);
+    //         } catch (error) {
+    //             console.error('Error fetching dashboard data:', error);
+    //         }
+    //     };
+
+    //     fetchDashboardData();
+    // }, []);
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
         return () => clearInterval(timer);
     }, []);
+
+    useEffect(() => {
+      dispatch(getHeaderdata());
+      dispatch(Sales_Performance());
+      dispatch(getAllSellerOrder());
+  }, []);
+
+
 
     const salesData = {
         '7d': [

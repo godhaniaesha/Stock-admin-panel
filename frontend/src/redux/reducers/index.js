@@ -11,6 +11,7 @@ import userReducer from '../slice/userSlice';
 import inventoryReducer from '../slice/inventory.Slice';
 import orderReducer from '../slice/order.slice';
 import paymentReducer from '../slice/payment.slice'
+import dashboardReducer from '../slice/dashboard.slice'
 
 export const rootReducer = combineReducers({
     addCategory: addCategoryReducer,
@@ -24,7 +25,8 @@ export const rootReducer = combineReducers({
     user:userReducer,
     inventory:inventoryReducer,
     order:orderReducer,
-    payment:paymentReducer
+    payment:paymentReducer,
+    dashboard:dashboardReducer
 });
 
 export default rootReducer;

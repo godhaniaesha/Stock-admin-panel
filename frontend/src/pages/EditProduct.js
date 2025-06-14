@@ -7,8 +7,8 @@ import { CiDiscount1 } from "react-icons/ci";
 import { MdReceipt } from "react-icons/md";
 import { useOutletContext } from 'react-router-dom';
 import { fetchProductById, updateProduct, clearProductError, clearProductSuccess } from '../redux/slice/product.slice';
-import { fetchCategories } from '../redux/slice/category.slice';
-import { fetchSubcategories } from '../redux/slice/subCategory.slice';
+import { fetchCategories, WaccessCategories } from '../redux/slice/category.slice';
+import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
 
 const EditProduct = () => {
     const { isDarkMode } = useOutletContext();
@@ -58,8 +58,10 @@ const EditProduct = () => {
 
     // Fetch categories and subcategories
     useEffect(() => {
-        dispatch(fetchCategories());
-        dispatch(fetchSubcategories());
+
+        dispatch(WaccessCategories());
+      
+        dispatch(WaccesssubCategories());
     }, [dispatch]);
 
     // Fetch product data when component mounts or ID changes

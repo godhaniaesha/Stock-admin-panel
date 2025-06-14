@@ -21,6 +21,7 @@
 //  module.exports  = SubcategoryModel
 
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const SubcategorySchema = new mongoose.Schema({
     subcategoryTitle: {
@@ -33,6 +34,11 @@ const SubcategorySchema = new mongoose.Schema({
     category: {
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Category',
+        required: true
+    },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Register',
         required: true
     },
     image: String

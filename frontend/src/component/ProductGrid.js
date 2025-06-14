@@ -8,11 +8,13 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { toast, ToastContainer } from 'react-toastify';
 import 'react-toastify/dist/ReactToastify.css';
-import { fetchProducts } from '../redux/slice/product.slice';
-import { fetchCategories } from '../redux/slice/category.slice';
-import { fetchSubcategories } from '../redux/slice/subCategory.slice';
+import { fetchProducts, getallwAccess } from '../redux/slice/product.slice';
+// import { fetchCategories } from '../redux/slice/category.slice';
+// import { fetchSubcategories } from '../redux/slice/subCategory.slice';
 import { addToCart, getCart } from '../redux/slice/cart.slice';
 import { addToWishlist, getAllWishlists, getWishlist, removeFromWishlist } from '../redux/slice/wishlist.slice';
+import { fetchCategories, WaccessCategories } from '../redux/slice/category.slice';
+import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
 
 function ProductGrid() {
     const { isDarkMode } = useOutletContext();
@@ -37,9 +39,12 @@ function ProductGrid() {
 
     useEffect(() => {
         const userId = localStorage.getItem('user');
-        dispatch(fetchProducts());
-        dispatch(fetchCategories());
-        dispatch(fetchSubcategories());
+        // dispatch(fetchProducts());
+        dispatch(getallwAccess())
+        // dispatch(fetchCategories());
+        dispatch(WaccessCategories());
+        dispatch(WaccesssubCategories());
+        // dispatch(fetchSubcategories());
         if (userId) {
             dispatch(getCart(userId));
             dispatch(getWishlist(userId));
@@ -288,7 +293,7 @@ function ProductGrid() {
                                             <Form.Check
                                                 key={subcategory._id}
                                                 type="checkbox"
-                                                label={`${subcategory.category.title} - ${subcategory.subcategoryTitle}`}
+                                                label={`${subcategory.category && subcategory.category.title ? subcategory.category.title : 'No Category'} - ${subcategory.subcategoryTitle}`}
                                                 className="Z_filter_option"
                                                 checked={filters.selectedSubcategories.includes(subcategory._id)}
                                                 onChange={() => handleFilterChange('selectedSubcategories', prev => {
@@ -502,7 +507,7 @@ function ProductGrid() {
                                                 <Form.Check
                                                     key={subcategory._id}
                                                     type="checkbox"
-                                                    label={`${subcategory.category.title} - ${subcategory.subcategoryTitle}`}
+                                                    label={`${subcategory.category && subcategory.category.title ? subcategory.category.title : 'No Category'} - ${subcategory.subcategoryTitle}`}
                                                     className="Z_filter_option"
                                                     checked={filters.selectedSubcategories.includes(subcategory._id)}
                                                     onChange={() => handleFilterChange('selectedSubcategories', prev => {
@@ -644,7 +649,7 @@ function ProductGrid() {
                                         <div className="Z_product_info">
                                             <h3 className="Z_product_title">{product.productName}</h3>
                                             <div className="Z_product_category">
-                                                {categories.find(cat => cat._id === product.categoryId._id)?.title || 'No Category'}
+                                                {product.categoryId && categories.find(cat => cat._id === product.categoryId._id)?.title || 'No Category'}
                                             </div>
                                             <div className="Z_product_price">
                                                 <span className="Z_price_current">${product.price}</span>

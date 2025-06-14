@@ -99,7 +99,13 @@ const createProduct = async (req, res) => {
 // Get all products
 const getAllProducts = async (req, res) => {
     try {
-        const products = await Product.find()
+        const user = req.user; // Make sure your auth middleware sets req.user
+        let query = {};
+        if (user.role === 'seller') {
+            query.sellerId = user._id;
+        }
+        // Admin gets all products, seller gets only their products
+        const products = await Product.find(query)
             .populate({
                 path: 'categoryId',
                 model: 'Category',
@@ -345,11 +351,48 @@ const getActiveProducts = async (req, res) => {
     }
 };
 
+const getallwAccess = async (req, res) => {
+    try {
+        const products = await Product.find()
+            .populate({
+                path: 'categoryId',
+                model: 'Category',
+                select: 'title description image'
+            })
+            .populate({
+                path: 'subcategoryId',
+                model: 'Subcategory',
+                select: 'subcategoryTitle description image'
+            })
+            .populate({
+                path: 'sellerId',
+                model: 'usersaa',
+                select: 'username email phone role'
+            })
+            .sort({ createdAt: -1 });
+ 
+        res.status(200).json({
+            success: true,
+            message: 'Products retrieved successfully',
+            data: products,
+            count: products.length
+        });
+    } catch (error) {
+        res.status(500).json({
+            success: false,
+            message: 'Error retrieving products',
+            error: error.message
+        });
+    }
+};
+ 
+
 module.exports = {
     createProduct,
     getAllProducts,
     getProductById,
     updateProduct,
     deleteProduct,
-    getActiveProducts
+    getActiveProducts,
+    getallwAccess
 };

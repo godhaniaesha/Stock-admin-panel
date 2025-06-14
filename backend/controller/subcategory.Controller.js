@@ -69,7 +69,6 @@ const SubcategoryModel = require('../model/subcategory.model');
 const createSubcategory = async (req, res) => {
     try {
         const { subcategoryTitle, description, category } = req.body;
-
         // Validate required fields
         if (!subcategoryTitle || !category) {
             return res.status(400).json({
@@ -77,7 +76,6 @@ const createSubcategory = async (req, res) => {
                 type: 'ValidationError'
             });
         }
-
         let image = '';
         if (req.file) {
             // Validate file type
@@ -102,27 +100,28 @@ const createSubcategory = async (req, res) => {
 
             image = req.file.path;
         }
-
         // Normalize for consistent check
         const formattedTitle = subcategoryTitle.charAt(0).toUpperCase() + subcategoryTitle.slice(1).toLowerCase();
-
         const existing = await SubcategoryModel.findOne({ subcategoryTitle: formattedTitle })
             .collation({ locale: 'en', strength: 2 });
-
         if (existing) {
             return res.status(409).json({
                 error: 'Duplicate Error: Subcategory with this title already exists.',
                 type: 'DuplicateError'
             });
         }
-
+        // Get userId from req.user (set by auth middleware)
+        const userId = req.user ? req.user._id : null;
+        if (!userId) {
+            return res.status(401).json({ error: 'User not authenticated' });
+        }
         const subcategory = new Subcategory({
             subcategoryTitle: formattedTitle,
             description,
             category,
-            image
+            image,
+            userId
         });
-
         await subcategory.save();
         res.status(201).json(subcategory);
     } catch (err) {
@@ -146,10 +145,20 @@ const createSubcategory = async (req, res) => {
         res.status(500).json({ error: message, type: err.name || 'Error' });
     }
 };
+
 // Get All Subcategories
 const getSubcategories = async (req, res) => {
     try {
-        const subcategories = await Subcategory.find().populate('category', 'title');
+        const user = req.user;
+        let query = {};
+        if (user.role === 'admin') {
+            // Admin can see all subcategories
+        } else if (user.role === 'seller') {
+            query.userId = user._id;
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+        const subcategories = await Subcategory.find(query).populate('category', 'title');
         res.json(subcategories);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -159,7 +168,16 @@ const getSubcategories = async (req, res) => {
 // Get Single Subcategory
 const getSubcategory = async (req, res) => {
     try {
-        const subcategory = await Subcategory.findById(req.params.id).populate('category', 'title');
+        const user = req.user;
+        let query = { _id: req.params.id };
+        if (user.role === 'admin') {
+            // Admin can see any subcategory
+        } else if (user.role === 'seller') {
+            query.userId = user._id;
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+        const subcategory = await Subcategory.findOne(query).populate('category', 'title');
         if (!subcategory) {
             return res.status(404).json({ error: 'Subcategory not found' });
         }
@@ -259,11 +277,19 @@ const deleteSubcategory = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
-
+const getallsubcategorywithoutaccess = async (req, res) => {
+    try {
+        const subcategories = await Subcategory.find().populate('category', 'title');
+        res.json(subcategories);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
 module.exports = {
     createSubcategory,
     getSubcategories,
     getSubcategory,
     updateSubcategory,
-    deleteSubcategory
+    deleteSubcategory,
+    getallsubcategorywithoutaccess
 };

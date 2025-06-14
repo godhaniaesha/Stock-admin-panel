@@ -22,6 +22,27 @@ export const fetchSubcategories = createAsyncThunk(
         }
     }
 );
+export const WaccesssubCategories = createAsyncThunk(
+    'subcategory/WaccesssubCategories',
+    async (_, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await fetch('http://localhost:2221/api/a1/subcategory/getall', {
+                headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            const data = await response.json();
+            if (!response.ok) {
+                throw new Error(data.message || 'Failed to fetch subcategories');
+            }
+            return data;
+        } catch (error) {
+            return rejectWithValue(error.message);
+        }
+    }
+);
 
 // Create subcategory
 export const createSubcategory = createAsyncThunk(
@@ -29,7 +50,7 @@ export const createSubcategory = createAsyncThunk(
     async (formData, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:2221/api/a1/subcategory/createSubcategory', {
+            const response = await fetch('http://localhost:2221/api/a1/subcategory/CreateSubcat', {
                 method: 'POST',
                 headers: {
                     'Authorization': `Bearer ${token}`
@@ -165,7 +186,21 @@ const subcategorySlice = createSlice({
             .addCase(updateSubcategory.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-            });
+            })
+            .addCase(WaccesssubCategories.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(WaccesssubCategories.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.subcategories = action.payload;
+            })
+            .addCase(WaccesssubCategories.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+            })
+            ;
+
     }
 });
 

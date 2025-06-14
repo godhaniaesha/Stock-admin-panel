@@ -1,4 +1,5 @@
-const {Category} = require('../model');
+const { log } = require('console');
+const { Category } = require('../model');
 const fs = require('fs');
 const path = require('path');
 
@@ -10,7 +11,13 @@ const createCategory = async (req, res) => {
         if (req.file) {
             image = req.file.path; // If using multer for file upload
         }
-        const category = new Category({ title, description, image });
+        // Use userId from req.user (set by auth middleware)
+        log("Request body:", req.user);
+        const userId = req.user ? req.user._id : null;
+        if (!userId) {
+            return res.status(401).json({ error: 'User not authenticatedrghj' });
+        }
+        const category = new Category({ title, description, image, userId });
         await category.save();
         res.status(201).json(category);
     } catch (err) {
@@ -30,7 +37,17 @@ const createCategory = async (req, res) => {
 // Get All Categories
 const getCategories = async (req, res) => {
     try {
-        const categories = await Category.find();
+        const user = req.user; // user is set by auth middleware
+        let query = {};
+        if (user.role === 'admin') {
+            // Admin can see all categories
+        } else if (user.role === 'seller') {
+            // Seller can only see their own categories
+            query.userId = user._id;
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+        const categories = await Category.find(query);
         res.json(categories);
     } catch (err) {
         res.status(500).json({ error: err.message });
@@ -40,13 +57,34 @@ const getCategories = async (req, res) => {
 // Get Single Category
 const getCategory = async (req, res) => {
     try {
-        const category = await Category.findById(req.params.id);
-        res.json(category);
+        const user = req.user; // user is set by auth middleware
+        let query = {};
+        if (user.role === 'admin') {
+            if (req.params.id) {
+                query._id = req.params.id;
+            }
+        } else if (user.role === 'seller') {
+            query.userId = user._id;
+            if (req.params.id) {
+                query._id = req.params.id;
+            }
+        } else {
+            return res.status(403).json({ error: "Access denied" });
+        }
+        if (req.params.id) {
+            const category = await Category.findOne(query);
+            if (!category) {
+                return res.status(404).json({ error: 'Category not found' });
+            }
+            return res.json(category);
+        } else {
+            const categories = await Category.find(query);
+            return res.json(categories);
+        }
     } catch (err) {
         res.status(500).json({ error: err.message });
     }
 };
-
 // Update Category
 const updateCategory = async (req, res) => {
     try {
@@ -55,14 +93,14 @@ const updateCategory = async (req, res) => {
         // console.log("Update request file:", req.file);
 
         let updateData = { title, description };
-        
+
         if (req.file) {
             updateData.image = req.file.path;
         }
 
         const category = await Category.findByIdAndUpdate(
-            req.params.id, 
-            updateData, 
+            req.params.id,
+            updateData,
             { new: true, runValidators: true }
         );
 
@@ -82,7 +120,7 @@ const updateCategory = async (req, res) => {
 const deleteCategory = async (req, res) => {
     try {
         const category = await Category.findById(req.params.id);
-        
+
         if (!category) {
             return res.status(404).json({ error: 'Category not found' });
         }
@@ -97,24 +135,32 @@ const deleteCategory = async (req, res) => {
 
         // Delete the category from database
         await Category.findByIdAndDelete(req.params.id);
-        res.json({ 
+        res.json({
             success: true,
             message: 'Category deleted successfully',
             deletedCategory: category
         });
     } catch (err) {
         console.error("Delete error:", err);
-        res.status(500).json({ 
+        res.status(500).json({
             success: false,
-            error: err.message 
+            error: err.message
         });
     }
 };
-
+const getallcategorywithoutaccess = async (req, res) => {
+    try {
+        const categories = await Category.find();
+        res.json(categories);
+    } catch (err) {
+        res.status(500).json({ error: err.message });
+    }
+}
 module.exports = {
     createCategory,
     getCategories,
     getCategory,
     updateCategory,
-    deleteCategory
+    deleteCategory,
+    getallcategorywithoutaccess
 }

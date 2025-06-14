@@ -6,9 +6,10 @@ const auth = require('../../../middleware/auth');
 // If using multer for file upload
 // const upload = require('../middleware/upload'); 
 
-router.post('/createCategory',  upload.single("image"),categoryController.createCategory);
-router.get('/', auth(['admin']), categoryController.getCategories);
-router.get('/:id', categoryController.getCategory);
+router.post('/createCategory',auth(['admin','seller']),  upload.single("image"),categoryController.createCategory);
+router.get('/getall', categoryController.getallcategorywithoutaccess);
+router.get('/', auth(['admin','seller']), categoryController.getCategories);
+router.get('/:id',auth(['admin','seller']), categoryController.getCategory);
 router.put('/:id',  upload.single("image"), categoryController.updateCategory);
 router.delete('/:id', categoryController.deleteCategory);
 

@@ -1,24 +1,5 @@
-// const mongoose = require('mongoose');
-
-// const CategorySchema = new mongoose.Schema({
-//     title: {
-//         type: String,
-//         required: true,
-//         trim: true,
-//         unique: true
-//     },
-//     description:  {
-//         type: String,
-//     },
-//     image:  {
-//         type: String
-//     },
-// }, { timestamps: true });
-
-//  const CategoryModel = mongoose.model('Category', CategorySchema);
-//  module.exports  = CategoryModel
-
 const mongoose = require('mongoose');
+const { Schema } = mongoose;
 
 const CategorySchema = new mongoose.Schema({
     title: {
@@ -29,6 +10,11 @@ const CategorySchema = new mongoose.Schema({
     },
     description: String,
     image: String,
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Register',
+        required: true
+    },
 }, { timestamps: true });
 
 // Pre-save hook to capitalize the first letter and lowercase the rest

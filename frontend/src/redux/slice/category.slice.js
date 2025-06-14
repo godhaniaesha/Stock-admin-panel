@@ -21,7 +21,23 @@ export const fetchCategories = createAsyncThunk(
     }
   }
 );
-
+export const WaccessCategories = createAsyncThunk(
+  'category/WaccessCategories',
+  async (_, { rejectWithValue }) => {
+    try {
+      const token = localStorage.getItem('token');
+      const response = await axios.get(API_URL + '/getall', {
+        headers: {
+          'Authorization': `Bearer ${token}`,
+          'Content-Type': 'application/json'
+        }
+      });
+      return response.data;
+    } catch (error) {
+      return rejectWithValue(error.response?.data?.message || 'Failed to fetch categories');
+    }
+  }
+);
 // Create async thunk for updating a category
 export const updateCategory = createAsyncThunk(
   'category/update',
@@ -112,6 +128,9 @@ const categorySlice = createSlice({
         const index = state.categories.findIndex(cat => cat._id === action.payload._id);
         if (index !== -1) {
           state.categories[index] = action.payload;
+        } else {
+          // If not found, add the updated/created category (handles upsert)
+          state.categories.push(action.payload);
         }
       })
       .addCase(updateCategory.rejected, (state, action) => {
@@ -129,9 +148,21 @@ const categorySlice = createSlice({
       .addCase(deleteCategory.rejected, (state, action) => {
         state.isLoading = false;
         state.error = action.payload;
+      })
+      .addCase(WaccessCategories.pending, (state) => {
+        state.isLoading = true;
+        state.error = null;
+      })
+      .addCase(WaccessCategories.fulfilled, (state, action) => {
+        state.isLoading = false;
+        state.categories = action.payload;
+      })
+      .addCase(WaccessCategories.rejected, (state, action) => {
+        state.isLoading = false;
+        state.error = action.payload
       });
   }
 });
 
 export const { clearCategoryError } = categorySlice.actions;
-export default categorySlice.reducer; 
+export default categorySlice.reducer;

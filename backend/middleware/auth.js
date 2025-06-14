@@ -5,6 +5,7 @@ const auth = (roles = []) => (req, res, next) => {
     try {
         // Get token from Authorization header
         const authHeader = req.header('Authorization');
+        console.log('Authorization header:', authHeader);
         if (!authHeader) {
             return res.status(401).json({
                 success: false,
@@ -13,9 +14,11 @@ const auth = (roles = []) => (req, res, next) => {
         }
 
         // Extract token from "Bearer <token>"
-        const token = authHeader.startsWith('Bearer ') 
-            ? authHeader.substring(7) 
-            : authHeader;
+        let token = authHeader;
+        console.log('Extracted token:', token);
+        if (authHeader.startsWith('Bearer ')) {
+            token = authHeader.substring(7);
+        }
 
         if (!token) {
             return res.status(401).json({
@@ -24,12 +27,8 @@ const auth = (roles = []) => (req, res, next) => {
             });
         }
 
-        // If token is from header, remove "Bearer " prefix
-        if (token.startsWith('Bearer ')) {
-            token = token.slice(7, token.length);
-        }
-
         jwt.verify(token, process.env.ACCESS_TOKEN_KEY, async function (err, decoded) {
+            console.log('JWT error:', err);
             if (err) {
                 return res.status(400).json({
                     success: false,

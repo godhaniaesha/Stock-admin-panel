@@ -21,7 +21,25 @@ export const createProduct = createAsyncThunk(
         }
     }
 );
-
+export const getallwAccess = createAsyncThunk(
+    'product/getallwAccess',
+    async (_, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${API_URL}/getall`, {
+               headers: {
+                    'Authorization': `Bearer ${token}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            console.log(response.data, "get all products with access");
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch products with access');
+        }
+    }
+);
+                    
 // Get all products
 export const fetchProducts = createAsyncThunk(
     'product/fetchAll',
@@ -193,7 +211,22 @@ const productSlice = createSlice({
             .addCase(deleteProduct.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
-            });
+            })
+            .addCase(getallwAccess.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            }
+            )
+            .addCase(getallwAccess.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.products = action.payload.data;
+            })
+            .addCase(getallwAccess.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload
+            }
+            )
+            ;
     }
 });
 

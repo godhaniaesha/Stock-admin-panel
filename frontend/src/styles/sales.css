@@ -264,3 +264,39 @@
     padding: 38px;
   }
 }
+
+.d_date-filter {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.d_custom-range-picker {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-left: 10px;
+}
+
+.d_date-input {
+  padding: 8px 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  background-color: white;
+}
+
+.d_date-input.d_dark {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #fff;
+}
+
+.d_date-separator {
+  color: #666;
+}
+
+.d_dark .d_date-separator {
+  color: #999;
+}

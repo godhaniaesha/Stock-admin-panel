@@ -80,7 +80,7 @@ const Register = () => {
       if (success) {
         toast.success(message || "Registration successful!");
         dispatch(clearAuthState());
-        navigate('/SellerGST'); // ✅ Redirect to GST number page
+        navigate('/SellerGST-verify'); // ✅ Redirect to GST number page
       } else if (error && message) {
         toast.error(message || "Registration failed.");
         dispatch(clearAuthState());

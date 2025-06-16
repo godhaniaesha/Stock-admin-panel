@@ -6,6 +6,7 @@ import { RiDeleteBin6Line } from 'react-icons/ri';
 import { useDispatch, useSelector } from 'react-redux';
 import { deleteCategory, fetchCategories } from '../redux/slice/category.slice';
 import { useOutletContext, useNavigate } from 'react-router-dom';
+import { FaCaretDown } from 'react-icons/fa';
 
 const CategoryList = () => {
     const { isDarkMode } = useOutletContext();
@@ -134,15 +135,18 @@ const CategoryList = () => {
                         <h4>All Category List</h4>
                         <div className="Z_table_actions">
                             <button className="Z_add_product_btn" onClick={() => navigate('/categories/add')}>Add Category</button>
-                            <select 
-                                className="Z_time_filter" 
-                                value={timeFilter}
-                                onChange={handleTimeFilterChange}
-                            >
-                                <option value="thisMonth">This Month</option>
-                                <option value="lastMonth">Last Month</option>
-                                <option value="last3Months">Last 3 Months</option>
-                            </select>
+                            <div className='Z_select_wrapper'>
+                                <select
+                                    className="Z_time_filter"
+                                    value={timeFilter}
+                                    onChange={handleTimeFilterChange}
+                                >
+                                    <option value="thisMonth">This Month</option>
+                                    <option value="lastMonth">Last Month</option>
+                                    <option value="last3Months">Last 3 Months</option>
+                                </select>
+                                <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
+                            </div>
                             {selectedCategories.length > 0 && (
                                 <button
                                     className="Z_btn Z_btn_delete"
@@ -160,9 +164,9 @@ const CategoryList = () => {
                                 <tr>
                                     <th>
                                         <div className="Z_custom_checkbox">
-                                            <input 
-                                                type="checkbox" 
-                                                id="selectAll" 
+                                            <input
+                                                type="checkbox"
+                                                id="selectAll"
                                                 className="Z_checkbox_input"
                                                 checked={selectedCategories.length === filteredCategories.length && filteredCategories.length > 0}
                                                 onChange={handleSelectAll}
@@ -221,7 +225,7 @@ const CategoryList = () => {
                                         </td>
                                         <td>
                                             <div className="Z_action_buttons">
-                                                    {/* <button className="Z_action_btn Z_view_btn">
+                                                {/* <button className="Z_action_btn Z_view_btn">
                                                         <TbEye size={22} />
                                                     </button> */}
                                                 <button

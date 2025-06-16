@@ -33,9 +33,10 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
     <Navbar 
       style={{
         backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`,
-        color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`
+        color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
+        padding: '16px 0',
       }}
-      className={`mb-0 border-bottom ${isDarkMode ? 'border-secondary' : 'border-gray'} shadow-sm py-2`}
+      className={`mb-0 border-bottom ${isDarkMode ? 'border-secondary' : 'border-gray'} shadow-sm`}
     >
       <Container fluid>
         <div className="d-flex align-items-center">
@@ -63,28 +64,37 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
           </Navbar.Brand>
         </div>
 
-        <Nav className="ms-auto align-items-center">
-          <div className="d-none d-md-flex align-items-center">
+        <Nav className="d-flex align-items-center ms-auto">
+          <div className="d-none d-md-flex align-items-center gap-3">
             <div
-              className="theme-toggle px-2"
+              className="theme-toggle d-flex align-items-center justify-content-center"
               onClick={toggleDarkMode}
-              style={{ color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}
+              style={{ 
+                color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
+                width: '32px',
+                height: '32px',
+                cursor: 'pointer'
+              }}
             >
               {isDarkMode ? 
-                <FaSun size={14} /> : 
-                <FaMoon size={14} />
+                <FaSun size={20} /> : 
+                <FaMoon size={20} />
               }
             </div>
-            <Nav.Link 
-              href="#" 
-              className="px-2 position-relative"
-              style={{ color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }}
+            {/* Bell icon with similar styling */}
+            {/* <div 
+              className="d-flex align-items-center justify-content-center position-relative"
+              style={{ 
+                width: '32px',
+                height: '32px',
+                cursor: 'pointer'
+              }}
             >
-              <FaBell size={14} />
+              <FaBell size={20} style={{ color: `var(${isDarkMode ? '--dark-text' : '--light-text'})` }} />
               <span className="position-absolute top-0 start-75 translate-middle badge rounded-pill bg-danger p-1">
                 3
               </span>
-            </Nav.Link>
+            </div> */}
           </div>
           <div className="custom-dropdown" ref={dropdownRef}>
             <button 
@@ -103,7 +113,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
               }}
             >
               <FaUserCircle 
-                size={16} 
+                size={20} 
                 className="me-2"
                 style={{ 
                   color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
@@ -139,15 +149,13 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
                     alignItems: 'center',
                     width: '100%',
                     padding: '8px 16px',
-                    border: 'none',
-                    borderBottom: `1px solid var(${isDarkMode ? '--dark-border' : '--light-border'})`,
-                    borderRadius: '4px',
                     backgroundColor: 'transparent',
                     color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
                     cursor: 'pointer',
                     transition: 'all 0.3s ease',
                     marginBottom: '4px',
-                    textAlign: 'left'
+                    textAlign: 'left',
+                    border:'none'
                   }}
                 >
                   <FaUserCircle 
@@ -157,7 +165,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
                   />
                   Profile
                 </button>
-                <button 
+                {/* <button 
                   className="custom-dropdown-item"
                   onClick={() => console.log('Settings clicked')}
                   style={{
@@ -182,7 +190,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
                     style={{ color: `var(--accent-color)` }} 
                   />
                   Settings
-                </button>
+                </button> */}
                 <button 
                   className="custom-dropdown-item d-md-none"
                   onClick={toggleDarkMode}

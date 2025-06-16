@@ -8,6 +8,11 @@ const CategorySchema = new mongoose.Schema({
         trim: true,
         unique: true
     },
+    userId: {
+        type: Schema.Types.ObjectId,
+        ref: 'Register',
+        required: true
+    },
     description: String,
     image: String,
     userId: {

@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchCoupons, deleteCoupon } from '../redux/slice/coupon.slice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
+import { FaCaretDown } from 'react-icons/fa';
 
 function ListCoupons() {
     const { isDarkMode } = useOutletContext();
@@ -137,15 +138,18 @@ function ListCoupons() {
                     <div className="Z_table_actions">
                         <button className="Z_add_product_btn" onClick={() => navigate('/coupons/add')}>Add Coupon</button>
                         <button className="Z_add_product_btn" onClick={handleDeleteSelectedClick}>Delete Selected</button>
-                        <select
-                            className="Z_time_filter"
-                            value={selectedStatusFilter}
-                            onChange={(e) => setSelectedStatusFilter(e.target.value)}
-                        >
-                            <option value="All">All Status</option>
-                            <option value="Active">Active</option>
-                            <option value="Inactive">Inactive</option>
-                        </select>
+                        <div className='Z_select_wrapper'>
+                            <select
+                                className="Z_time_filter"
+                                value={selectedStatusFilter}
+                                onChange={(e) => setSelectedStatusFilter(e.target.value)}
+                            >
+                                <option value="All">All Status</option>
+                                <option value="Active">Active</option>
+                                <option value="Inactive">Inactive</option>
+                            </select>
+                            <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
+                        </div>
                     </div>
                 </div>
                 <div className="Z_table_scroll_container">

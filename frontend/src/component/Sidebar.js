@@ -10,6 +10,8 @@ import { BsFillGrid1X2Fill } from "react-icons/bs";
 import { Link, useLocation } from 'react-router-dom';
 import '../styles/admin.css';
 import { TbListDetails } from 'react-icons/tb';
+import { useDispatch } from 'react-redux';
+import { db_fetchUserById } from '../redux/slice/userSlice';
 
 const Sidebar = ({ show, isDarkMode }) => {
   const location = useLocation();
@@ -17,6 +19,8 @@ const Sidebar = ({ show, isDarkMode }) => {
   const [expandedMenus, setExpandedMenus] = useState({});
   const [favorites, setFavorites] = useState([]);
   const [isExpanded, setIsExpanded] = useState(false);
+  const [userRole, setUserRole] = useState(null);
+  const dispatch = useDispatch();
 
   const toggleFavorite = (path) => {
     setFavorites(prev => prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]);
@@ -32,6 +36,22 @@ const Sidebar = ({ show, isDarkMode }) => {
       return newState;
     });
   };
+
+  useEffect(() => {
+    const checkUserRole = async () => {
+      try {
+        const userId = localStorage.getItem('user');
+        if (userId) {
+          const result = await dispatch(db_fetchUserById(userId)).unwrap();
+          setUserRole(result.role);
+        }
+      } catch (error) {
+        console.error('Error checking user role:', error);
+      }
+    };
+
+    checkUserRole();
+  }, [dispatch]);
 
   const menuItems = [
     {
@@ -102,6 +122,7 @@ const Sidebar = ({ show, isDarkMode }) => {
     {
       title: 'Users',
       icon: <FaUsers size={18} />,
+      show: userRole === 'admin',
       submenu: [
         { title: 'User List', path: '/users', icon: <FaUsers size={16} /> },
         // { title: 'User Roles', path: '/user-roles', icon: <FaUserCog size={16} /> },
@@ -118,11 +139,11 @@ const Sidebar = ({ show, isDarkMode }) => {
         { title: 'Inventory Report', path: '/inventory-report', icon: <FaChartPie size={16} /> }
       ]
     },
-    {
-      title: 'Settings',
-      path: '/settings',
-      icon: <FaCog size={18} />
-    }
+    // {
+    //   title: 'Settings',
+    //   path: '/settings',
+    //   icon: <FaCog size={18} />
+    // }
   ];
 
   const renderMenuItem = (item) => {
@@ -229,16 +250,18 @@ const Sidebar = ({ show, isDarkMode }) => {
       </div>
       <Nav className="flex-column py-2">
         {filteredMenuItems.map(item => (
-          <div
-            key={item.title}
-            className="nav-item"
-            style={{
-              backgroundColor: location.pathname === item.path ? `var(${isDarkMode ? '--dark-border' : '--light-border'})` : 'transparent',
-              borderLeft: `3px solid ${location.pathname === item.path ? 'var(--accent-color)' : 'transparent'}`
-            }}
-          >
-            {renderMenuItem(item)}
-          </div>
+          item.show !== false && (
+            <div
+              key={item.title}
+              className="nav-item"
+              style={{
+                backgroundColor: location.pathname === item.path ? `var(${isDarkMode ? '--dark-border' : '--light-border'})` : 'transparent',
+                borderLeft: `3px solid ${location.pathname === item.path ? 'var(--accent-color)' : 'transparent'}`
+              }}
+            >
+              {renderMenuItem(item)}
+            </div>
+          )
         ))}
       </Nav>
     </div>

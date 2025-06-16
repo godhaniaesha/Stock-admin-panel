@@ -41,16 +41,47 @@ const validationSchema = Yup.object().shape({
     .required('Country is required'),
   paymentMethod: Yup.string()
     .required('Please select a payment method'),
+  // cardNumber: Yup.string().when('paymentMethod', {
+  //   is: 'card',
+  //   then: (schema) => schema
+  //     .matches(/^[0-9]{16}$/, 'Card number must be 16 digits')
+  //     .required('Card number is required')
+  // }),
   cardNumber: Yup.string().when('paymentMethod', {
     is: 'card',
     then: (schema) => schema
-      .matches(/^[0-9]{16}$/, 'Card number must be 16 digits')
+      .matches(/^[0-9]{4}\s[0-9]{4}\s[0-9]{4}\s[0-9]{4}$/, 'Card number must be 16 digits with spaces.')
       .required('Card number is required')
   }),
+  // cardExpiry: Yup.string().when('paymentMethod', {
+  //   is: 'card',
+  //   then: (schema) => schema
+  //     .matches(/^(0[1-9]|1[0-2])\/([0-9]{2})$/, 'Invalid expiry date (MM/YY)')
+  //     .required('Expiry date is required')
+  // }),
   cardExpiry: Yup.string().when('paymentMethod', {
     is: 'card',
     then: (schema) => schema
-      .matches(/^(0[1-9]|1[0-2])\/([0-9]{2})$/, 'Invalid expiry date (MM/YY)')
+      .matches(/^(0[1-9]|1[0-2])\/([0-9]{2})$/, 'Invalid expiry date format (MM/YY)')
+      .test('expiry-date', 'Card has expired', function (value) {
+        if (!value) return false;
+
+        const [month, year] = value.split('/');
+        const currentDate = new Date();
+        const currentYear = currentDate.getFullYear() % 100; // Get last 2 digits of year
+        const currentMonth = currentDate.getMonth() + 1; // getMonth() returns 0-11
+
+        // Convert to numbers for comparison
+        const expMonth = parseInt(month, 10);
+        const expYear = parseInt(year, 10);
+
+        // Check if the card has expired
+        if (expYear < currentYear || (expYear === currentYear && expMonth < currentMonth)) {
+          return false;
+        }
+
+        return true;
+      })
       .required('Expiry date is required')
   }),
   cardCvv: Yup.string().when('paymentMethod', {
@@ -486,7 +517,7 @@ const CheckoutPage = () => {
                       </div>
                       {values.paymentMethod === 'card' && (
                         <div className="d_payment_details x_product_form">
-                          <div className="d_form_group">
+                          {/* <div className="d_form_group">
                             <label>Card Number</label>
                             <Field
                               type="text"
@@ -496,16 +527,63 @@ const CheckoutPage = () => {
                               maxLength="16"
                             />
                             <ErrorMessage name="cardNumber" component="div" className="error-message" />
+                          </div> */}
+                          <div className="d_form_group">
+                            <label>Card Number</label>
+                            <Field
+                              type="text"
+                              name="cardNumber"
+                              className={`d_input ${touched.cardNumber && errors.cardNumber ? 'is-invalid' : ''}`}
+                              placeholder="1234 5678 9012 3456"
+                              maxLength="19"
+                              onChange={(e) => {
+                                // Only allow numbers
+                                const value = e.target.value.replace(/[^0-9]/g, '');
+                                const formattedValue = value.replace(/(\d{4})(?=\d)/g, '$1 ');
+                                e.target.value = formattedValue;
+                                setFieldValue('cardNumber', formattedValue);
+                              }}
+                              onKeyPress={(e) => {
+                                // Prevent non-numeric input
+                                if (!/[0-9]/.test(e.key)) {
+                                  e.preventDefault();
+                                }
+                              }}
+                            />
+                            <ErrorMessage name="cardNumber" component="div" className="error-message" />
                           </div>
                           <div className="d_card_row">
                             <div className="d_form_group">
                               <label>Expiry Date</label>
+                              {/* <Field
+                                type="text"
+                                name="cardExpiry"
+                                className={`d_input ${touched.cardExpiry && errors.cardExpiry ? 'is-invalid' : ''}`}
+                                placeholder="MM/YY"
+                                maxLength="5"
+                              /> */}
                               <Field
                                 type="text"
                                 name="cardExpiry"
                                 className={`d_input ${touched.cardExpiry && errors.cardExpiry ? 'is-invalid' : ''}`}
                                 placeholder="MM/YY"
                                 maxLength="5"
+                                onChange={(e) => {
+                                  // Only allow numbers
+                                  const value = e.target.value.replace(/[^0-9]/g, '');
+                                  let formattedValue = value;
+                                  if (value.length > 2) {
+                                    formattedValue = value.slice(0, 2) + '/' + value.slice(2);
+                                  }
+                                  e.target.value = formattedValue;
+                                  setFieldValue('cardExpiry', formattedValue);
+                                }}
+                                onKeyPress={(e) => {
+                                  // Prevent non-numeric input
+                                  if (!/[0-9]/.test(e.key)) {
+                                    e.preventDefault();
+                                  }
+                                }}
                               />
                               {/* <input
                                 type="text"
@@ -571,7 +649,7 @@ const CheckoutPage = () => {
                                 type="password"
                                 name="cardCvv"
                                 className={`d_input ${touched.cardCvv && errors.cardCvv ? 'is-invalid' : ''}`}
-                                placeholder="123"
+                                placeholder="***"
                                 maxLength="3"
                               />
                               <ErrorMessage name="cardCvv" component="div" className="error-message" />

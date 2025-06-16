@@ -3,7 +3,7 @@ const { Payment, Order } = require('../model');
 // Create new payment
 const createPayment = async (req, res) => {
     try {
-        const { orderId, amount, method } = req.body;
+        const { orderId, amount, method, status } = req.body;
 
         // Optional: validate order
         const order = await Order.findById(orderId);
@@ -17,8 +17,8 @@ const createPayment = async (req, res) => {
         const newPayment = new Payment({
             orderId,
             amount,
-            method
-            
+            method,
+            status
         });
 
         const savedPayment = await newPayment.save();

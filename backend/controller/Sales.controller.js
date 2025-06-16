@@ -1,5 +1,7 @@
 const Payment = require('../model/payment.model');
 const Order = require('../model/order.model');
+const Product = require('../model/product.model');
+const Inventory = require('../model/inventory.model');
 
 
 const getSalesMetrics = async (req, res) => {
@@ -133,7 +135,26 @@ const getSalesMetrics = async (req, res) => {
         } else {
             // For admin, get sales data from payments
             salesData = await Payment.aggregate([
-                { $match: matchCondition },
+                {
+                    $match: {
+                        status: 'success',
+                        createdAt: { $gte: startDate, $lte: endDate }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'orders',
+                        localField: 'orderId',
+                        foreignField: '_id',
+                        as: 'order'
+                    }
+                },
+                { $unwind: '$order' },
+                {
+                    $match: {
+                        'order.status': 'delivered'
+                    }
+                },
                 {
                     $group: {
                         _id: { $dayOfWeek: '$createdAt' },
@@ -144,7 +165,7 @@ const getSalesMetrics = async (req, res) => {
                     $project: {
                         _id: 0,
                         dayOfWeek: '$_id',
-                        totalSales: '$totalSales'
+                        totalSales: 1
                     }
                 },
                 { $sort: { dayOfWeek: 1 } }
@@ -307,6 +328,438 @@ const getAllSalesOrders = async (req, res) => {
     }
 };
 
+const getInventoryMetrics = async (req, res) => {
+    try {
+        const { role, _id } = req.user;
+        const isAdmin = req.user.role === 'admin';
+        const { period, startDate: customStartDate, endDate: customEndDate } = req.query;
+
+        // Calculate date ranges based on period
+        const now = new Date();
+        let startDate;
+        let endDate = now;
+
+        switch (period) {
+            case 'last_7_days':
+                startDate = new Date(now.setDate(now.getDate() - 7));
+                break;
+            case 'last_30_days':
+                startDate = new Date(now.setDate(now.getDate() - 30));
+                break;
+            case 'last_quarter':
+                startDate = new Date(now.setMonth(now.getMonth() - 3));
+                break;
+            case 'custom':
+                if (!customStartDate || !customEndDate) {
+                    return res.status(400).json({ error: 'Start date and end date are required for custom period' });
+                }
+                startDate = new Date(customStartDate);
+                endDate = new Date(customEndDate);
+                break;
+            default:
+                startDate = new Date(0); // If no period specified, get all time
+        }
+
+        // Get products based on user role
+        let products;
+        if (role === 'seller') {
+            // For sellers, get only their products
+            products = await Product.find({ sellerId: _id });
+        } else {
+            // For admin, get all products
+            products = await Product.find();
+        }
+
+        // GET OUT OF STOCK based on user role
+        let OutStock;
+        if (role === 'seller') {
+            // For sellers, get only their products with quantity less than or equal to lowStockLimit
+            OutStock = await Inventory.find({ 'product.sellerId': _id, quantity: { $lte: 0 } });
+        } else {
+            // For admin, get all products with quantity less than or equal to lowStockLimit
+            OutStock = await Inventory.find({ quantity: { $lte: 0 } });
+        }
+
+        // GET Stock Value based on user role
+        let StockValue;
+        if (role === 'seller') {
+            // For sellers, get only their products with quantity less than or equal to lowStockLimit and merge with product price
+            StockValue = await Inventory.aggregate([
+                {
+                    $match: { sellerId: _id }
+                },
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: 'product',
+                        foreignField: '_id',
+                        as: 'productDetails'
+                    }
+                },
+                {
+                    $unwind: '$productDetails'
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        quantity: 1,
+                        lowStockLimit: 1,
+                        productPrice: '$productDetails.price',
+                        totalValue: { $multiply: ['$quantity', '$productDetails.price'] },
+                        stockStatus: { $cond: { if: { $lte: ['$quantity', '$lowStockLimit'] }, then: 'Low Stock', else: 'In Stock' } }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalStockValue: { $sum: '$totalValue' },
+                        products: { $push: '$$ROOT' }
+                    }
+                }
+            ]);
+        } else {
+            // For admin, get all products with quantity less than or equal to lowStockLimit and merge with product price
+            StockValue = await Inventory.aggregate([
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: 'product',
+                        foreignField: '_id',
+                        as: 'productDetails'
+                    }
+                },
+                {
+                    $unwind: '$productDetails'
+                },
+                {
+                    $project: {
+                        _id: 1,
+                        quantity: 1,
+                        lowStockLimit: 1,
+                        productPrice: '$productDetails.price',
+                        totalValue: { $multiply: ['$quantity', '$productDetails.price'] },
+                        stockStatus: { $cond: { if: { $lte: ['$quantity', '$lowStockLimit'] }, then: 'Low Stock', else: 'In Stock' } }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        totalStockValue: { $sum: '$totalValue' },
+                        products: { $push: '$$ROOT' }
+                    }
+                }
+            ]);
+        }
+
+        // low Stock 
+        const matchStageforStock = isAdmin ? {} : { 'sellerId': _id };
+        const lowStockItems = await Inventory.aggregate([
+            {
+                $match: {
+                    $expr: { $lte: ["$quantity", "$lowStockLimit"] }
+                }
+            },
+            { $match: matchStageforStock }, // Match sellerId directly from inventory
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'product',
+                    foreignField: '_id',
+                    as: 'productData'
+                }
+            },
+            { $unwind: '$productData' },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'category',
+                    foreignField: '_id',
+                    as: 'categoryData'
+                }
+            },
+            { $unwind: '$categoryData' },
+            {
+                $lookup: {
+                    from: 'subcategories',
+                    localField: 'subcategory',
+                    foreignField: '_id',
+                    as: 'subcategoryData'
+                }
+            },
+            { $unwind: '$subcategoryData' },
+            {
+                $project: {
+                    _id: 1,
+                    productName: '$productData.productName',
+                    currentStock: '$quantity',
+                    lowStockLimit: '$lowStockLimit',
+                    category: '$categoryData.title',
+                    subcategory: '$subcategoryData.subcategoryTitle',
+                    productId: '$productData._id',
+                    sellerId: '$sellerId', // Use sellerId directly from inventory
+                    productImage: '$productData.images'
+                }
+            },
+            { $sort: { currentStock: 1 } }
+        ]);
+
+        // stock By Category
+        let StockByCategory;
+        if (role === 'seller') {
+            // For sellers, get products count by category with category details
+            StockByCategory = await Product.aggregate([
+                { $match: { sellerId: _id } },
+                {
+                    $group: {
+                        _id: "$categoryId",
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "categories", // Replace with your actual category collection name
+                        localField: "_id",
+                        foreignField: "_id",
+                        as: "categoryDetails"
+                    }
+                },
+                {
+                    $unwind: "$categoryDetails"
+                },
+                {
+                    $project: {
+                        categoryId: "$_id",
+                        categoryName: "$categoryDetails.title", // Adjust field name as per your category schema
+                        count: 1,
+                        _id: 0
+                    }
+                }
+            ]);
+        } else {
+            // For admin, get all products count by category with category details
+            StockByCategory = await Product.aggregate([
+                {
+                    $group: {
+                        _id: "$categoryId",
+                        count: { $sum: 1 }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: "categories", // Replace with your actual category collection name
+                        localField: "_id",
+                        foreignField: "_id",
+                        as: "categoryDetails"
+                    }
+                },
+                {
+                    $unwind: "$categoryDetails"
+                },
+                {
+                    $project: {
+                        categoryId: "$_id",
+                        categoryName: "$categoryDetails.title", // Adjust field name as per your category schema
+                        count: 1,
+                        _id: 0
+                    }
+                }
+            ]);
+        }
+
+
+        res.status(200).json({
+            TotalProducts: products.length,
+            TotalOutStock: OutStock.length,
+            TotalStockValue: StockValue[0].totalStockValue,
+            TotalLowStock: lowStockItems.length,
+            StockByCategory: StockByCategory,
+            period: period || 'all_time',
+            startDate,
+            endDate,
+            role: role
+        });
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
+const getProductMovement = async (req, res) => {
+    try {
+        const { role, _id } = req.user;
+        const { period, startDate: customStartDate, endDate: customEndDate } = req.query;
+
+        const now = new Date();
+        let startDate;
+        let endDate = new Date();
+
+        switch (period) {
+            case 'last_6_months':
+                startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of current month
+                break;
+            case 'last_12_months':
+                startDate = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                break;
+            case 'custom':
+                if (!customStartDate || !customEndDate) {
+                    return res.status(400).json({ error: 'Start date and end date are required for custom period' });
+                }
+                startDate = new Date(customStartDate);
+                endDate = new Date(customEndDate);
+                break;
+            default: // Default to last 6 months if no period is specified
+                startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        }
+
+        let sellerProductIds = [];
+        if (role === 'seller') {
+            const sellerProducts = await Product.find({ sellerId: _id }).select('_id');
+            sellerProductIds = sellerProducts.map(product => product._id.toString());
+        }
+
+        // Products Added
+        let productAddedMatchCondition = {
+            createdAt: { $gte: startDate, $lte: endDate }
+        };
+
+        if (role === 'seller') {
+            // For seller, filter products by their sellerId directly
+            productAddedMatchCondition.sellerId = _id;
+        }
+
+        const productsAdded = await Product.aggregate([
+            { $match: productAddedMatchCondition },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: '$createdAt' },
+                        month: { $month: '$createdAt' }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { '_id.year': 1, '_id.month': 1 } }
+        ]);
+
+        console.log("-------------------------------------", productsAdded);
+
+
+        // Products Sold
+        let productSoldMatchCondition = {
+            // status: 'delivered',
+            createdAt: { $gte: startDate, $lte: endDate }
+        };
+
+        let productsSold = [];
+        if (role === 'seller') {
+            productsSold = await Order.aggregate([
+                { $match: productSoldMatchCondition },
+                { $unwind: '$items' },
+                {
+                    $lookup: {
+                        from: 'products', // The collection name for products
+                        localField: 'items.productId',
+                        foreignField: '_id',
+                        as: 'productInfo'
+                    }
+                },
+                { $unwind: '$productInfo' },
+                { $match: { 'productInfo.sellerId': _id } },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: '$createdAt' },
+                            month: { $month: '$createdAt' }
+                        },
+                        totalSold: { $sum: '$items.quantity' }
+                    }
+                },
+                { $sort: { '_id.year': 1, '_id.month': 1 } }
+            ]);
+        } else {
+            productsSold = await Order.aggregate([
+                { $match: productSoldMatchCondition },
+                { $unwind: '$items' },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: '$createdAt' },
+                            month: { $month: '$createdAt' }
+                        },
+                        totalSold: { $sum: '$items.quantity' }
+                    }
+                },
+                { $sort: { '_id.year': 1, '_id.month': 1 } }
+            ]);
+        }
+
+        const productMovementData = {};
+
+        // Initialize data for all months of the current year
+        const currentYear = now.getFullYear();
+        for (let month = 1; month <= 12; month++) {
+            const monthKey = `${currentYear}-${month.toString().padStart(2, '0')}`;
+            productMovementData[monthKey] = {
+                month: new Date(currentYear, month - 1, 1).toLocaleString('en-US', { month: 'short' }),
+                productsAdded: 0,
+                productsSold: 0
+            };
+        }
+
+        productsAdded.forEach(data => {
+            const monthKey = `${data._id.year}-${data._id.month.toString().padStart(2, '0')}`;
+            if (productMovementData[monthKey]) {
+                productMovementData[monthKey].productsAdded = data.count;
+            }
+        });
+
+        productsSold.forEach(data => {
+            const monthKey = `${data._id.year}-${data._id.month.toString().padStart(2, '0')}`;
+            if (productMovementData[monthKey]) {
+                productMovementData[monthKey].productsSold = data.totalSold;
+            }
+        });
+
+        // Convert to frontend chart format
+        const chartData = {
+            labels: Object.values(productMovementData).map(item => item.month),
+            datasets: [
+                {
+                    label: 'Products Added',
+                    data: Object.values(productMovementData).map(item => item.productsAdded),
+                    borderColor: '#a3c6c4',
+                    backgroundColor: 'rgba(163,198,196,0.2)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                },
+                {
+                    label: 'Products Sold',
+                    data: Object.values(productMovementData).map(item => item.productsSold),
+                    borderColor: '#D3CEDF',
+                    backgroundColor: 'rgba(218, 182, 209, 0.2)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                }
+            ]
+        };
+
+        res.status(200).json({
+            productMovement: chartData,
+            period: period || 'last_6_months',
+            startDate,
+            endDate
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message });
+    }
+};
 
 module.exports = {
     // getTotalSales,
@@ -316,5 +769,7 @@ module.exports = {
     // getSalesOverTime,
     // getOrdersAndSales,
     getSalesMetrics,
-    getAllSalesOrders
+    getAllSalesOrders,
+    getInventoryMetrics,
+    getProductMovement
 }; 

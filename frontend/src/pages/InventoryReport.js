@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useOutletContext } from 'react-router-dom';
 import '../styles/sales.css';
 import '../styles/Z_styles.css';
@@ -18,11 +18,94 @@ import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import { useDispatch, useSelector } from 'react-redux';
+import { fetchInventoryMetrics, fetchProductMovement } from '../redux/slice/sales.slice';
 
 ChartJS.register(LineElement, BarElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, ArcElement);
 
 export default function InventoryReport() {
   const { isDarkMode } = useOutletContext();
+  const dispatch = useDispatch()
+
+  const inventoryData = useSelector((state) => state.dashboard.inventory);
+  const productMovement = useSelector((state) => state.dashboard.productMovement)
+  const [selectedRange, setSelectedRange] = useState('Last 7 Days');
+  const [showCustomRange, setShowCustomRange] = useState(false);
+  const [startDate, setStartDate] = useState('');
+  const [endDate, setEndDate] = useState('');
+
+  useEffect(() => {
+    let period;
+    let params = {};
+
+    switch (selectedRange) {
+      case 'Last 7 Days':
+        period = 'last_7_days';
+        break;
+      case 'Last 30 Days':
+        period = 'last_30_days';
+        break;
+      case 'Last Quarter':
+        period = 'last_quarter';
+        break;
+      case 'Custom Range':
+        if (startDate && endDate) {
+          period = 'custom';
+          params = {
+            startDate,
+            endDate
+          };
+        } else {
+          return;
+        }
+        break;
+      default:
+        period = 'last_7_days';
+    }
+
+    dispatch(fetchInventoryMetrics({ period, ...params }))
+  }, [dispatch, selectedRange, startDate, endDate])
+
+  useEffect(() => {
+    dispatch(fetchProductMovement());
+  }, [dispatch]);
+
+
+  const handleRangeChange = (e) => {
+    const value = e.target.value;
+    setSelectedRange(value);
+    if (value === 'Custom Range') {
+      setShowCustomRange(true);
+    } else {
+      setShowCustomRange(false);
+      setStartDate('');
+      setEndDate('');
+    }
+  };
+
+  // const productMovementData = {
+  //   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+  //   datasets: [
+  //     {
+  //       label: 'Products Added',
+  //       data: [150, 180, 120, 200, 250, 230],
+  //       borderColor: '#a3c6c4',
+  //       backgroundColor: 'rgba(163,198,196,0.2)',
+  //       tension: 0.4,
+  //       fill: true,
+  //       pointRadius: 0,
+  //     },
+  //     {
+  //       label: 'Products Sold',
+  //       data: [100, 130, 90, 160, 180, 170],
+  //       borderColor: '#D3CEDF',
+  //       backgroundColor: 'rgba(218, 182, 209, 0.2)',
+  //       tension: 0.4,
+  //       fill: true,
+  //       pointRadius: 0,
+  //     },
+  //   ],
+  // };
 
   const inventorySummaryData = {
     totalProducts: 1250,
@@ -30,13 +113,12 @@ export default function InventoryReport() {
     lowStock: 120,
     stockValue: 150000,
   };
-
   const productMovementData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    labels: productMovement?.labels || [],
     datasets: [
       {
         label: 'Products Added',
-        data: [150, 180, 120, 200, 250, 230],
+        data: productMovement?.datasets?.[0]?.data || [],
         borderColor: '#a3c6c4',
         backgroundColor: 'rgba(163,198,196,0.2)',
         tension: 0.4,
@@ -45,7 +127,7 @@ export default function InventoryReport() {
       },
       {
         label: 'Products Sold',
-        data: [100, 130, 90, 160, 180, 170],
+        data: productMovement?.datasets?.[1]?.data || [],
         borderColor: '#D3CEDF',
         backgroundColor: 'rgba(218, 182, 209, 0.2)',
         tension: 0.4,
@@ -55,12 +137,31 @@ export default function InventoryReport() {
     ],
   };
 
+  // const stockByCategoryData = {
+  //   labels: ['Fashion', 'Accessories', 'Electronics', 'Footwear'],
+  //   datasets: [
+  //     {
+  //       label: 'Stock Quantity',
+  //       data: [500, 300, 200, 250],
+  //       backgroundColor: [
+  //         '#A3C6C4',
+  //         '#79A3B1',
+  //         '#E5E1DA',
+  //         '#D3CEDF',
+  //       ],
+  //       borderColor: isDarkMode ? '#1a1a1a' : '#ffffff',
+  //       borderWidth: 2,
+  //     },
+  //   ],
+  // };
+
   const stockByCategoryData = {
-    labels: ['Fashion', 'Accessories', 'Electronics', 'Footwear'],
+    labels: inventoryData?.StockByCategory?.slice(0, 4)?.map(category => category?.categoryName),
     datasets: [
       {
         label: 'Stock Quantity',
-        data: [500, 300, 200, 250],
+        data: inventoryData?.StockByCategory?.slice(0, 4)?.map(category => category?.count),
+        // backgroundColor: inventoryData?.StockByCategory?.slice(0, 4).map(category => category?.backgroundColor),
         backgroundColor: [
           '#A3C6C4',
           '#79A3B1',
@@ -106,7 +207,7 @@ export default function InventoryReport() {
       padding: 20, // Add some padding around the chart
     },
     // Added for better responsiveness on smaller screens
-    onResize: function(chart, size) {
+    onResize: function (chart, size) {
       if (size.width < 768) { // Adjust legend position for smaller screens
         chart.options.plugins.legend.position = 'bottom';
       } else {
@@ -216,7 +317,25 @@ export default function InventoryReport() {
           <p className="d_subtitle">Detailed overview of your product stock</p>
         </div>
         <div className="d_date-filter">
-          <select className={`d_filter-select ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+          {showCustomRange && (
+            <div className="d_custom-range-picker">
+              <input
+                type="date"
+                className={`d_date-input ${isDarkMode ? 'd_dark' : 'd_light'}`}
+                value={startDate}
+                onChange={(e) => setStartDate(e.target.value)}
+              />
+              <span className="d_date-separator">to</span>
+              <input
+                type="date"
+                className={`d_date-input ${isDarkMode ? 'd_dark' : 'd_light'}`}
+                value={endDate}
+                onChange={(e) => setEndDate(e.target.value)}
+              />
+            </div>
+          )}
+          <select className={`d_filter-select ${isDarkMode ? 'd_dark' : 'd_light'}`} value={selectedRange}
+            onChange={handleRangeChange}>
             <option>Last 7 Days</option>
             <option>Last 30 Days</option>
             <option>Last Quarter</option>
@@ -228,19 +347,19 @@ export default function InventoryReport() {
       <div className="d_summary-cards">
         <div className="d_summary-card">
           <h4>Total Products</h4>
-          <p>{inventorySummaryData.totalProducts.toLocaleString()}</p>
+          <p>{inventoryData?.TotalProducts}</p>
         </div>
         <div className="d_summary-card">
           <h4>Out of Stock</h4>
-          <p>{inventorySummaryData.outOfStock}</p>
+          <p>{inventoryData.TotalOutStock}</p>
         </div>
         <div className="d_summary-card">
           <h4>Low Stock</h4>
-          <p>{inventorySummaryData.lowStock}</p>
+          <p>{inventoryData.TotalLowStock}</p>
         </div>
         <div className="d_summary-card">
           <h4>Total Stock Value</h4>
-          <p>${inventorySummaryData.stockValue.toLocaleString()}</p>
+          <p>${inventoryData.TotalStockValue}</p>
         </div>
       </div>
 
@@ -258,7 +377,7 @@ export default function InventoryReport() {
           </div>
         </div>
       </div>
-      
+
       <section className='m-0'>
         <div className="Z_table_wrapper">
           <div className="Z_table_header">

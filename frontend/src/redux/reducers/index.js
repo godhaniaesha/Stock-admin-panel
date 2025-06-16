@@ -11,7 +11,7 @@ import userReducer from '../slice/userSlice';
 import inventoryReducer from '../slice/inventory.Slice';
 import orderReducer from '../slice/order.slice';
 import paymentReducer from '../slice/payment.slice';
-import dashboardReducer from '../slice/sales.slice';
+import dashboardReducer from '../slice/dashboard.slice';
 
 
 export const rootReducer = combineReducers({

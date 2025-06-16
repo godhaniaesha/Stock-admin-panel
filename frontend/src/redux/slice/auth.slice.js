@@ -37,7 +37,9 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
     }
     console.log(data,"data");
     localStorage.setItem("user",data.finduser._id)
-    localStorage.setItem("token",data.accessToken)
+    // localStorage.setItem("token",data.accessToken)
+    localStorage.setItem("token",data.refreshToken)
+    localStorage.setItem("userName",data.finduser.username)
     return data;
   } catch (err) {
     return rejectWithValue(err.message || 'An unknown error occurred during login.');

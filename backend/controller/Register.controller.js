@@ -14,18 +14,20 @@ const generateTokens = async (id) => {
             throw new Error("User not found");
         }
 
-        const assesToken = jwt.sign(
+        const assesToken = await jwt.sign(
             {
                 _id: user._id,
                 username: user.username,
                 role: user.role
             },
             process.env.ACCESS_TOKEN_KEY,
-            { expiresIn: 60 * 60 });
+            { expiresIn: '2d' });
 
         const refreshToken = await jwt.sign(
             {
-                _id: user._id
+                _id: user._id,
+                username: user.username,
+                role: user.role
             },
             process.env.REFRESH_TOKEN_KEY,
             { expiresIn: 60 * 60 * 24 * 2 }
@@ -122,7 +124,7 @@ const login = async (req, res) => {
         return res.status(200)
             .cookie("accessToken", assesToken, { httpOnly: true, secure: true })
             .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true })
-            .json({ success: true, finduser: finduser, data: userDetails, accessToken: assesToken, message: "Login successful" }); // Added accessToken to the response body
+            .json({ success: true, finduser: finduser, data: userDetails, accessToken: assesToken,refreshToken:refreshToken,  message: "Login successful" }); // Added accessToken to the response body
 
     } catch (error) {
         return res.status(500).json({ success: false, message: "Login failed: " + error.message });

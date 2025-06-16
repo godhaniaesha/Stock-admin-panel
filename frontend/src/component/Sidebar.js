@@ -102,6 +102,7 @@ const Sidebar = ({ show, isDarkMode }) => {
     {
       title: 'Coupons',
       icon: <RiCoupon3Fill size={18} />,
+      show: userRole === 'admin',
       submenu: [
         { title: 'Coupon List', path: '/coupons', icon: <FaList size={14} /> },
         { title: 'Add Coupon', path: '/coupons/add', icon: <FaPlus size={14} /> },

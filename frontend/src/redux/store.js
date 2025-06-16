@@ -5,10 +5,10 @@ import { rootReducer } from "./reducers/index";
 // import categoryReducer from './slice/category.slice'
 // import subcategoryReducer from './slice/subCategory.slice'
 // import productReducer from './slice/product.slice'
-import categoryReducer from './slice/category.slice'
-import subcategoryReducer from './slice/subCategory.slice'
-import productReducer from './slice/product.slice'
-import salesReducer from './slice/sales.slice'
+// import categoryReducer from './slice/category.slice'
+// import subcategoryReducer from './slice/subCategory.slice'
+// import productReducer from './slice/product.slice'
+// import salesReducer from './slice/sales.slice'
 
 const persistConfig = {
     key: 'root',
@@ -21,12 +21,12 @@ const persistConfig = {
 //     subcategory: subcategoryReducer,
 //     product: productReducer
 // })
-const rootReducer = combineReducers({
-    category: categoryReducer,
-    subcategory: subcategoryReducer,
-    product: productReducer,
-    sales: salesReducer
-})
+// const rootReducer = combineReducers({
+//     category: categoryReducer,
+//     subcategory: subcategoryReducer,
+//     product: productReducer,
+//     sales: salesReducer
+// })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 

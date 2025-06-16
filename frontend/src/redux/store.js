@@ -21,12 +21,12 @@ const persistConfig = {
 //     subcategory: subcategoryReducer,
 //     product: productReducer
 // })
-const rootReducer = combineReducers({
-    category: categoryReducer,
-    subcategory: subcategoryReducer,
-    product: productReducer,
-    sales: salesReducer
-})
+// const rootReducer = combineReducers({
+//     category: categoryReducer,
+//     subcategory: subcategoryReducer,
+//     product: productReducer,
+//     sales: salesReducer
+// })
 
 const persistedReducer = persistReducer(persistConfig, rootReducer)
 

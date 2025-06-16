@@ -1,5 +1,6 @@
-import React from 'react';
-import { useOutletContext } from 'react-router-dom';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
+import { useOutletContext, useNavigate } from 'react-router-dom';
 import '../styles/sales.css';
 import '../styles/Z_styles.css';
 import {
@@ -18,11 +19,47 @@ import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import { fetchInventories, deleteInventory } from '../redux/slice/inventory.Slice';
+import { fetchProductMovement } from '../redux/slice/sales.slice';
 
 ChartJS.register(LineElement, BarElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, ArcElement);
 
 export default function InventoryReport() {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
+  const { inventory, isLoading, error } = useSelector((state) => state.inventory);
+  const  {productMovement} = useSelector((state) => state.dashboard.productMovement);
+  const linechart = useSelector((state) => state);
+  console.log('Inventory Data:', inventory);
+
   const { isDarkMode } = useOutletContext();
+
+  useEffect(() => {
+    dispatch(fetchInventories());
+  }, [dispatch]);
+
+  useEffect(() => {
+    dispatch(fetchProductMovement());
+  }, [dispatch]);
+
+  const handleDelete = async (id) => {
+    if (window.confirm('Are you sure you want to delete this inventory item?')) {
+      try {
+        await dispatch(deleteInventory(id)).unwrap();
+        dispatch(fetchInventories());
+      } catch (error) {
+        alert('Failed to delete inventory item: ' + error);
+      }
+    }
+  };
+
+  if (isLoading) {
+    return <div>Loading...</div>;
+  }
+
+  if (error) {
+    return <div>Error: {error}</div>;
+  }
 
   const inventorySummaryData = {
     totalProducts: 1250,
@@ -30,13 +67,13 @@ export default function InventoryReport() {
     lowStock: 120,
     stockValue: 150000,
   };
-
+console.log(productMovement)
   const productMovementData = {
-    labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun'],
+    labels: productMovement?.labels || [],
     datasets: [
       {
         label: 'Products Added',
-        data: [150, 180, 120, 200, 250, 230],
+        data: productMovement?.datasets?.[0]?.data || [],
         borderColor: '#a3c6c4',
         backgroundColor: 'rgba(163,198,196,0.2)',
         tension: 0.4,
@@ -45,7 +82,7 @@ export default function InventoryReport() {
       },
       {
         label: 'Products Sold',
-        data: [100, 130, 90, 160, 180, 170],
+        data: productMovement?.datasets?.[1]?.data || [],
         borderColor: '#D3CEDF',
         backgroundColor: 'rgba(218, 182, 209, 0.2)',
         tension: 0.4,
@@ -106,7 +143,7 @@ export default function InventoryReport() {
       padding: 20, // Add some padding around the chart
     },
     // Added for better responsiveness on smaller screens
-    onResize: function(chart, size) {
+    onResize: function (chart, size) {
       if (size.width < 768) { // Adjust legend position for smaller screens
         chart.options.plugins.legend.position = 'bottom';
       } else {
@@ -150,63 +187,6 @@ export default function InventoryReport() {
       },
     },
   };
-
-  const products = [
-    {
-      id: 1,
-      name: "Men's T-Shirt",
-      category: "Fashion",
-      stock: 150,
-      price: 25.00,
-      sku: "MT-001",
-      image: "https://i.ibb.co/VpW4x5t/roll-up-t-shirt.png",
-    },
-    {
-      id: 2,
-      name: "Women's Handbag",
-      category: "Accessories",
-      stock: 75,
-      price: 45.00,
-      sku: "WHB-002",
-      image: "https://i.ibb.co/CtqLGfZ/green-bag.png",
-    },
-    {
-      id: 3,
-      name: "Bluetooth Headphones",
-      category: "Electronics",
-      stock: 30,
-      price: 75.00,
-      sku: "BTH-003",
-      image: "https://i.ibb.co/9ZXPN8n/headphone.png",
-    },
-    {
-      id: 4,
-      name: "Running Shoes",
-      category: "Footwear",
-      stock: 100,
-      price: 60.00,
-      sku: "RNS-004",
-      image: "https://i.ibb.co/QJfzwXx/shoes.png",
-    },
-    {
-      id: 5,
-      name: "Leather Wallet",
-      category: "Accessories",
-      stock: 50,
-      price: 35.00,
-      sku: "LWL-005",
-      image: "https://i.ibb.co/Lx6zw4v/wallet.png",
-    },
-    {
-      id: 6,
-      name: "Baseball Cap",
-      category: "Accessories",
-      stock: 90,
-      price: 20.00,
-      sku: "BSC-006",
-      image: "https://i.ibb.co/TRw8qzb/black-cap.png",
-    },
-  ];
 
   return (
     <div className={`Z_product_section d_sales-report-container ${isDarkMode ? 'd_dark' : 'd_light'}`}>
@@ -258,7 +238,7 @@ export default function InventoryReport() {
           </div>
         </div>
       </div>
-      
+
       <section className='m-0'>
         <div className="Z_table_wrapper">
           <div className="Z_table_header">
@@ -276,15 +256,9 @@ export default function InventoryReport() {
             <Table className="Z_product_table p-1">
               <thead>
                 <tr>
-                  <th>
-                    <div className="Z_custom_checkbox">
-                      <input type="checkbox" id="selectAll" className="Z_checkbox_input" />
-                      <label htmlFor="selectAll" className="Z_checkbox_label"></label>
-                    </div>
-                  </th>
                   <th>Product ID</th>
                   <th>Product Details</th>
-                  <th>Category</th>
+                  {/* <th>Category</th> */}
                   <th>Stock</th>
                   <th>Price</th>
                   <th>SKU</th>
@@ -292,51 +266,47 @@ export default function InventoryReport() {
                 </tr>
               </thead>
               <tbody>
-                {products.map((product) => (
-                  <tr key={product.id}>
-                    <td>
-                      <div className="Z_custom_checkbox">
-                        <input
-                          type="checkbox"
-                          id={`checkbox-${product.id}`}
-                          className="Z_checkbox_input"
-                        />
-                        <label
-                          htmlFor={`checkbox-${product.id}`}
-                          className="Z_checkbox_label"
-                        ></label>
-                      </div>
-                    </td>
-                    <td>#{product.id}</td>
+                {inventory && inventory.map((item) => (
+                  <tr key={item._id}>
+                    <td>{item._id}</td>
                     <td>
                       <div className="Z_subcategory_details_cell">
                         <img
-                          src={product.image}
-                          alt={product.name}
+                          src={`http://localhost:2221/${item.productData.images[0]}`}
+                          alt={item.productData?.productName || 'Product Image'}
                           className="Z_table_subcategory_img"
                           width={60}
                           height={60}
+                          onError={(e) => {
+                            e.target.onerror = null;
+                            // e.target.src = 'https://via.placeholder.com/60';
+                          }}
+                          style={{
+                            objectFit: 'cover',
+                            borderRadius: '4px',
+                            border: '1px solid #e0e0e0'
+                          }}
                         />
-                        <div className="Z_table_subcategory_name">{product.name}</div>
+                        <div className="Z_table_subcategory_name">{item.productData?.productName}</div>
                       </div>
                     </td>
-                    <td>
+                    {/* <td>
                       <div className="Z_category_name_cell">
-                        <div className="Z_table_product_name">{product.category}</div>
+                        <div className="Z_table_product_name">{item.categoryData?.name}</div>
                       </div>
-                    </td>
-                    <td>{product.stock}</td>
-                    <td>${product.price.toFixed(2)}</td>
-                    <td>{product.sku}</td>
+                    </td> */}
+                    <td>{item.quantity}</td>
+                    <td>${item.productData?.price?.toFixed(2) || '0.00'}</td>
+                    <td>{item.productData?.sku || 'N/A'}</td>
                     <td>
                       <div className="Z_action_buttons">
-                        <button className="Z_action_btn Z_view_btn">
+                        {/* <button className="Z_action_btn Z_view_btn">
                           <TbEye size={22} />
-                        </button>
-                        <button className="Z_action_btn Z_edit_btn">
+                        </button> */}
+                        <button className="Z_action_btn Z_edit_btn" onClick={() => navigate(`/stock/edit/${item._id}`)} >
                           <TbEdit size={22} />
                         </button>
-                        <button className="Z_action_btn Z_delete_btn">
+                        <button className="Z_action_btn Z_delete_btn" onClick={() => handleDelete(item._id)}>
                           <RiDeleteBin6Line size={22} />
                         </button>
                       </div>

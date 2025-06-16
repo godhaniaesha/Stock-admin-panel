@@ -1,5 +1,6 @@
 const Payment = require('../model/payment.model');
 const Order = require('../model/order.model');
+const Product = require('../model/product.model');
 
 
 const getSalesMetrics = async (req, res) => {
@@ -10,14 +11,16 @@ const getSalesMetrics = async (req, res) => {
         // Calculate date ranges based on period
         const now = new Date();
         let startDate;
-        let endDate = now;
-
+        let endDate = new Date();
+        console.log(endDate, "Asssssss")
         switch (period) {
             case 'last_7_days':
                 startDate = new Date(now.setDate(now.getDate() - 7));
+                console.log(endDate, "Asssssss")
                 break;
             case 'last_30_days':
                 startDate = new Date(now.setDate(now.getDate() - 30));
+                console.log(endDate, "Asssssss")
                 break;
             case 'last_quarter':
                 startDate = new Date(now.setMonth(now.getMonth() - 3));
@@ -33,10 +36,12 @@ const getSalesMetrics = async (req, res) => {
                 startDate = new Date(0); // If no period specified, get all time
         }
 
+        console.log(endDate, "Asssssss")
+
         // Base match condition for payments
         let matchCondition = {
             status: 'success',
-            createdAt: { $gte: startDate, $lte: endDate }
+            // createdAt: { $gte: startDate, $lte: endDate }
         };
 
         // If user is a seller, get their products first
@@ -45,6 +50,7 @@ const getSalesMetrics = async (req, res) => {
             const sellerProducts = await Product.find({ sellerId: _id }).select('_id');
             sellerProductIds = sellerProducts.map(product => product._id.toString());
         }
+        console.log(endDate, "ASDfsssssssssssssss")
 
         // Get total sales with role-based filtering
         let totalSales = 0;
@@ -78,12 +84,16 @@ const getSalesMetrics = async (req, res) => {
             totalSales = totalSalesResult[0]?.total || 0;
         }
 
+        console.log(endDate, "A111111111111111111111")
+
         // Get total orders with role-based filtering
         let orderMatchCondition = {
             status: 'delivered',
-            createdAt: { $gte: startDate, $lte: endDate }
+            createdAt: { $gte: startDate, $lte: endDate },
         };
+        console.log(endDate)
         if (role === 'seller') {
+
             orderMatchCondition['items.productId'] = { $in: sellerProductIds };
         }
         const totalOrdersCount = await Order.countDocuments(orderMatchCondition);
@@ -95,7 +105,8 @@ const getSalesMetrics = async (req, res) => {
         const avgOrderValue = successfulOrdersCount > 0 ? (totalSales / successfulOrdersCount).toFixed(2) : 0;
 
         // Calculate conversion rate
-        const conversionRate = totalOrdersCount > 0 ? ((successfulOrdersCount / totalOrdersCount) * 100).toFixed(2) : 0;
+        const conversionRate = totalOrdersCount > 0 ?
+            ((successfulOrdersCount / totalOrdersCount) * 100).toFixed(2).replace(/\.?0+$/, '') : 0;
 
         // Get sales data over time with role-based filtering
         let salesData = [];
@@ -133,7 +144,26 @@ const getSalesMetrics = async (req, res) => {
         } else {
             // For admin, get sales data from payments
             salesData = await Payment.aggregate([
-                { $match: matchCondition },
+                {
+                    $match: {
+                        status: 'success',
+                        createdAt: { $gte: startDate, $lte: endDate }
+                    }
+                },
+                {
+                    $lookup: {
+                        from: 'orders',
+                        localField: 'orderId',
+                        foreignField: '_id',
+                        as: 'order'
+                    }
+                },
+                { $unwind: '$order' },
+                {
+                    $match: {
+                        'order.status': 'delivered'
+                    }
+                },
                 {
                     $group: {
                         _id: { $dayOfWeek: '$createdAt' },
@@ -144,7 +174,7 @@ const getSalesMetrics = async (req, res) => {
                     $project: {
                         _id: 0,
                         dayOfWeek: '$_id',
-                        totalSales: '$totalSales'
+                        totalSales: 1
                     }
                 },
                 { $sort: { dayOfWeek: 1 } }
@@ -170,7 +200,11 @@ const getSalesMetrics = async (req, res) => {
             { $sort: { dayOfWeek: 1 } }
         ]);
 
+        console.log("ordersData", ordersData);
+
+
         const days = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+
 
         const formattedData = days.map((day, index) => {
             const dayOfWeekMongo = (index + 1) % 7 === 0 ? 7 : (index + 1) % 7;
@@ -200,7 +234,7 @@ const getSalesMetrics = async (req, res) => {
             period: period || 'all_time',
             startDate,
             endDate,
-            role: role
+            role: role, salesData,
         });
     } catch (error) {
         console.log(error);
@@ -308,6 +342,183 @@ const getAllSalesOrders = async (req, res) => {
 };
 
 
+const getProductMovement = async (req, res) => {
+    try {
+        const { role, _id } = req.user;
+        const { period, startDate: customStartDate, endDate: customEndDate } = req.query;
+
+        const now = new Date();
+        let startDate;
+        let endDate = new Date();
+
+        switch (period) {
+            case 'last_6_months':
+                startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0); // Last day of current month
+                break;
+            case 'last_12_months':
+                startDate = new Date(now.getFullYear() - 1, now.getMonth(), 1);
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+                break;
+            case 'custom':
+                if (!customStartDate || !customEndDate) {
+                    return res.status(400).json({ error: 'Start date and end date are required for custom period' });
+                }
+                startDate = new Date(customStartDate);
+                endDate = new Date(customEndDate);
+                break;
+            default: // Default to last 6 months if no period is specified
+                startDate = new Date(now.getFullYear(), now.getMonth() - 5, 1);
+                endDate = new Date(now.getFullYear(), now.getMonth() + 1, 0);
+        }
+
+        let sellerProductIds = [];
+        if (role === 'seller') {
+            const sellerProducts = await Product.find({ sellerId: _id }).select('_id');
+            sellerProductIds = sellerProducts.map(product => product._id.toString());
+        }
+
+        // Products Added
+        let productAddedMatchCondition = {
+            createdAt: { $gte: startDate, $lte: endDate }
+        };
+
+        if (role === 'seller') {
+             // For seller, filter products by their sellerId directly
+             productAddedMatchCondition.sellerId = _id;
+        }
+
+        const productsAdded = await Product.aggregate([
+            { $match: productAddedMatchCondition },
+            {
+                $group: {
+                    _id: {
+                        year: { $year: '$createdAt' },
+                        month: { $month: '$createdAt' }
+                    },
+                    count: { $sum: 1 }
+                }
+            },
+            { $sort: { '_id.year': 1, '_id.month': 1 } }
+        ]);
+
+        console.log("-------------------------------------",productsAdded);
+        
+
+        // Products Sold
+        let productSoldMatchCondition = {
+            // status: 'delivered',
+            createdAt: { $gte: startDate, $lte: endDate }
+        };
+
+        let productsSold = [];
+        if (role === 'seller') {
+            productsSold = await Order.aggregate([
+                { $match: productSoldMatchCondition },
+                { $unwind: '$items' },
+                {
+                    $lookup: {
+                        from: 'products', // The collection name for products
+                        localField: 'items.productId',
+                        foreignField: '_id',
+                        as: 'productInfo'
+                    }
+                },
+                { $unwind: '$productInfo' },
+                { $match: { 'productInfo.sellerId': _id } },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: '$createdAt' },
+                            month: { $month: '$createdAt' }
+                        },
+                        totalSold: { $sum: '$items.quantity' }
+                    }
+                },
+                { $sort: { '_id.year': 1, '_id.month': 1 } }
+            ]);
+        } else {
+            productsSold = await Order.aggregate([
+                { $match: productSoldMatchCondition },
+                { $unwind: '$items' },
+                {
+                    $group: {
+                        _id: {
+                            year: { $year: '$createdAt' },
+                            month: { $month: '$createdAt' }
+                        },
+                        totalSold: { $sum: '$items.quantity' }
+                    }
+                },
+                { $sort: { '_id.year': 1, '_id.month': 1 } }
+            ]);
+        }
+
+        const productMovementData = {};
+
+        // Initialize data for all months of the current year
+        const currentYear = now.getFullYear();
+        for (let month = 1; month <= 12; month++) {
+            const monthKey = `${currentYear}-${month.toString().padStart(2, '0')}`;
+            productMovementData[monthKey] = {
+                month: new Date(currentYear, month - 1, 1).toLocaleString('en-US', { month: 'short' }),
+                productsAdded: 0,
+                productsSold: 0
+            };
+        }
+
+        productsAdded.forEach(data => {
+            const monthKey = `${data._id.year}-${data._id.month.toString().padStart(2, '0')}`;
+            if (productMovementData[monthKey]) {
+                productMovementData[monthKey].productsAdded = data.count;
+            }
+        });
+
+        productsSold.forEach(data => {
+            const monthKey = `${data._id.year}-${data._id.month.toString().padStart(2, '0')}`;
+            if (productMovementData[monthKey]) {
+                productMovementData[monthKey].productsSold = data.totalSold;
+            }
+        });
+
+        // Convert to frontend chart format
+        const chartData = {
+            labels: Object.values(productMovementData).map(item => item.month),
+            datasets: [
+                {
+                    label: 'Products Added',
+                    data: Object.values(productMovementData).map(item => item.productsAdded),
+                    borderColor: '#a3c6c4',
+                    backgroundColor: 'rgba(163,198,196,0.2)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                },
+                {
+                    label: 'Products Sold',
+                    data: Object.values(productMovementData).map(item => item.productsSold),
+                    borderColor: '#D3CEDF',
+                    backgroundColor: 'rgba(218, 182, 209, 0.2)',
+                    tension: 0.4,
+                    fill: true,
+                    pointRadius: 0,
+                }
+            ]
+        };
+
+        res.status(200).json({
+            productMovement: chartData,
+            period: period || 'last_6_months',
+            startDate,
+            endDate
+        });
+
+    } catch (error) {
+        console.log(error);
+        res.status(500).json({ error: error.message });
+    }
+};
+
 module.exports = {
     // getTotalSales,
     // getTotalOrders,
@@ -316,5 +527,6 @@ module.exports = {
     // getSalesOverTime,
     // getOrdersAndSales,
     getSalesMetrics,
-    getAllSalesOrders
+    getAllSalesOrders,
+    getProductMovement
 }; 

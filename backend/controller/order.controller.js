@@ -220,11 +220,100 @@ const getOrdersByUser = async (req, res) => {
     }
 };
 
+// Get all orders for a specific seller
+const getallorderbyseller = async (req, res) => {
+    try {
+        const { sellerId } = req.params;
+
+
+        const orders = await Order.find({
+            'items.productId': { $exists: true }
+        })
+            .populate({
+                path: 'items.productId',
+                populate: [
+                    { path: 'categoryId', model: 'Category' },
+                    { path: 'subcategoryId', model: 'Subcategory' },
+                    { path: 'sellerId', model: 'usersaa' }
+                ]
+            })
+            .populate('userId')
+            .populate('couponId');
+
+        const sellerOrders = [];
+
+        for (const order of orders) {
+            let sellerSpecificItems = [];
+            let sellerTotalAmount = 0;
+
+
+            for (const item of order.items) {
+
+                if (item.productId && item.productId.sellerId && item.productId.sellerId._id.toString() === sellerId) {
+                    sellerSpecificItems.push(item);
+                    sellerTotalAmount += item.productId.price * item.quantity;
+                }
+            }
+
+
+            if (sellerSpecificItems.length > 0) {
+
+                const sellerTax = sellerTotalAmount * 0.18;
+                const sellerDeliveryCharge = order.deliveryCharge / orders.length;
+
+
+
+                const sellerDiscountAmount = (order.discountAmount * (sellerTotalAmount / order.totalAmount)) || 0;
+
+
+                const sellerFinalAmount = (sellerTotalAmount - sellerDiscountAmount) + sellerDeliveryCharge + sellerTax;
+
+
+                sellerOrders.push({
+                    ...order.toObject(),
+                    items: sellerSpecificItems,
+                    totalAmount: sellerTotalAmount,
+                    discountAmount: sellerDiscountAmount,
+                    deliveryCharge: sellerDeliveryCharge,
+                    tax: sellerTax,
+                    finalAmount: sellerFinalAmount,
+                    originalOrderTotalAmount: order.totalAmount,
+                    originalOrderFinalAmount: order.finalAmount
+                });
+            }
+        }
+
+        if (!sellerOrders || sellerOrders.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No orders found for this seller.'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Orders for seller retrieved successfully',
+            data: sellerOrders
+        });
+    } catch (error) {
+        console.error("Error in getallorderbyseller:", error);
+        res.status(500).json({
+            success: false,
+            message: 'Error retrieving orders for seller',
+            error: error.message
+        });
+    }
+};
+
+
 module.exports = {
     createOrder,
     getAllOrders,
     getOrderById,
     updateOrder,
     deleteOrder,
-    getOrdersByUser
+    getOrdersByUser,
+    getallorderbyseller
+
+
 };

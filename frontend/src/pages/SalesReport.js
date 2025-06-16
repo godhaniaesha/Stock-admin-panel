@@ -18,7 +18,7 @@ import { Table, Modal } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
-import { fetchSalesMetrics } from '../redux/slice/sales.slice';
+import { fetchSalesMetrics, fetchOrdersBySeller } from '../redux/slice/sales.slice';
 import { fetchOrders } from '../redux/slice/order.slice';
 import { useNavigate } from 'react-router-dom';
 
@@ -31,6 +31,7 @@ export default function SalesReport() {
   const salesState = useSelector((state) => state.dashboard.dashboardData);
   const { totalSales, totalOrders, avgOrderValue, conversionRate, ordersAndSalesOverTime = [], loading = false, error = null } = salesState || {};
   const { orders, isLoading: ordersLoading, error: ordersError } = useSelector((state) => state.order);
+  const { sellerOrders = [] } = useSelector((state) => state.sales) || {};
 
   const [selectedRange, setSelectedRange] = useState('Last 7 Days');
   const [showCustomRange, setShowCustomRange] = useState(false);
@@ -40,6 +41,8 @@ export default function SalesReport() {
   const [ordersPerPage] = useState(10);
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
+  console.log(selectedOrder);
+
 
   useEffect(() => {
     let period;
@@ -71,8 +74,12 @@ export default function SalesReport() {
     }
 
     dispatch(fetchSalesMetrics({ period, ...params }));
-    dispatch(fetchOrders());
+
   }, [dispatch, selectedRange, startDate, endDate]);
+
+  useEffect(() => {
+    dispatch(fetchOrders());
+  }, [dispatch])
 
   // Get current orders for pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
@@ -84,6 +91,12 @@ export default function SalesReport() {
 
   const handleViewOrder = (orderId) => {
     const order = orders.find(order => order._id === orderId);
+    if (order && order.items && order.items.length > 0) {
+      const sellerId = order.items[0].productId?.sellerId?._id;
+      if (sellerId) {
+        dispatch(fetchOrdersBySeller(sellerId));
+      }
+    }
     setSelectedOrder(order);
     setShowModal(true);
   };
@@ -319,7 +332,7 @@ export default function SalesReport() {
                         <tr key={order._id}>
                           <td className="Z_order_id">
                             {/* #{indexOfFirstOrder + index + 1} */}
-                            {order._id ? `${order._id.slice(-6)}` : 'N/A'}
+                            {order._id ? `${order._id}` : 'N/A'}
                           </td>
                           <td>
                             {/* ${order.finalAmount.toFixed(2)} */}
@@ -375,10 +388,10 @@ export default function SalesReport() {
       )}
 
       <Modal show={showModal} onHide={handleCloseModal} centered>
-        <Modal.Header closeButton>
+        <Modal.Header closeButton className='a_main_price'>
           <Modal.Title>Order Details</Modal.Title>
         </Modal.Header>
-        <Modal.Body>
+        <Modal.Body className='a_modal_body'>
           {selectedOrder && (
             <div className="order-details">
               <div className="mb-3">
@@ -390,23 +403,50 @@ export default function SalesReport() {
                 <h6>Items:</h6>
                 <Table striped bordered hover>
                   <thead>
-                    <tr>
-                      <th>Item</th>
-                      <th>Quantity</th>
-                      <th>Price</th>
+                    <tr className='a_main_tr'>
+                      {/* <th className='a_main_tr'>Product</th> */}
+                      <th className='a_main_tr'>Product Name</th>
+                      <th className='a_main_tr'>Quantity</th>
+                      <th className='a_main_tr'>Price</th>
+                      {/* <th className='a_main_tr'>Seller</th> */}
                     </tr>
                   </thead>
                   <tbody>
                     {selectedOrder.items && selectedOrder.items.map((item, index) => (
                       <tr key={index}>
-                        <td>{item.name}</td>
-                        <td>{item.quantity}</td>
-                        <td>${item.price}</td>
+                        {/* <td className='a_main_tr'>{item.productId?.name || 'N/A'}</td> */}
+                        <td className='a_main_tr'>{item?.productId?.productName}</td>
+                        <td className='a_main_tr'>{item?.quantity}</td>
+                        <td className='a_main_tr'>${item?.productId?.price}</td>
+                        {/* <td className='a_main_tr'>{item.productId?.sellerId?.name || 'N/A'}</td> */}
                       </tr>
                     ))}
                   </tbody>
                 </Table>
               </div>
+              {sellerOrders && sellerOrders.length > 0 && (
+                <div className="seller-orders mt-4">
+                  <h6>Other Orders from this Seller:</h6>
+                  <Table striped bordered hover>
+                    <thead>
+                      <tr className='a_main_tr'>
+                        <th className='a_main_tr'>Order ID</th>
+                        <th className='a_main_tr'>Total Amount</th>
+                        <th className='a_main_tr'>Items</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {sellerOrders.map((order, index) => (
+                        <tr key={index}>
+                          <td className='a_main_tr'>{order._id}</td>
+                          <td className='a_main_tr'>${Math.floor(order.finalAmount)}</td>
+                          <td className='a_main_tr'>{order.items.reduce((total, item) => total + item.quantity, 0)}</td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </Table>
+                </div>
+              )}
             </div>
           )}
         </Modal.Body>

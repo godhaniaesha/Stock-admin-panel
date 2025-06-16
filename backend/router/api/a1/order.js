@@ -9,6 +9,9 @@ router.post('/add', orderController.createOrder);
 // Get all orders
 router.get('/get', orderController.getAllOrders);
 
+// // Get orders by sellerId
+router.get('/seller/:sellerId', orderController.getallorderbyseller);
+
 // Get order by ID
 router.get('/get/:id', orderController.getOrderById);
 

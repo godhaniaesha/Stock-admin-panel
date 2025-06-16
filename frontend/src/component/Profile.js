@@ -15,7 +15,7 @@ const Profile = () => {
   const [currentUser, setCurrentUser] = useState(null);
 
   const [formData, setFormData] = useState({
-    fullName: '',
+    firstName: '',
     email: '',
     role: '',
     phone: '',
@@ -24,6 +24,7 @@ const Profile = () => {
     password: '',
     confirmPassword: ''
   });
+
 
   const [isEditing, setIsEditing] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
@@ -39,12 +40,14 @@ const Profile = () => {
   // Set form data only when user changes
   useEffect(() => {
     const userId = localStorage.getItem('user');
+    
     if (userId && allUsers.length > 0) {
       const user = allUsers.find(u => u._id === userId);
+      console.log(user,"user");
       if (user) {
         setCurrentUser(user);
         setFormData({
-          fullName: user.fullName || '',
+          firstName: user.firstName || '',
           email: user.email || '',
           role: user.role || '',
           phone: user.phone || '',
@@ -67,19 +70,65 @@ const Profile = () => {
     }
   }, [isEditing]);
 
+  // const validateForm = () => {
+  //   const newErrors = {};
+  //   if (!formData.firstName.trim()) newErrors.firstName = 'Full name is required';
+  //   if (!formData.email.trim()) newErrors.email = 'Email is required';
+  //   else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email format';
+  //   if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+  //   if (!formData.company.trim()) newErrors.company = 'Company is required';
+  //   if (!formData.address.trim()) newErrors.address = 'Address is required';
+  //   if (formData.password && formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
+  //   if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+  //   setErrors(newErrors);
+  //   return Object.keys(newErrors).length === 0;
+  // };
+
+
   const validateForm = () => {
     const newErrors = {};
-    if (!formData.fullName.trim()) newErrors.fullName = 'Full name is required';
-    if (!formData.email.trim()) newErrors.email = 'Email is required';
-    else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) newErrors.email = 'Invalid email format';
-    if (!formData.phone.trim()) newErrors.phone = 'Phone number is required';
+  
+    // Full Name - only alphabets
+    if (!formData.firstName.trim()) {
+      newErrors.firstName = 'first name is required';
+    } else if (!/^[A-Za-z\s]+$/.test(formData.firstName)) {
+      newErrors.firstName = 'first name must contain only letters';
+    }
+  
+    // Email
+    if (!formData.email.trim()) {
+      newErrors.email = 'Email is required';
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
+      newErrors.email = 'Invalid email format';
+    }
+  
+    // Phone - 10 digit number
+    if (!formData.phone.trim()) {
+      newErrors.phone = 'Phone number is required';
+    } else if (!/^\d{10}$/.test(formData.phone)) {
+      newErrors.phone = 'Phone number must be 10 digits';
+    }
+  
+    // Company
     if (!formData.company.trim()) newErrors.company = 'Company is required';
+  
+    // Address
     if (!formData.address.trim()) newErrors.address = 'Address is required';
-    if (formData.password && formData.password.length < 6) newErrors.password = 'Password must be at least 6 characters';
-    if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = 'Passwords do not match';
+  
+    // Password
+    if (formData.password && formData.password.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters';
+    }
+  
+    // Confirm Password
+    if (formData.password !== formData.confirmPassword) {
+      newErrors.confirmPassword = 'Passwords do not match';
+    }
+  
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
+  
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -130,7 +179,7 @@ const Profile = () => {
   };
 
   const formFields = [
-    { name: 'fullName', label: 'Full Name', icon: User, type: 'text', required: true },
+    { name: 'firstName', label: 'First Name', icon: User, type: 'text', required: true },
     { name: 'email', label: 'Email Address', icon: Mail, type: 'email', required: true },
     { name: 'phone', label: 'Phone Number', icon: Phone, type: 'tel', required: true },
     { name: 'company', label: 'Company', icon: Building, type: 'text', required: true },
@@ -180,7 +229,7 @@ const Profile = () => {
                 )}
               </div>
               <div className="db_user_info">
-                <h3 className="db_user_name">{formData.fullName}</h3>
+                <h3 className="db_user_name">{formData.firstName}</h3>
                 <span className="db_user_role">{formData.role}</span>
               </div>
             </div>

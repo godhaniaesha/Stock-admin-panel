@@ -46,7 +46,7 @@ export const loginUser = createAsyncThunk('auth/login', async (credentials, { re
 
 export const getAllUsers = createAsyncThunk('auth/getAllUsers', async (_, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${BASE_URL}/register/getAllregister`);
+    const response = await fetch(`${BASE_URL}/register/getAllUsers`);
     const data = await response.json();
     if (!response.ok || !data.success) {
       throw new Error(data.message || 'Failed to fetch users');
@@ -152,7 +152,7 @@ export const logoutUser = createAsyncThunk('auth/logout', async (userId, { rejec
 
 export const updateProfile = createAsyncThunk('auth/updateProfile', async ({ id, formData }, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${BASE_URL}/register/updateprofile/${id}`, {
+    const response = await fetch(`${BASE_URL}/register/updateUser/${id}`, {
       method: 'PUT',
       body: formData, 
     });
@@ -160,6 +160,8 @@ export const updateProfile = createAsyncThunk('auth/updateProfile', async ({ id,
     if (!response.ok || !data.success) {
       throw new Error(data.message || 'Profile update failed');
     }
+    console.log(data,"data");
+    
     return data;
   } catch (err) {
     return rejectWithValue(err.message || 'An unknown error occurred during profile update.');

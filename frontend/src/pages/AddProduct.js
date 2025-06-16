@@ -209,7 +209,7 @@ const AddProduct = () => {
     };
 
     return (
-        <div className={`x_product_page_container w-100 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+        <div className={`x_product_page_container Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'}`}>
 
             {/*  pro card */}
             <div className="x_add_product_container">

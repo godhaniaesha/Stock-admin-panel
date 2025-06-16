@@ -171,7 +171,7 @@ const EditUser = () => {
     }
 
     return (
-        <div className="x_product_page_container">
+        <div className="x_product_page_container Z_product_section">
             <div className="x_add_product_container">
                 {/* Image Upload Section */}
                 <div className="x_upload_section">

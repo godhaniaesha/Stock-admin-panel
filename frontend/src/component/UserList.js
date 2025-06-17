@@ -13,6 +13,7 @@ import {
     db_deleteUser,
     db_resetUserState
 } from '../redux/slice/userSlice';
+import { IMG_URL } from '../utils/baseUrl';
 
 function UserList() {
     const { isDarkMode } = useOutletContext();
@@ -404,7 +405,7 @@ function UserList() {
                                         <td>
                                             <div className="Z_product_info_cell">
                                                 <img
-                                                    src={`http://localhost:2221/KAssets/profileImage/${user.profileImage}`}
+                                                    src={`${IMG_URL}KAssets/profileImage/${user.profileImage}`}
                                                     alt={user.name || 'User'}
                                                     className="Z_table_product_img"
                                                 />

@@ -7,6 +7,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { deleteCategory, fetchCategories } from '../redux/slice/category.slice';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { FaCaretDown } from 'react-icons/fa';
+import { IMG_URL } from '../utils/baseUrl';
 
 const CategoryList = () => {
     const { isDarkMode } = useOutletContext();
@@ -202,7 +203,7 @@ const CategoryList = () => {
                                         <td>
                                             <div className="Z_category_img_cell">
                                                 <img
-                                                    src={`http://localhost:2221/${category.image}`}
+                                                    src={`${IMG_URL}${category.image}`}
                                                     alt={category.title}
                                                     className="Z_table_product_img"
                                                 />

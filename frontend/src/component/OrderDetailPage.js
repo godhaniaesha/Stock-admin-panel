@@ -17,6 +17,7 @@ import {
   FaPercent
 } from 'react-icons/fa';
 import { MdOutlineLocalShipping } from 'react-icons/md';
+import { IMG_URL } from '../utils/baseUrl';
 
 const OrderDetailPage = () => {
   const { isDarkMode } = useOutletContext();
@@ -502,7 +503,7 @@ const OrderDetailPage = () => {
                   <div key={index} className="d_product-item justify-content-between ">
                     <div className="d-flex gap-3">
                       <div className="d_product-image">
-                      <img src={`http://localhost:2221/${item.productId.images[0]}`} alt={item.productId.productName} className="img-fluid" />
+                      <img src={`${IMG_URL}${item.productId.images[0]}`} alt={item.productId.productName} className="img-fluid" />
                     </div>
                     <div className="d_product-info">
                       <h6 className="d_product-name">{item.productId.productName}</h6>

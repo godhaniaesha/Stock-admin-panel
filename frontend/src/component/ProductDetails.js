@@ -9,6 +9,7 @@ import { GiStarFormation } from 'react-icons/gi';
 import { IoMdArrowDropleft, IoMdArrowDropright } from 'react-icons/io';
 import { MdStars } from 'react-icons/md';
 import { toast } from 'react-toastify';
+import { IMG_URL } from '../utils/baseUrl';
 
 const ProductDetail = () => {
   const { id: productId } = useParams();
@@ -52,7 +53,7 @@ const ProductDetail = () => {
     }
   }, [currentProduct]);
 
-  const productImages = currentProduct?.images?.map(img => `http://localhost:2221/${img}`) || [];
+  const productImages = currentProduct?.images?.map(img => `${IMG_URL}${img}`) || [];
 
   // Auto slide effect
   useEffect(() => {
@@ -784,7 +785,7 @@ const ProductDetail = () => {
                 className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
                 onClick={() => handleImageClick(index)}
               >
-                <img src={img} alt={`View ${index + 1} of ${currentProduct.productName}`} />
+                <img src={`${IMG_URL}${img}`} alt={`View ${index + 1} of ${currentProduct.productName}`} />
               </div>
             ))}
           </div>
@@ -944,7 +945,7 @@ const ProductDetail = () => {
                 {review.images && review.images.length > 0 && (
                   <div className="review-images">
                     {review.images.map((img, imgIdx) => (
-                      <img key={imgIdx} src={`http://localhost:2221/${img}`} alt={`Review image ${imgIdx + 1}`} className="review-image" />
+                      <img key={imgIdx} src={`${IMG_URL}${img}`} alt={`Review image ${imgIdx + 1}`} className="review-image" />
                     ))}
                   </div>
                 )}

@@ -52,6 +52,7 @@ import { BiRightArrow } from 'react-icons/bi';
 import { getAxios } from '../utils/axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { Sales_Performance,getHeaderdata,getAllSellerOrder } from '../redux/slice/dashboard.slice';
+import { IMG_URL } from '../utils/baseUrl';
 
 
 const Dashboard = () => {
@@ -460,7 +461,7 @@ const Dashboard = () => {
                           <img
                             src={
                               item?.image
-                                ? `http://localhost:2221/${item?.image}`
+                                ? `${IMG_URL}${item?.image}`
                                 : "placeholder.jpg"
                             }
                             // alt={item?.name}
@@ -664,7 +665,7 @@ const Dashboard = () => {
                           <img
                             src={
                               event?.productImage
-                                ? `http://localhost:2221/${event?.productImage[0]}`
+                                ? `${IMG_URL}${event?.productImage[0]}`
                                 : "placeholder.jpg"
                             }
                             alt={event?.productName}

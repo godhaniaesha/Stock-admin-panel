@@ -16,6 +16,7 @@ import { addToCart, getCart } from '../redux/slice/cart.slice';
 import { addToWishlist, getAllWishlists, getWishlist, removeFromWishlist } from '../redux/slice/wishlist.slice';
 import { fetchCategories, WaccessCategories } from '../redux/slice/category.slice';
 import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
+import { IMG_URL } from '../utils/baseUrl';
 function ProductGrid() {
     const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
@@ -579,7 +580,7 @@ function ProductGrid() {
                                         <Card className="h-100 Z_product_card">
                                             <div className="Z_product_image">
                                                 <img
-                                                    src={`http://localhost:2221/${product.images?.[0]}`}
+                                                    src={`${IMG_URL}${product.images?.[0]}`}
                                                     alt={product.productName}
                                                 />
                                             </div>

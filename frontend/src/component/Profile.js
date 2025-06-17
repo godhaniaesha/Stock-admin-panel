@@ -7,6 +7,7 @@ import '../styles/d_style.css';
 import { useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getAllUsers, updateProfile } from '../redux/slice/auth.slice';
+import { IMG_URL } from '../utils/baseUrl';
 
 const Profile = () => {
   const { isDarkMode } = useOutletContext();
@@ -57,7 +58,7 @@ const Profile = () => {
           confirmPassword: ''
         });
         if (user.profileImage) {
-          setPreviewUrl(`http://localhost:2221/KAssets/profileImage/${user.profileImage}`);
+          setPreviewUrl(`${IMG_URL}KAssets/profileImage/${user.profileImage}`);
         }
       }
     }

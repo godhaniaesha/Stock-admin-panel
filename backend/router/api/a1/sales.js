@@ -13,4 +13,6 @@ const auth = require('../../../middleware/auth');
 router.get("/salesMetrics",auth(['admin','seller']), salesController.getSalesMetrics);
 // router.get("/salesOverTime1",auth(['admin','seller']), salesController.getOrdersAndSales);
 router.get("/getAllSalesOrders",auth(['admin','seller']), salesController.getAllSalesOrders);
+router.get("/InventoryMetrics",auth(['admin','seller']), salesController.getInventoryMetrics);
+router.get("/ProductMovement",auth(['admin','seller']), salesController.getProductMovement);
 module.exports = router;

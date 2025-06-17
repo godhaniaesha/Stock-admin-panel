@@ -44,6 +44,49 @@ export const fetchSalesMetrics = createAsyncThunk(
         }
     }
 );
+export const fetchInventoryMetrics = createAsyncThunk(
+    'sales/InventoryMetrics',
+    async (params = {}, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${API_URL}/InventoryMetrics`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                params: {
+                    period: params.period || 'last_7_days',
+                    startDate: params.startDate,
+                    endDate: params.endDate
+                }
+            });
+            console.log(response.data);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
+export const fetchProductMovement = createAsyncThunk(
+    'sales/fetchProductMovement',
+    async (params = {}, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${API_URL}/ProductMovement`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                },
+                params: {
+                    startDate: params.startDate,
+                    endDate: params.endDate
+                }
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
 
 const initialState = {
     metrics: {
@@ -51,6 +94,13 @@ const initialState = {
         totalOrders: 0,
         avgOrderValue: 0,
         conversionRate: 0,
+    },
+    inventory: {
+        TotalProducts: 0,
+        TotalOutStock: 0,
+        TotalStockValue: 0,
+        TotalLowStock: 0,
+        StockByCategory: []
     },
     salesData: [],
     ordersData: [],
@@ -77,6 +127,31 @@ const salesSlice = createSlice({
                 state.ordersData = action.payload.ordersData;
             })
             .addCase(fetchSalesMetrics.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(fetchInventoryMetrics.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchInventoryMetrics.fulfilled, (state, action) => {
+                state.loading = false;
+                state.inventory = action.payload;
+            })
+            .addCase(fetchInventoryMetrics.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
+            .addCase(fetchProductMovement.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchProductMovement.fulfilled, (state, action) => {
+                state.loading = false;
+
+                state.productMovement = action.payload;
+            })
+            .addCase(fetchProductMovement.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.payload;
             });

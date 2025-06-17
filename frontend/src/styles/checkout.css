@@ -552,6 +552,9 @@
   .d_card_row {
     grid-template-columns: 1fr;
   }
+  .d_checkout_header {
+    margin-top:20px;
+  }
 }
 
 .Z_radio_custom {

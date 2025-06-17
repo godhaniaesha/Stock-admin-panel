@@ -332,9 +332,24 @@
 @media (max-width: 576px) {
   
 .d_header-section {
-  flex-direction: column;
-
+  /* flex-direction: column; */
+  margin-top:6px;
 }
+.d_header-section h1{
+
+  font-size: 25px;
+}
+.d_header-section .d_subtitle{
+  font-size: 14px;
+  margin-bottom: 10px !important;
+}
+}
+@media  (max-width: 420px) {
+  .d_header-section {
+  flex-direction: column;
+  margin-top:6px;
+}
+  
 }
 .d_date-filter {
   position: relative;

@@ -899,6 +899,12 @@
   .x_password_toggle {
     right: 13%;
   }
+  .x_form_group input,.x_form_group textarea ,.x_form_group select,.x_form_group .x_dropdown_header{
+    width: 100% !important;
+  }
+  .x_add_product_container.Z_product_section {
+    padding: 3px !important;
+  }
 }
 
 .x_preview_image {

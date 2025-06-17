@@ -175,7 +175,7 @@ const EditInventory = () => {
     };
 
     const handleCancel = () => {
-        navigate('/stock-overview');
+        navigate('/stock');
     };
 
     const isLoading = inventoryLoading || categoriesLoading || subcategoriesLoading || productsLoading;

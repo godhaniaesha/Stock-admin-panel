@@ -90,7 +90,7 @@ const AddInventory = () => {
           quantity: '',
           lowStockLimit: ''
         });
-        navigate('/products');
+        navigate('/stock');
       }
     } catch (error) {
       console.error('Create inventory failed:', error);

@@ -147,6 +147,8 @@ function ListCoupons() {
                                 <option value="All">All Status</option>
                                 <option value="Active">Active</option>
                                 <option value="Inactive">Inactive</option>
+                                <option value="FuturePlan">Future Plan</option>
+
                             </select>
                             <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
                         </div>

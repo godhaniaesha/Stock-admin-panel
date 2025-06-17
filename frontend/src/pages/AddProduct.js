@@ -9,6 +9,7 @@ import { fetchCategories } from '../redux/slice/category.slice';
 import { fetchSubcategories } from '../redux/slice/subCategory.slice';
 import { createProduct } from '../redux/slice/product.slice';
 import { useNavigate } from 'react-router-dom';
+import { RiAiGenerate } from 'react-icons/ri';
 
 const AddProduct = () => {
     const { isDarkMode } = useOutletContext();
@@ -83,7 +84,7 @@ const AddProduct = () => {
     const validateAndHandleFile = (file) => {
         // Reset error state
         setError('');
-        
+
         // Check if file exists
         if (!file) {
             setError('Please select a file');
@@ -136,7 +137,7 @@ const AddProduct = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+
         // Get sellerId directly from localStorage
         const sellerId = localStorage.getItem('user');
         if (!sellerId) {
@@ -166,7 +167,7 @@ const AddProduct = () => {
         try {
             // Dispatch createProduct with the FormData object
             const result = await dispatch(createProduct(actualFormData)).unwrap();
-            
+
             if (result) {
                 // Reset form
                 setProductData({
@@ -237,8 +238,8 @@ const AddProduct = () => {
                             {productImagePreview ? (
                                 <div className="x_image_preview">
                                     <img src={productImagePreview} alt="Product preview" className="x_preview_img" />
-                                    <button 
-                                        className="x_remove_image" 
+                                    <button
+                                        className="x_remove_image"
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setProductImagePreview(null);
@@ -283,8 +284,8 @@ const AddProduct = () => {
                                             onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                                         >
                                             <span>
-                                                {categoriesLoading ? 'Loading categories...' : 
-                                                 categories.find(cat => cat._id === productData.categoryId)?.title || 'Select Category'}
+                                                {categoriesLoading ? 'Loading categories...' :
+                                                    categories.find(cat => cat._id === productData.categoryId)?.title || 'Select Category'}
                                             </span>
                                             <svg
                                                 className={`x_dropdown_arrow ${isCategoryOpen ? 'open' : ''}`}
@@ -319,8 +320,8 @@ const AddProduct = () => {
                                             onClick={() => setIsSubcategoryOpen(!isSubcategoryOpen)}
                                         >
                                             <span>
-                                                {subcategoriesLoading ? 'Loading subcategories...' : 
-                                                 subcategories.find(sub => sub._id === productData.subcategoryId)?.subcategoryTitle || 'Select Subcategory'}
+                                                {subcategoriesLoading ? 'Loading subcategories...' :
+                                                    subcategories.find(sub => sub._id === productData.subcategoryId)?.subcategoryTitle || 'Select Subcategory'}
                                             </span>
                                             <svg
                                                 className={`x_dropdown_arrow ${isSubcategoryOpen ? 'open' : ''}`}
@@ -375,7 +376,7 @@ const AddProduct = () => {
                             </div>
 
                             <div className="x_form_row">
-                                
+
                                 <div className="x_form_group">
                                     <label>Weight</label>
                                     <input
@@ -457,6 +458,24 @@ const AddProduct = () => {
                             <div className="x_form_row">
                                 <div className="x_form_group">
                                     <label>SKU Number</label>
+                                    {/* <div className="x_input_group">
+                                        <input
+                                            type="text"
+                                            name="sku"
+                                            placeholder="SKU Number"
+                                            value={productData.sku}
+                                            onChange={handleInputChange}
+                                            className="x_input"
+                                            readOnly
+                                        />
+                                        <button
+                                            type="button"
+                                            className="x_btn x_btn_generate"
+                                            onClick={generateSKU}
+                                        >
+                                            <RiAiGenerate />
+                                        </button>
+                                    </div> */}
                                     <div className="x_input_group">
                                         <input
                                             type="text"
@@ -467,13 +486,12 @@ const AddProduct = () => {
                                             className="x_input"
                                             readOnly
                                         />
-                                        <button 
-                                            type="button" 
-                                            className="x_btn x_btn_generate"
-                                            onClick={generateSKU}
-                                        >
-                                            Generate
-                                        </button>
+                                        <span  type="button"
+                                            className=" x_input_icon "
+                                            onClick={generateSKU}>
+                                            <RiAiGenerate />
+                                        </span>
+
                                     </div>
                                 </div>
                                 <div className="x_form_group">
@@ -589,16 +607,16 @@ const AddProduct = () => {
                 </div>
 
                 <div className="x_btn_wrapper mt-3">
-                    <button 
-                        type="submit" 
+                    <button
+                        type="submit"
                         className="x_btn x_btn_create"
                         onClick={handleSubmit}
                         disabled={productLoading}
                     >
                         {productLoading ? 'Creating...' : 'Create Product'}
                     </button>
-                    <button 
-                        type="button" 
+                    <button
+                        type="button"
                         className="x_btn x_btn_cancel"
                         onClick={() => navigate('/products')}
                     >

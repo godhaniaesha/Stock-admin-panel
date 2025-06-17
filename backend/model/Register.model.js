@@ -3,11 +3,9 @@ const mongoose = require("mongoose");
 const RegisterSchema = new mongoose.Schema({
     firstName: {
         type: String,
-        required: true
     },
     lastName: {
         type: String,
-        required: true
     },
     username: {
         type: String,
@@ -25,7 +23,6 @@ const RegisterSchema = new mongoose.Schema({
     },
     birthdate: {
         type: Date,
-        required: true
     },
     gender: {
         type: String,

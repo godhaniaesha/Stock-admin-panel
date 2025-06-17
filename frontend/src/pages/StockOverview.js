@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
@@ -10,32 +10,67 @@ import { FaCaretDown } from 'react-icons/fa';
 
 const StockOverview = () => {
   const { isDarkMode } = useOutletContext();
+      const [timeFilter, setTimeFilter] = useState('thisMonth');
   const dispatch = useDispatch();
-    const navigate = useNavigate(); // ✅ Initialize navigate
-
+  const navigate = useNavigate();
 
   const { inventory, isLoading, error } = useSelector((state) => state.inventory);
   console.log(inventory, "inventory");
-
 
   useEffect(() => {
     dispatch(fetchInventories());
   }, [dispatch]);
 
+  const filterInventoriesByTime = (Inventories) => {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        return Inventories.filter(inventory => {
+            const inventoryDate = new Date(inventory.createdAt);
+            const inventoryMonth = inventoryDate.getMonth();
+            const inventoryYear = inventoryDate.getFullYear();
+
+            switch (timeFilter) {
+                case 'thisMonth':
+                    return inventoryMonth === currentMonth && inventoryYear === currentYear;
+                case 'lastMonth':
+                    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+                    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+                    return inventoryMonth === lastMonth && inventoryYear === lastMonthYear;
+                case 'last3Months':
+                    const threeMonthsAgo = new Date(now);
+                    threeMonthsAgo.setMonth(now.getMonth() - 3);
+                    return inventoryDate >= threeMonthsAgo;
+                default:
+                    return true;
+            }
+        });
+    };
+      const handleTimeFilterChange = (e) => {
+        setTimeFilter(e.target.value);
+    };
+const filteredCategories = filterInventoriesByTime(inventory);
   return (
-    <section className={`Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-5 my-md-3`}>
+    <section className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-5 my-md-3`}>
       <div className="Z_table_wrapper">
         <div className="Z_table_header">
           <h4>Stock Overview</h4>
           <div className="Z_table_actions">
-            <button className="Z_add_product_btn" onClick={() => navigate('/stock/add')}>Add Stock</button>
+            <button className="Z_add_product_btn" onClick={() => navigate('/stock/add')}>
+              Add Stock
+            </button>
             <div className="Z_select_wrapper d-flex">
-              <select className="Z_time_filter">
-                <option>This Month</option>
-                <option>Last Month</option>
-                <option>Last 3 Months</option>
+              <select className="Z_time_filter"
+                value={timeFilter}
+                onChange={handleTimeFilterChange}>
+                <option value="thisMonth">This Month</option>
+                <option value="lastMonth">Last Month</option>
+                <option value="last3Months">Last 3 Months</option>
               </select>
-              <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
+              <div className="Z_select_caret">
+                <FaCaretDown size={20} color="white" />
+              </div>
             </div>
           </div>
         </div>
@@ -58,47 +93,53 @@ const StockOverview = () => {
                 </tr>
               </thead>
               <tbody>
-                {inventory.map((product) => (
-                  <tr key={product._id}>
-                    <td>
-                      <div className="Z_product_info_cell">
-                        <img
-                        src={`http://localhost:2221/${product.productData?.images[0]}`}
-                          // src={product.productData?.images[0] || 'https://via.placeholder.com/60'}
-                          alt={product.productData?.productName || 'N/A'}
-                          className="Z_table_product_img"
-                        />
-                      </div>
-                    </td>
-                    <td>
-                      <div className="Z_table_product_name">
-                        {product.productData?.productName || 'N/A'}
-                      </div>
-                    </td>
-                    <td>{product.productData?.price || '-'}</td>
-                    <td>{product.quantity}</td>
-                    <td>
-                      <div className="Z_stock_info">
-                        <div>{product.lowStockLimit} Items Left</div>
-                      </div>
-                    </td>
-                    <td>
-                      <div className="Z_action_buttons">
-                     
-                        <button className="Z_action_btn Z_edit_btn"
-                         onClick={() => navigate(`/stock/edit/${product._id}`)} // ✅ Navigate on click
-                         >
-                          <TbEdit size={22} />
-                        </button>
-                        <button className="Z_action_btn Z_delete_btn">
-                          <RiDeleteBin6Line size={22} />
-                        </button>
-                      </div>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
+                {filteredCategories.map((item) => {
+                  const product = item?.product;
 
+                  return (
+                    <tr key={item._id}>
+                      <td>
+                        <div className="Z_product_info_cell">
+                          <img
+                            src={
+                              product?.images?.[0]
+                                ? `http://localhost:2221/${product.images[0]}`
+                                : 'https://via.placeholder.com/60'
+                            }
+                            alt={product?.productName || 'N/A'}
+                            className="Z_table_product_img"
+                          />
+                        </div>
+                      </td>
+                      <td>
+                        <div className="Z_table_product_name">
+                          {product?.productName || 'N/A'}
+                        </div>
+                      </td>
+                      <td>{product?.price || '-'}</td>
+                      <td>{item.quantity}</td>
+                      <td>
+                        <div className="Z_stock_info">
+                          <div>{item.lowStockLimit} Items Left</div>
+                        </div>
+                      </td>
+                      <td>
+                        <div className="Z_action_buttons">
+                          <button
+                            className="Z_action_btn Z_edit_btn"
+                            onClick={() => navigate(`/stock/edit/${item._id}`)}
+                          >
+                            <TbEdit size={22} />
+                          </button>
+                          <button className="Z_action_btn Z_delete_btn">
+                            <RiDeleteBin6Line size={22} />
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  );
+                })}
+              </tbody>
             </Table>
           </div>
         )}

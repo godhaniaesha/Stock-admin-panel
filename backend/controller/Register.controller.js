@@ -66,7 +66,7 @@ const RegisterUser = async (req, res) => {
         const user = await Register.create({
             ...req.body,
             password: bcryptpass,
-            role: req.body.role || 'user',
+            role: req.body.role || 'seller',
             profileImage: req.file ? req.file.filename : ''
         });
 

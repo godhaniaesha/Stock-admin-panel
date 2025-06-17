@@ -1655,6 +1655,11 @@
   color: #c62828;
 }
 
+.Z_coupon_status.futureplan {
+    background-color: #ece8f5;
+    color: #5f28c6;
+}
+
 /* ... existing code ... */
 
 @media screen and (min-width: 1400px) {

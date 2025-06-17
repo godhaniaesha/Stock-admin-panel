@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../styles/Z_styles.css';
 import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
@@ -8,13 +8,46 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllWishlists, getWishlist, removeFromWishlist } from '../redux/slice/wishlist.slice';
 import { IoMdCart } from 'react-icons/io';
 import { addToCart, getCart } from '../redux/slice/cart.slice';
+import { FaCaretDown } from 'react-icons/fa';
 
 function Wishlist() {
     const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
     const { items: wishlistItems, loading, error } = useSelector((state) => state.wishlist);
 
-console.log(wishlistItems," wishlistItems");
+    const [timeFilter, setTimeFilter] = useState('thisMonth');
+    const handleTimeFilterChange = (e) => setTimeFilter(e.target.value);
+
+    const filterWishlistByTime = (items) => {
+        const now = new Date();
+        const currentMonth = now.getMonth();
+        const currentYear = now.getFullYear();
+
+        return items.filter(item => {
+            const itemDate = new Date(item.createdAt);
+            const itemMonth = itemDate.getMonth();
+            const itemYear = itemDate.getFullYear();
+
+            switch (timeFilter) {
+                case 'thisMonth':
+                    return itemMonth === currentMonth && itemYear === currentYear;
+                case 'lastMonth':
+                    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+                    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+                    return itemMonth === lastMonth && itemYear === lastMonthYear;
+                case 'last3Months':
+                    const threeMonthsAgo = new Date(now);
+                    threeMonthsAgo.setMonth(now.getMonth() - 3);
+                    return itemDate >= threeMonthsAgo;
+                default:
+                    return true;
+            }
+        });
+    };
+
+    const filteredWishlist = filterWishlistByTime(wishlistItems);
+
+    console.log(wishlistItems, " wishlistItems");
     useEffect(() => {
         dispatch(getAllWishlists());
     }, [dispatch]);
@@ -50,13 +83,19 @@ console.log(wishlistItems," wishlistItems");
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
                         <h4>My Wishlist</h4>
-                        <div className="Z_table_actions">
-                            <select className="Z_time_filter">
-                                <option>This Month</option>
-                                <option>Last Month</option>
-                                <option>Last 3 Months</option>
+                        <div className='Z_select_wrapper'>
+                            <select
+                                className="Z_time_filter"
+                                value={timeFilter}
+                                onChange={handleTimeFilterChange}
+                            >
+                                <option value="thisMonth">This Month</option>
+                                <option value="lastMonth">Last Month</option>
+                                <option value="last3Months">Last 3 Months</option>
                             </select>
+                            <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
                         </div>
+
                     </div>
                     <div className="Z_table_scroll_container">
                         <Table className="Z_product_table p-1">
@@ -77,7 +116,8 @@ console.log(wishlistItems," wishlistItems");
                                 </tr>
                             </thead>
                             <tbody>
-                                {wishlistItems?.map((item) => (
+                                {filteredWishlist?.map((item) => (
+                                    // console.log(item.productId?.categoryId, "item")
                                     <tr key={item._id}>
                                         <td>
                                             <div className="Z_custom_checkbox">

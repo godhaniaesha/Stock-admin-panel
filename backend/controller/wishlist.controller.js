@@ -58,14 +58,23 @@ const getWishlist = async (req, res) => {
 const getAllWishlists = async (req, res) => {
   try {
     const items = await Wishlist.find()
-      .populate('productId')
-      .populate('userId', 'name email') // Assuming you want to include user details
-      .sort({ createdAt: -1 }); // Sort by newest first
+      .populate({
+        path: 'productId',
+        populate: { path: 'categoryId' }
+      })
+      .populate('userId', 'name email')
+      .sort({ createdAt: -1 });
+
+    // Add CategoryData field to each item
+    const itemsWithCategory = items.map(item => ({
+      ...item.toObject(),
+      CategoryData: item.productId?.categoryId || null
+    }));
 
     res.status(200).json({
       success: true,
-      data: items,
-      count: items.length
+      data: itemsWithCategory,
+      count: itemsWithCategory.length
     });
   } catch (error) {
     res.status(500).json({

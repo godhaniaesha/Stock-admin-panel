@@ -469,6 +469,7 @@
 @media (max-width: 375px) {
     .x_form_p {
         padding: 1rem;
+        text-align: center;
     }
 
     .x_btn_wrapper {
@@ -857,17 +858,35 @@
     background: rgba(0, 0, 0, 0.7);
 }
 
-@media (max-width: 576px) {
+
+
+@media (max-width: 375px) {
     .x_product_page_container .x_add_product_container {
         padding: 0;
     }
-    .x_product_page_container .x_dropdown_header,.x_product_page_container  .x_input,.x_product_page_container .x_textarea {
+
+    .x_product_page_container .x_dropdown_header,
+    .x_product_page_container .x_input,
+    .x_product_page_container .x_textarea {
         width: 90%;
     }
+
     .x_password_toggle {
         right: 13%;
-    }   
-} 
+    }
+
+    .x_custom_dropdown {
+        display: flex;
+        justify-content: center;
+    }
+
+    .x_form_p {
+        padding: 0.4rem;
+    }
+}
+
+
+
 .x_preview_image {
     width: 200px;
     height: 200px;

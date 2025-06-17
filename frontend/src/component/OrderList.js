@@ -1,7 +1,7 @@
 // ../components/OrderList.js
 import React, { useEffect } from 'react';
 import { Row, Col, Card, Dropdown, Table } from 'react-bootstrap';
-import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import { FaAngleLeft, FaAngleRight, FaCaretDown } from 'react-icons/fa';
 import { useNavigate } from 'react-router-dom';
 
 import { GiProgression } from 'react-icons/gi';
@@ -9,13 +9,16 @@ import { MdCancelPresentation, MdPendingActions, MdPlaylistAddCheck } from 'reac
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchOrders } from '../redux/slice/order.slice';
 import { useOutletContext } from 'react-router-dom';
-import { useState } from 'react'; 
-import {  TbEye } from 'react-icons/tb';
+import { useState } from 'react';
+import { TbEdit, TbEye } from 'react-icons/tb';
+import { RiDeleteBin6Line } from 'react-icons/ri';
 
 function OrderList() {
   const { isDarkMode } = useOutletContext();
   const dispatch = useDispatch();
-    const navigate = useNavigate();
+  const navigate = useNavigate();
+  //  const [selectedTimeFilter, setSelectedTimeFilter] = useState('All');
+      const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
 
   const { orders, isLoading, error } = useSelector((state) => state.order);
 
@@ -27,24 +30,29 @@ function OrderList() {
     dispatch(fetchOrders());
   }, [dispatch]);
 
+  // Filter orders based on selectedStatusFilter
+  const filteredOrders = selectedStatusFilter === 'All'
+    ? orders
+    : orders.filter(order => (order.status || '').toLowerCase() === selectedStatusFilter.toLowerCase());
+
   // Get current orders for pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
-  const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
+  const currentOrders = filteredOrders.slice(indexOfFirstOrder, indexOfLastOrder);
 
   // Change page
   const paginate = (pageNumber) => setCurrentPage(pageNumber);
 
   // Calculate total pages
-  const totalPages = Math.ceil(orders.length / ordersPerPage);
+  const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
   const pageNumbers = [];
   for (let i = 1; i <= totalPages; i++) {
     pageNumbers.push(i);
   }
-const handleViewOrder = (orderId) => {
-  navigate(`/orderdetail/${orderId}`);
-};
+  const handleViewOrder = (orderId) => {
+    navigate(`/orderdetail/${orderId}`);
+  };
   return (
     <section className={`Z_product_section mx-0 mx-lg-5 my-md-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
       <div className="Z_order_header d-flex justify-content-between align-items-center mb-4">
@@ -109,7 +117,7 @@ const handleViewOrder = (orderId) => {
       <div className="Z_table_wrapper">
         <div className="Z_order_header d-flex justify-content-between align-items-center mb-4">
           <h5 className="Z_order_title mb-0">All Order List</h5>
-          <Dropdown className="Z_time_filter">
+          {/* <Dropdown className="Z_time_filter">
             <Dropdown.Toggle variant="light" className="Z_filter_toggle">
               This Month
             </Dropdown.Toggle>
@@ -118,7 +126,21 @@ const handleViewOrder = (orderId) => {
               <Dropdown.Item>Last Month</Dropdown.Item>
               <Dropdown.Item>Last 3 Months</Dropdown.Item>
             </Dropdown.Menu>
-          </Dropdown>
+          </Dropdown> */}
+          <div className='Z_select_wrapper'>
+            <select
+              className="Z_time_filter"
+              value={selectedStatusFilter}
+              onChange={(e) => setSelectedStatusFilter(e.target.value)}
+            >
+              <option value="All">All Order</option>
+              <option value="delivered">Delivered</option>
+              <option value="pending">Pending</option>
+              <option value="processing">Processing</option>
+
+            </select>
+            <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
+          </div>
         </div>
 
         <Table className="Z_order_table">
@@ -126,41 +148,30 @@ const handleViewOrder = (orderId) => {
             <tr>
               <th>Order ID</th>
               <th>Customer</th>
-              {/* <th>Items</th> */}
               <th>Created at</th>
               <th>Total</th>
-              {/* <th>Payment Status</th> */}
-              {/* <th>Delivery Number</th> */}
               <th>Order Status</th>
               <th>Action</th>
             </tr>
           </thead>
           <tbody>
             {isLoading ? (
-              <tr><td colSpan="8">Loading...</td></tr>
+              <tr><td colSpan="6">Loading...</td></tr>
             ) : error ? (
-              <tr><td colSpan="8">Error: {error}</td></tr>
+              <tr><td colSpan="6">Error: {error}</td></tr>
             ) : currentOrders.length === 0 ? (
-              <tr><td colSpan="8">No Orders Found</td></tr>
+              <tr><td colSpan="6">No Orders Found</td></tr>
             ) : (
               currentOrders.map((order, index) => (
                 <tr key={order._id || index}>
                   <td className="Z_order_id">
                     {order._id ? `...${order._id.slice(-6)}` : 'N/A'}
                   </td>
-
                   <td className="Z_customer_name">
                     {order.userId ? `${order.userId.username}` : 'N/A'}
                   </td>
-                  {/* <td className="Z_items_count">
-                    {order.items ? order.items.map(item => (
-                      <div key={item._id}>
-                        {item.productId?.productName} (Qty: {item.quantity})
-                      </div>
-                    )) : 'N/A'}
-                  </td> */}
-                   <td>
-                    {order.createdAt ? 
+                  <td>
+                    {order.createdAt ?
                       new Date(order.createdAt).toLocaleDateString('en-US', {
                         day: '2-digit',
                         month: 'short',
@@ -175,26 +186,20 @@ const handleViewOrder = (orderId) => {
                     {order.items ? order.items.reduce(
                       (total, item) => total + (item.productId?.price * item.quantity), 0
                     ).toFixed(2) : 'N/A'}
-                  </td> 
-                  {/* <td>
-                    <span className={`Z_payment_status ${order.paymentMethod ? order.paymentMethod.toLowerCase() : ''}`}>
-                      {order.paymentMethod || 'N/A'}
-                    </span>
-                  </td> */}
-                  {/* <td className="Z_delivery_number">{order.phone || 'N/A'}</td> */}
+                  </td>
                   <td>
                     <span className="Z_order_status">
                       {order.status || 'N/A'}
                     </span>
                   </td>
                   <td>
-  <button 
-    className="Z_action_btn Z_view_btn"
-    onClick={() => handleViewOrder(order._id)}
-  >
-    <TbEye size={22} />
-  </button>
-</td>
+                    <button
+                      className="Z_action_btn Z_view_btn"
+                      onClick={() => handleViewOrder(order._id)}
+                    >
+                      <TbEye size={22} />
+                    </button>
+                  </td>
                 </tr>
               ))
             )}

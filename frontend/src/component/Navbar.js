@@ -4,6 +4,7 @@ import { FaBars, FaUserCircle, FaBell, FaCog, FaSignOutAlt, FaMoon, FaSun } from
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '../redux/slice/auth.slice';
+import { MdLightMode } from 'react-icons/md';
 
 const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
@@ -80,7 +81,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
               }}
             >
               {isDarkMode ? 
-                <FaSun size={20} /> : 
+                <MdLightMode size={20} /> : 
                 <FaMoon size={20} />
               }
             </div>

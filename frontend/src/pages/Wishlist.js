@@ -46,7 +46,7 @@ console.log(wishlistItems," wishlistItems");
     };
     return (
         <>
-            <section className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'} mx-lg-5 my-md-3`}>
+            <section className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'} mx-lg-2 my-md-3`}>
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
                         <h4>My Wishlist</h4>

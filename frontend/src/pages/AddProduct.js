@@ -5,8 +5,10 @@ import { CiDiscount1 } from "react-icons/ci";
 import { MdReceipt } from "react-icons/md";
 import { useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchCategories } from '../redux/slice/category.slice';
-import { fetchSubcategories } from '../redux/slice/subCategory.slice';
+// import { fetchCategories } from '../redux/slice/category.slice';
+// import { fetchSubcategories } from '../redux/slice/subCategory.slice';
+import { fetchCategories, WaccessCategories } from '../redux/slice/category.slice';
+import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
 import { createProduct } from '../redux/slice/product.slice';
 import { useNavigate } from 'react-router-dom';
 
@@ -46,8 +48,8 @@ const AddProduct = () => {
     const [isSubcategoryOpen, setIsSubcategoryOpen] = useState(false);
 
     useEffect(() => {
-        dispatch(fetchCategories());
-        dispatch(fetchSubcategories());
+        dispatch(WaccessCategories());
+        dispatch(WaccesssubCategories());
     }, [dispatch]);
 
     useEffect(() => {

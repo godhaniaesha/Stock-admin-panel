@@ -16,18 +16,29 @@ const getAxios = () => {
 };
 
 // Fetch all orders
+// export const fetchOrders = createAsyncThunk(
+//     'order/fetchAll',
+//     async (_, { rejectWithValue }) => {
+//         try {
+//             const { data } = await getAxios().get('/get');
+//             return data.data;
+//         } catch (error) {
+//             return rejectWithValue(error.response?.data?.message || error.message);
+//         }
+//     }
+// );
+
 export const fetchOrders = createAsyncThunk(
     'order/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().get('/get');
+            const { data } = await getAxios().get('/seller');
             return data.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 );
-
 // Fetch order by ID
 export const fetchOrderById = createAsyncThunk(
     'order/fetchById',

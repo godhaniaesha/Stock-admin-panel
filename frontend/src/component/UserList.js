@@ -225,7 +225,7 @@ function UserList() {
     }
 
     return (
-        <section className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-5 my-md-3`}>
+        <section className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-2 my-md-3`}>
             {/* Error Alert */}
             {error && (
                 <Alert variant="danger" dismissible onClose={() => dispatch(db_resetUserState())}>
@@ -245,7 +245,7 @@ function UserList() {
 
             {/* Statistics Cards */}
             <Row className="mb-4">
-                <Col lg={3} className="mb-3">
+                <Col xl={3} lg={6} className="mb-3">
                     <Card className="Z_order_card">
                         <Card.Body className="d-flex align-items-center justify-content-between">
                             <div>
@@ -258,7 +258,7 @@ function UserList() {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col lg={3} className="mb-3">
+                <Col xl={3} lg={6} className="mb-3">
                     <Card className="Z_order_card">
                         <Card.Body className="d-flex align-items-center justify-content-between">
                             <div>
@@ -271,7 +271,7 @@ function UserList() {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col lg={3} className="mb-3">
+                <Col xl={3} lg={6} className="mb-3">
                     <Card className="Z_order_card">
                         <Card.Body className="d-flex align-items-center justify-content-between">
                             <div>
@@ -284,7 +284,7 @@ function UserList() {
                         </Card.Body>
                     </Card>
                 </Col>
-                <Col lg={3} className="mb-3">
+                <Col xl={3} lg={6} className="mb-3">
                     <Card className="Z_order_card">
                         <Card.Body className="d-flex align-items-center justify-content-between">
                             <div>

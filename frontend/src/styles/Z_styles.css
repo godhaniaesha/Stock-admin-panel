@@ -442,7 +442,7 @@
 
 .Z_time_filter {
   padding: 8px 12px;
-  border: 1px solid #e0e0e0;
+  /* border: 1px solid #e0e0e0; */
   border-radius: 4px;
   background: #fff;
   color: #333;
@@ -1261,6 +1261,7 @@
 
 /* OrderList.js */
 .Z_order_card {
+  height: 100%;
   border: none;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
   transition: transform 0.2s, box-shadow 0.2s;
@@ -1657,21 +1658,31 @@
 
 /* ... existing code ... */
 
-@media screen and (min-width: 1400px) {
-  .Z_product_section {
-    width: 86vw;
-  }
-}
-@media screen and (min-width: 1200px) {
-  .Z_product_section {
-    width: 78vw;
-  }
-}
+
+
+
 @media screen and (min-width: 768px) {
   .Z_product_section {
     width: 75vw;
   }
 }
+
+@media screen and (min-width: 991px) {
+  .Z_product_section {
+    width: 59vw;
+  }
+}
+@media screen and (min-width: 1200px) {
+  .Z_product_section {
+    width: 70vw;
+  }
+}
+@media screen and (min-width: 1400px) {
+  .Z_product_section {
+    width: 70vw;
+  }
+}
+
 @media screen and (max-width: 767px) {
   .Z_product_section {
     width: 86vw;
@@ -2167,4 +2178,7 @@
   color: var(--accent-hover-color); /* Or your desired hover color */
   transform: scale(1.1);
   outline: none; /* Remove default focus outline if you add custom focus styles */
+}
+.Z_filter_content_show{
+  padding: 4px;
 }

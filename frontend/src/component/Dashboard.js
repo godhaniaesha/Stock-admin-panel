@@ -146,6 +146,8 @@ const Dashboard = () => {
         { id: 3, title: 'product3', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
         { id: 4, title: 'product4', time: '2:00 PM', date: 'Tomorrow', type: 'launch', icon: <MdLaunch /> },
         { id: 5, title: 'product5', time: '4:30 PM', date: 'Today', type: 'call', icon: <MdCall /> },
+        { id: 6, title: 'product6', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
+
     ];
     const toggleTheme = () => {
         // This function should be handled by the parent component
@@ -341,7 +343,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   <div className="d-flex gap-2">
-                    <div className="btn-group">
+                    <div className="btn-group gap-2">
                       <button
                         className={`d_btn-ghost btn-sm ${
                           selectedPeriod === "7d" ? "d_btn-primary" : ""

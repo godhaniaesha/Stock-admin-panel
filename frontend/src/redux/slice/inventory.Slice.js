@@ -120,6 +120,24 @@ export const getLowInventory = createAsyncThunk(
     }
 );
 
+// Get Product Movement Thunk
+export const getProductMovement = createAsyncThunk(
+    'inventory/getProductMovement',
+    async (period, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${API_URL}/product-movement?period=${period}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch product movement data');
+        }
+    }
+);
+ 
 const productSlice = createSlice({
     name: 'inventory',
     initialState: {
@@ -228,6 +246,20 @@ const productSlice = createSlice({
                 state.lowInventory = action.payload; // store low inventory data separately
             })
             .addCase(getLowInventory.rejected, (state, action) => {
+                state.isLoading = false;
+                state.error = action.payload;
+              })
+
+            // Product Movement
+            .addCase(getProductMovement.pending, (state) => {
+                state.isLoading = true;
+                state.error = null;
+            })
+            .addCase(getProductMovement.fulfilled, (state, action) => {
+                state.isLoading = false;
+                state.productMovement = action.payload.productMovement;
+            })
+            .addCase(getProductMovement.rejected, (state, action) => {
                 state.isLoading = false;
                 state.error = action.payload;
             });

@@ -2,26 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 const API_URL = 'http://localhost:2221/api/a1/sales';
-
-// export const fetchSalesMetrics = createAsyncThunk(
-//     'sales/fetchMetrics',
-//     async (_, { rejectWithValue }) => {
-//         try {
-//             const token = localStorage.getItem('token');
-//             console.log(token)
-//             const response = await axios.get(`${API_URL}/salesMetrics`, {
-//                 headers: {
-//                     'Authorization': `Bearer ${token}`
-//                 }
-//             });
-//             console.log(response.data)
-//             return response.data;
-//         } catch (error) {
-//             return rejectWithValue(error.response.data);
-//         }
-//     }
-// );
-
+const API_URL_ORDER = 'http://localhost:2221/api/a1/order';
 
 export const fetchSalesMetrics = createAsyncThunk(
     'sales/fetchMetrics',
@@ -67,12 +48,50 @@ export const fetchInventoryMetrics = createAsyncThunk(
     }
 );
 
+// export const fetchProductMovement = createAsyncThunk(
+//     'sales/fetchProductMovement',
+//     async (params = {}, { rejectWithValue }) => {
+//         try {
+//             const token = localStorage.getItem('token');
+//             const response = await axios.get(`${API_URL}/ProductMovement`, {
+//                 headers: {
+//                     'Authorization': `Bearer ${token}`
+//                 },
+//                 params: {
+//                     startDate: params.startDate,
+//                     endDate: params.endDate
+//                 }
+//             });
+//             return response.data;
+//         } catch (error) {
+//             return rejectWithValue(error.response.data);
+//         }
+//     }
+// );
+
+export const fetchOrdersBySeller = createAsyncThunk(
+    'sales/fetchOrdersBySeller',
+    async (sellerId, { rejectWithValue }) => {
+        try {
+            const token = localStorage.getItem('token');
+            const response = await axios.get(`${API_URL_ORDER}/seller/${sellerId}`, {
+                headers: {
+                    'Authorization': `Bearer ${token}`
+                }
+            });
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
 export const fetchProductMovement = createAsyncThunk(
     'sales/fetchProductMovement',
     async (params = {}, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/ProductMovement`, {
+            const response = await axios.get(`${API_URL}/getProductMovement`, {
                 headers: {
                     'Authorization': `Bearer ${token}`
                 },
@@ -105,6 +124,8 @@ const initialState = {
     salesData: [],
     ordersData: [],
     dashboardData: [],
+    sellerOrders: [],
+    productMovement: [],
     loading: false,
     error: null,
 };
@@ -142,6 +163,18 @@ const salesSlice = createSlice({
                 state.loading = false;
                 state.error = action.payload;
             })
+            .addCase(fetchOrdersBySeller.pending, (state) => {
+                state.loading = true;
+                state.error = null;
+            })
+            .addCase(fetchOrdersBySeller.fulfilled, (state, action) => {
+                state.loading = false;
+                state.sellerOrders = action.payload.data;
+            })
+            .addCase(fetchOrdersBySeller.rejected, (state, action) => {
+                state.loading = false;
+                state.error = action.payload;
+            })
             .addCase(fetchProductMovement.pending, (state) => {
                 state.loading = true;
                 state.error = null;
@@ -149,6 +182,7 @@ const salesSlice = createSlice({
             .addCase(fetchProductMovement.fulfilled, (state, action) => {
                 state.loading = false;
 
+               
                 state.productMovement = action.payload;
             })
             .addCase(fetchProductMovement.rejected, (state, action) => {

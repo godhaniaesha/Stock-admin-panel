@@ -277,11 +277,19 @@ const getallorderbyseller = async (req, res) => {
                 }
             }
 
+
             if (sellerSpecificItems.length > 0) {
+
                 const sellerTax = sellerTotalAmount * 0.18;
-                const sellerDeliveryCharge = order.deliveryCharge > 0 ? order.deliveryCharge / order.items.length : 0;
+                const sellerDeliveryCharge = order.deliveryCharge / orders.length;
+
+
+
                 const sellerDiscountAmount = (order.discountAmount * (sellerTotalAmount / order.totalAmount)) || 0;
+
+
                 const sellerFinalAmount = (sellerTotalAmount - sellerDiscountAmount) + sellerDeliveryCharge + sellerTax;
+
 
                 sellerOrders.push({
                     ...order.toObject(),
@@ -297,7 +305,7 @@ const getallorderbyseller = async (req, res) => {
             }
         }
 
-        if (sellerOrders.length === 0) {
+        if (!sellerOrders || sellerOrders.length === 0) {
             return res.status(404).json({
                 success: false,
                 message: 'No orders found for this seller.'
@@ -319,7 +327,6 @@ const getallorderbyseller = async (req, res) => {
     }
 };
 
-        
 module.exports = {
     createOrder,
     getAllOrders,

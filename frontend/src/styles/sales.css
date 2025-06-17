@@ -4,6 +4,7 @@
   align-items: center;
   margin-bottom: 2rem;
 }
+
 .d_sales-report-container {
   padding: 0.5rem;
 }
@@ -51,6 +52,7 @@
   background-color: var(--dark-bg) !important;
   /* color: #fff; */
 }
+
 .d_dark .d_summary-card,
 .d_dark .x_product_form,
 .d_dark .Z_filter_sidebar .Z_filter_button,
@@ -83,6 +85,7 @@
 {
   background-color: var(--light-card-bg) !important;
 }
+
 .d_dark .Z_product_card .Z_product_title,
 .d_dark .Z_product_card .Z_price_current,
 .d_dark .Z_product_card .Z_rating_count,
@@ -97,7 +100,7 @@
 .d_dark .Z_product_table,
 .d_dark .Z_table_product_name,
 .d_dark .Z_product_table tbody tr,
-.d_dark .table > :not(caption) > * > *,
+.d_dark .table> :not(caption)>*>*,
 .d_dark .x_upload_content .x_upload_text,
 .d_dark .Z_pagination .Z_page_btn,
 .d_dark .Z_filter_option label,
@@ -113,6 +116,7 @@
 .d_dark .x_password_toggle:hover {
   color: var(--accent-color) !important;
 }
+
 .d_dark .Z_add_to_cart_btn,
 .d_dark .Z_filter_sidebar .Z_filter_button,
 .d_dark .x_size_buttons .x_size_btn {
@@ -126,16 +130,20 @@
   background: var(--accent-color)  !important;
   color: #fff !important;
 } */
+
 .d_dark .Z_card_wishlist_btn {
   border: 1px solid var(--accent-color) !important;
 }
+
 .d_dark .Z_product_table tbody tr {
   --bs-table-bg: var(--dark-card-bg) !important;
   background: var(--dark-card-bg) !important;
 }
+
 .d_light.Z_product_section {
   background-color: var(--light-bg) !important;
 }
+
 .d_dark .Z_order_table tbody tr {
   --bs-table-bg: var(--dark-bg) !important;
   background: var(--dark-bg) !important;
@@ -153,12 +161,15 @@
   border-radius: 0.75rem;
   padding: 1rem;
   box-shadow: 0 0 8px rgba(0, 0, 0, 0.05);
-  min-height: 250px; /* <-- Add this line */
+  min-height: 250px;
+  /* <-- Add this line */
 }
+
 .d_chart-container canvas {
   width: 100% !important;
   height: 100% !important;
 }
+
 .d_dark .d_chart-container {
   background-color: var(--dark-card-bg) !important;
 }
@@ -174,6 +185,7 @@
   .d_sales-report-container {
     padding: 2rem;
   }
+
   .d_chart-section {
     flex-direction: row;
   }
@@ -211,6 +223,7 @@
 .d_dark .d_chart-title {
   color: var(--dark-text-color);
 }
+
 /* Existing styles for d_summary-cards and d_summary-card */
 
 .d_summary-cards {
@@ -233,19 +246,25 @@
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transition: transform 0.3s ease, box-shadow 0.3s ease; /* Smooth transition for hover effects */
-  border: 1px solid rgba(0, 0, 0, 0.05); /* subtle border */
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  /* Smooth transition for hover effects */
+  border: 1px solid rgba(0, 0, 0, 0.05);
+  /* subtle border */
 }
 
 .d_dark .d_summary-card {
   background-color: var(--dark-card-bg) !important;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3); /* Darker shadow for dark mode */
-  border: 1px solid rgba(255, 255, 255, 0.1); /* subtle border in dark mode */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+  /* Darker shadow for dark mode */
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  /* subtle border in dark mode */
 }
 
 .d_summary-card:hover {
-  transform: translateY(-5px); /* Slight lift effect on hover */
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* More pronounced shadow on hover */
+  transform: translateY(-5px);
+  /* Slight lift effect on hover */
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15);
+  /* More pronounced shadow on hover */
 }
 
 .d_dark .d_summary-card:hover {
@@ -253,7 +272,8 @@
 }
 
 .d_summary-card h4 {
-  font-size: 1.1rem; /* Slightly larger heading */
+  font-size: 1.1rem;
+  /* Slightly larger heading */
   font-weight: 600;
   margin-bottom: 0.75rem; /* Space between title and value */
   color: var(
@@ -268,19 +288,42 @@
 }
 
 .d_summary-card p {
-  font-size: 2.2rem; /* Significantly larger font size for the value */
+  font-size: 2.2rem;
+  /* Significantly larger font size for the value */
   font-weight: 700;
-  color: var(--text-color); /* Main text color for the value */
-  margin: 0; /* Remove default paragraph margin */
+  color: var(--text-color);
+  /* Main text color for the value */
+  margin: 0;
+  /* Remove default paragraph margin */
 }
 
 .d_dark .d_summary-card p {
-  color: var(
-    --light-bg
-  ) !important; /* Ensure value color is light in dark mode */
+  color: var(--light-bg) !important;
+  /* Ensure value color is light in dark mode */
+}
+
+.a_main_price {
+  background-color: #282F36;
+  color: white;
+}
+
+.a_modal_body {
+  background-color: #22282E;
+  color: white;
+}
+
+.a_main_tr {
+  background-color: #282F36 !important;
+  color: white !important;
+}
+
+.a_main_tr {
+  background-color: #22282E !important;
+  color: white !important;
 }
 
 @media (max-width: 768px) {
+
   .d_chart-container {
     margin: 10px 0px;
     padding: 38px;

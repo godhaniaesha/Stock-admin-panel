@@ -15,4 +15,5 @@ router.get("/salesMetrics",auth(['admin','seller']), salesController.getSalesMet
 router.get("/getAllSalesOrders",auth(['admin','seller']), salesController.getAllSalesOrders);
 router.get("/InventoryMetrics",auth(['admin','seller']), salesController.getInventoryMetrics);
 router.get("/ProductMovement",auth(['admin','seller']), salesController.getProductMovement);
+router.get("/getProductMovement",auth(['admin','seller']), salesController.getProductMovement);
 module.exports = router;

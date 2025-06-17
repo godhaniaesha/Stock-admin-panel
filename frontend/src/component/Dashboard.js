@@ -491,19 +491,22 @@ const Dashboard = () => {
           <div className="row g-4 mb-4">
             <div className="col-lg-8">
               <div className="d_card">
-                <div className="d-flex justify-content-between align-items-center mb-4">
+                <div className="d-flex justify-content-between align-items-center mb-4 ">
                   <div>
                     <h5 className="fw-bold mb-0">Recent Order</h5>
                     <p className="mb-0 opacity-75 small">
                       Latest Orders and Transactions
                     </p>
                   </div>
-                  <div className="d-flex gap-2">
+                  <div className="d-flex gap-2 text-sm-wrap text-nowrap">
                     {/* <button className="d_btn-ghost btn-sm">
                       <Filter size={16} />
                     </button> */}
                     <button
-                      className="d_btn-primary btn-sm"
+                      className="d_btn-primary btn-sm fs-sm-3 p-sm-3 p-2" 
+                      style={{
+                        fontSize: "small",
+                      }}
                       onClick={() => {
                         naviget("/orders");
                       }}

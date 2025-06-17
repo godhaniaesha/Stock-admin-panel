@@ -220,10 +220,10 @@ export default function SalesReport() {
 
   return (
     <div className={`Z_product_section d_sales-report-container ${isDarkMode ? 'd_dark' : 'd_light'}`}>
-      <div className="d_header-section">
+      <div className="d_header-section mb-4">
         <div>
           <h1 className="d_main-title">Sales Report</h1>
-          <p className="d_subtitle">Overview of your store's performance</p>
+          <p className="d_subtitle mb-0">Overview of your store's performance</p>
         </div>
         <div className="d_date-filter">
           {showCustomRange && (

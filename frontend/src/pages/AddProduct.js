@@ -361,7 +361,7 @@ const AddProduct = () => {
     };
 
     return (
-        <div className={`x_product_page_container Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+        <div className={`x_product_page_container x_add_product_container Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'}`}>
 
             {/*  pro card */}
             <div className="x_add_product_container">
@@ -640,6 +640,11 @@ const AddProduct = () => {
                                         </button>
                                     </div> */}
                                     <div className="x_input_group">
+                                          <span  type="button"
+                                            className=" x_input_icon "
+                                            onClick={generateSKU}>
+                                            <RiAiGenerate />
+                                        </span>
                                         <input
                                             type="text"
                                             name="sku"
@@ -649,11 +654,7 @@ const AddProduct = () => {
                                             className={`x_input ${formErrors.sku ? 'x_input_error' : ''}`}
                                             readOnly
                                         />
-                                        <span  type="button"
-                                            className=" x_input_icon "
-                                            onClick={generateSKU}>
-                                            <RiAiGenerate />
-                                        </span>
+                                      
 
                                     </div>
                                     <ErrorMessage error={formErrors.sku} />

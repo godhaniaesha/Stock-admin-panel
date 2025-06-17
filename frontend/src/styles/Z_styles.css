@@ -20,28 +20,17 @@
   padding: 17px 12px;
   border-radius: 8px;
 }
-
 .Z_search_icon {
   background-color: transparent;
-  border: 1px solid #e0e0e0;
+  border: none !important;
   border-left: none;
   color: #757575;
   cursor: pointer;
   padding: 0 15px;
 }
 
-/* .Z_input_grp InputGroup {
-  border: 1px solid white !important;
-  border-radius: 6px !important;
-} */
-
-.Z_search_input:focus {
-  border: 1px solid #e0e0e0 !important;
-  border-right: none !important;
-}
-
 .Z_search_input {
-  border: 1px solid #e0e0e0;
+  border: none !important;
   border-right: none;
   color: #212121;
   padding: 10px 12px;
@@ -49,12 +38,10 @@
   width: calc(100% - 50px);
 }
 
-/* .Z_search_input:focus {
-  background-color: #fff;
-  border-color: #e0e0e0;
-  box-shadow: none;
-  color: #212121;
-} */
+.Z_input_grp .input-group {
+  border: 1px solid #9f9f9f;
+  border-radius: 8px;
+}
 
 .Z_search_input::placeholder {
   color: #9e9e9e;
@@ -278,17 +265,48 @@
 
 .Z_product_image {
   position: relative;
-  padding-top: 100%;
+  width: 100%;
+  height: 200px;
   overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
 .Z_product_image img {
-  position: absolute;
-  top: 0;
-  left: 0;
   width: 100%;
   height: 100%;
-  object-fit: cover;
+  object-fit: contain;
+  transition: filter 0.3s ease-in-out;
+}
+
+.Z_out_of_stock_image {
+  filter: grayscale(100%);
+}
+
+.Z_out_of_stock_overlay {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 120px;
+  height: 120px;
+  /* background-color: rgba(255, 255, 255, 0.9); */
+  background-color: rgb(44 44 44 / 64%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 2;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.Z_out_of_stock_text {
+  font-size: 15px;
+  font-weight: bold;
+  color: #c9c5c5;
+  text-align: center;
+  text-transform: uppercase;
 }
 
 .Z_product_info {
@@ -352,7 +370,7 @@
 
 .Z_add_to_cart_btn {
   flex: 1;
-  border: 1px solid gray;
+  border: 1px solid #6a9c89;
   background-color: transparent;
   color: #000;
   transition: background-color 0.2s;
@@ -361,7 +379,7 @@
 
 .Z_add_to_cart_btn:hover {
   border: none;
-  background-color: #22282e;
+  background-color: var(--accent-color) !important;
 }
 
 .Z_card_wishlist_btn {
@@ -384,8 +402,9 @@
   border-color: #22282e;
 }
 
-.d_show_result {
-  white-space: nowrap;
+.Z_wishlist_btn:hover svg {
+  fill: red !important;
+  cursor: pointer;
 }
 
 .Z_wishlist_btn {
@@ -394,6 +413,10 @@
   border-radius: 6px;
   cursor: pointer;
 }
+
+/* .Z_wishlist_btn:hover{
+  background-color: var(--accent-color);
+} */
 
 .Z_wishlist_btn svg {
   color: #6a9c89;
@@ -869,7 +892,7 @@
 .Z_product_category {
   font-size: 0.85rem;
   color: #757575;
-  margin-bottom: 8px;
+  margin-bottom: 3px;
 }
 
 .Z_price_current {
@@ -916,16 +939,16 @@
 
 .Z_add_to_cart_btn {
   flex: 1;
-  border: 1px solid gray;
+  border: 1px solid var(--accent-color);
   background-color: transparent;
   color: #000;
   transition: background-color 0.2s;
-  padding: 8px 16px;
+  padding: 8px 10px;
 }
 
-.Z_add_to_cart_btn:hover {
-  border: none;
-  background-color: #22282e;
+.d_dark .Z_add_to_cart_btn:hover {
+  background-color: #6a9c89;
+  color: white !important;
 }
 
 .Z_card_wishlist_btn {
@@ -1679,14 +1702,11 @@
 }
 
 .Z_coupon_status.futureplan {
-    background-color: #ece8f5;
-    color: #5f28c6;
+  background-color: #ece8f5;
+  color: #5f28c6;
 }
 
 /* ... existing code ... */
-
-
-
 
 @media screen and (min-width: 768px) {
   .Z_product_section {
@@ -1804,7 +1824,7 @@
   position: relative;
 }
 
-.Z_faq_search .Z_search_input {
+/* .Z_faq_search .Z_search_input {
   height: 50px;
   padding-left: 20px;
   font-size: 1rem;
@@ -1812,7 +1832,7 @@
   border-right: none;
   border-radius: 8px 0 0 8px;
   background: white;
-}
+} */
 
 .Z_faq_search .Z_search_icon {
   background: white;
@@ -2041,6 +2061,14 @@
   .Z_faq_tweet_btn {
     width: 100%;
   }
+  .Z_order_count,
+  .Z_order_title {
+    font-size: 18px;
+  }
+  .Z_order_icon {
+    width: 40px;
+    height: 40px;
+  }
 }
 
 @media (max-width: 576px) {
@@ -2094,6 +2122,21 @@
   .Z_table_actions {
     flex-direction: column;
     align-items: start;
+  }
+  .Z_order_card  .card-body
+  {
+    padding: 12px;
+  }
+  .Z_order_count,
+  .Z_order_title {
+    font-size: 16px;
+  }
+  .Z_order_icon {
+    width: 36px;
+    height: 36px;
+  }
+  .Z_order_header {
+    padding: 0px;
   }
 }
 /* Modal Styles */
@@ -2186,7 +2229,7 @@
 .Z_reset_button {
   padding: 8px 20px;
   /* background-color: #dc3545; */
-  background-color:  #6a9c89;;
+  background-color: #6a9c89;
   color: white;
   border: none;
   border-radius: 4px;
@@ -2212,7 +2255,7 @@
   transform: scale(1.1);
   outline: none; /* Remove default focus outline if you add custom focus styles */
 }
-.Z_filter_content_show{
+.Z_filter_content_show {
   padding: 4px;
 }
 
@@ -2257,37 +2300,50 @@
   .Z_no_data_image {
     width: 150px;
   }
-  
+
   .Z_no_data_title {
     font-size: 20px;
   }
-  
+
   .Z_no_data_text {
     font-size: 14px;
   }
 }
 
-
 /* Modal Footer Button Styles */
-.z_delete_modal.modal{
+.z_delete_modal.modal {
   background-color: var(--dark-bg) !important;
 }
 .z_delete_modal .modal-footer {
-    display: flex;
-    gap: 10px;
-    width: 100%;
-    padding: 15px;
-    border-top: 1px solid #e0e0e0;
+  display: flex;
+  gap: 10px;
+  width: 100%;
+  padding: 15px;
+  border-top: 1px solid #e0e0e0;
 }
 
 .z_delete_modal .modal-footer .Z_btn {
-    flex: 1;
-    width: 50%;
-    margin: 0;
-    padding: 10px;
-    text-align: center;
+  flex: 1;
+  width: 50%;
+  margin: 0;
+  padding: 10px;
+  text-align: center;
 }
-.z_delete_modal.show{
+.z_delete_modal.show {
   background-color: rgba(0, 0, 0, 0.6) !important;
 }
 
+@media (min-width: 1200px) {
+  .Z_offcan_width {
+    display: none !important;
+  }
+  .Z_offcan_width .offcanvas-backdrop.show {
+    opacity: 0 !important;
+  }
+}
+
+.Z_add_to_cart_btn:disabled {
+  background-color: #282f36  !important;
+  cursor: not-allowed;
+  opacity: 0.7;
+}

@@ -16,6 +16,9 @@ import { addToCart, getCart } from '../redux/slice/cart.slice';
 import { addToWishlist, getAllWishlists, getWishlist, removeFromWishlist } from '../redux/slice/wishlist.slice';
 import { fetchCategories, WaccessCategories } from '../redux/slice/category.slice';
 import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
+import { fetchInventories } from '../redux/slice/inventory.Slice';
+// import ProductQuickView from './ProductQuickView';
+
 function ProductGrid() {
     const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
@@ -35,6 +38,7 @@ function ProductGrid() {
     const { subcategories } = useSelector((state) => state.subcategory);
     const { items: wishlistItems } = useSelector((state) => state.wishlist);
     const { items: cartItems, totalItems } = useSelector((state) => state.cart);
+    const { inventory } = useSelector((state) => state.inventory);
 
     useEffect(() => {
         const userId = localStorage.getItem('user');
@@ -43,7 +47,7 @@ function ProductGrid() {
         // dispatch(fetchCategories());
         dispatch(WaccessCategories());
         dispatch(WaccesssubCategories());
-        // dispatch(fetchSubcategories());
+        dispatch(fetchInventories());
         if (userId) {
             dispatch(getCart(userId));
             dispatch(getWishlist(userId));
@@ -57,8 +61,16 @@ function ProductGrid() {
         }));
     };
 
+    const productsWithInventory = products.map(product => {
+        const inventoryItem = inventory.find(inv => inv.product?._id === product._id);
+        return {
+            ...product,
+            quantity: inventoryItem ? inventoryItem.quantity : 0
+        };
+    });
+
     const filterProducts = () => {
-        return products.filter(product => {
+        return productsWithInventory.filter(product => {
             const searchMatch = product.productName.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
                 product.description?.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
                 product.categoryId?.title?.toLowerCase().includes(filters.searchQuery.toLowerCase()) ||
@@ -87,7 +99,7 @@ function ProductGrid() {
         // If already in wishlist, remove it
         if (isProductInWishlist(product._id)) {
             // Find the wishlist item id (not product id)
-            const wishlistItem = wishlistItems.find(item => item.productId._id === product._id);
+            const wishlistItem = wishlistItems.find(item => item && item.productId && item.productId._id === product._id);
             if (wishlistItem) {
                 setLocalWishlist((prev) => prev.filter(id => id !== product._id));
                 dispatch(removeFromWishlist(wishlistItem._id))
@@ -131,11 +143,7 @@ function ProductGrid() {
         if (localWishlist.length > 0) {
             return localWishlist.includes(productId);
         }
-        return wishlistItems.some(item => {
-            console.log('Checking wishlist item:', item);
-            console.log('Item productId:', item ? item.productId : 'item is null');
-            return item && item.productId && item.productId._id === productId;
-        });
+        return wishlistItems.some(item => item && item.productId && item.productId._id === productId);
     };
     useEffect(() => {
         if (wishlistItems && wishlistItems.length > 0) {
@@ -581,14 +589,20 @@ function ProductGrid() {
                                                 <img
                                                     src={`http://localhost:2221/${product.images?.[0]}`}
                                                     alt={product.productName}
+                                                    className={(!product.quantity || product.quantity <= 0) ? 'Z_out_of_stock_image' : ''}
                                                 />
+                                                {(!product.quantity || product.quantity <= 0) && (
+                                                    <div className="Z_out_of_stock_overlay">
+                                                        <span className="Z_out_of_stock_text">Out of Stock</span>
+                                                    </div>
+                                                )}
                                             </div>
                                             <div className="Z_product_info">
                                                 <h3 className="Z_product_title">{product.productName}</h3>
                                                 <div className="Z_product_category">
                                                     {product.categoryId && categories.find(cat => cat._id === product.categoryId._id)?.title || 'No Category'}
                                                 </div>
-                                                <div className="Z_product_price">
+                                                <div className="Z_product_price pb-2">
                                                     <span className="Z_price_current">${product.price}</span>
                                                     {product.discount > 0 && (
                                                         <>
@@ -603,15 +617,16 @@ function ProductGrid() {
                                                     <Button
                                                         className="Z_add_to_cart_btn"
                                                         onClick={() => handleAddToCart(product)}
+                                                        disabled={!product.quantity || product.quantity <= 0}
                                                     >
-                                                        Add To Cart
+                                                        {(!product.quantity || product.quantity <= 0) ? 'Out of Stock' : 'Add To Cart'}
                                                     </Button>
                                                     <div
                                                         className="Z_wishlist_btn"
                                                         onClick={() => handleWishlistToggle(product)}
                                                     >
                                                         {isProductInWishlist(product._id) ? (
-                                                            <IoMdHeart size={24} color="red" />
+                                                            <IoMdHeart size={24} style={{ fill: 'red' }} />
                                                         ) : (
                                                             <IoMdHeartEmpty size={24} />
                                                         )}

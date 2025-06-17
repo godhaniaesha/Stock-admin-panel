@@ -629,7 +629,7 @@ const Dashboard = () => {
                   style={{
                     height: "575px",
                     maxHeight: "575px",
-                    display: "flex",
+                    // display: "flex",
                     justifyContent: "center",
                     alignItems: "center",
                   }}

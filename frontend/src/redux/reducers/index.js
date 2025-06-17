@@ -12,6 +12,7 @@ import inventoryReducer from '../slice/inventory.Slice';
 import orderReducer from '../slice/order.slice';
 import paymentReducer from '../slice/payment.slice';
 import dashboardReducer from '../slice/dashboard.slice';
+import salesReducer from '../slice/sales.slice';
 
 
 export const rootReducer = combineReducers({
@@ -27,7 +28,8 @@ export const rootReducer = combineReducers({
     inventory:inventoryReducer,
     order:orderReducer,
     payment:paymentReducer,
-    dashboard:dashboardReducer
+    dashboard:dashboardReducer,
+    report:salesReducer
 });
 
 export default rootReducer;

@@ -375,7 +375,7 @@ const getInventoryMetrics = async (req, res) => {
         }
 
         // Get products based on user role
-        let products;
+        let products = [];
         if (role === 'seller') {
             // For sellers, get only their products
             products = await Product.find({ sellerId: _id });
@@ -385,7 +385,7 @@ const getInventoryMetrics = async (req, res) => {
         }
 
         // GET OUT OF STOCK based on user role
-        let OutStock;
+        let OutStock = [];
         if (role === 'seller') {
             // For sellers, get only their products with quantity less than or equal to lowStockLimit
             OutStock = await Inventory.find({ 'product.sellerId': _id, quantity: { $lte: 0 } });
@@ -395,7 +395,7 @@ const getInventoryMetrics = async (req, res) => {
         }
 
         // GET Stock Value based on user role
-        let StockValue;
+        let StockValue = [];
         if (role === 'seller') {
             // For sellers, get only their products with quantity less than or equal to lowStockLimit and merge with product price
             StockValue = await Inventory.aggregate([
@@ -518,7 +518,7 @@ const getInventoryMetrics = async (req, res) => {
         ]);
 
         // stock By Category
-        let StockByCategory;
+        let StockByCategory = [];
         if (role === 'seller') {
             // For sellers, get products count by category with category details
             StockByCategory = await Product.aggregate([
@@ -582,11 +582,11 @@ const getInventoryMetrics = async (req, res) => {
 
 
         res.status(200).json({
-            TotalProducts: products.length,
-            TotalOutStock: OutStock.length,
-            TotalStockValue: StockValue[0].totalStockValue,
-            TotalLowStock: lowStockItems.length,
-            StockByCategory: StockByCategory,
+            TotalProducts: products?.length || 0,
+            TotalOutStock: OutStock?.length || 0,
+            TotalStockValue: StockValue?.[0]?.totalStockValue || 0,
+            TotalLowStock: lowStockItems?.length || 0,
+            StockByCategory: StockByCategory || [],
             period: period || 'all_time',
             startDate,
             endDate,

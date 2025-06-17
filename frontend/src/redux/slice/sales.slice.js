@@ -19,6 +19,8 @@ export const fetchSalesMetrics = createAsyncThunk(
                     endDate: params.endDate
                 }
             });
+            console.log(response.data);
+            
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -141,6 +143,8 @@ const salesSlice = createSlice({
                 state.error = null;
             })
             .addCase(fetchSalesMetrics.fulfilled, (state, action) => {
+                console.log(action.payload,"---------------------------");
+                
                 state.loading = false;
                 state.dashboardData = action.payload;
                 state.metrics = action.payload.metrics;

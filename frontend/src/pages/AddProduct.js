@@ -196,9 +196,9 @@ const AddProduct = () => {
 
     const handleTagNumberInput = (e) => {
         const value = e.target.value.toUpperCase();
-        if (value === '' || /^#[A-Z0-9]{0,6}$/.test(value)) {
-            handleInputChange({ ...e, target: { ...e.target, value } });
-        }
+        // Always update the state, validation will be handled by validateForm
+        setProductData(prev => ({ ...prev, tagNumber: value }));
+        setFormErrors(prev => ({ ...prev, tagNumber: null })); // Clear error on change
     };
 
     const handleStockInput = (e) => {
@@ -225,7 +225,11 @@ const AddProduct = () => {
         if (!productData.gender) errors.gender = 'Gender is required';
         if (!productData.description?.trim()) errors.description = 'Description is required';
         if (!productData.sku?.trim()) errors.sku = 'SKU is required';
-        if (!productData.tagNumber?.trim()) errors.tagNumber = 'Tag number is required';
+        if (!productData.tagNumber?.trim()) {
+            errors.tagNumber = 'Tag number is required';
+        } else if (!/^#[A-Z0-9]{0,6}$/.test(productData.tagNumber)) {
+            errors.tagNumber = 'Tag number must start with # and be followed by up to 6 alphanumeric characters (e.g., #ABC123)';
+        }
         if (!productData.stock?.trim()) errors.stock = 'Stock is required';
         if (!productData.price?.trim()) errors.price = 'Price is required';
         if (!productImageFile) errors.image = 'Product image is required';

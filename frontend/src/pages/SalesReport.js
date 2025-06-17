@@ -28,7 +28,9 @@ export default function SalesReport() {
   const { isDarkMode } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const salesState = useSelector((state) => state.dashboard.dashboardData);
+  const salesState = useSelector((state) => state.report.dashboardData);
+  console.log(salesState);
+
   const { totalSales, totalOrders, avgOrderValue, conversionRate, ordersAndSalesOverTime = [], loading = false, error = null } = salesState || {};
   const { orders, isLoading: ordersLoading, error: ordersError } = useSelector((state) => state.order);
   const { sellerOrders = [] } = useSelector((state) => state.sales) || {};
@@ -334,13 +336,16 @@ export default function SalesReport() {
                             {/* #{indexOfFirstOrder + index + 1} */}
                             {order._id ? `${order._id}` : 'N/A'}
                           </td>
+
                           <td>
                             {/* ${order.finalAmount.toFixed(2)} */}
                             ${Math.floor(order.finalAmount)}
                           </td>
+
                           <td className="Z_quantity">
                             {order.items ? order.items.reduce((total, item) => total + item.quantity, 0) : 0}
                           </td>
+
                           <td>
                             <div className="Z_action_buttons">
                               <button
@@ -351,6 +356,7 @@ export default function SalesReport() {
                               </button>
                             </div>
                           </td>
+
                         </tr>
                       ))
                     )}

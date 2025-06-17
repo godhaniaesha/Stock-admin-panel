@@ -30,14 +30,14 @@ export default function InventoryReport() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { inventory, isLoading, error } = useSelector((state) => state.inventory);
-  const  {productMovement} = useSelector((state) => state.dashboard.productMovement);
+  const {productMovement} = useSelector((state) => state.report.productMovement);
   const linechart = useSelector((state) => state);
   console.log('Inventory Data:', inventory);
 
   const { isDarkMode } = useOutletContext();
 
 
-  const inventoryData = useSelector((state) => state.dashboard.inventory);
+  const inventoryData = useSelector((state) => state.report.inventory);
 
   const [selectedRange, setSelectedRange] = useState('Last 7 Days');
   const [showCustomRange, setShowCustomRange] = useState(false);
@@ -150,7 +150,7 @@ export default function InventoryReport() {
     lowStock: 120,
     stockValue: 150000,
   };
-console.log(productMovement)
+  console.log(productMovement)
   const productMovementData = {
     labels: productMovement?.labels || [],
     datasets: [
@@ -328,19 +328,19 @@ console.log(productMovement)
       <div className="d_summary-cards">
         <div className="d_summary-card">
           <h4>Total Products</h4>
-          <p>{inventoryData?.TotalProducts}</p>
+          <p>{inventoryData?.TotalProducts || 0}</p>
         </div>
         <div className="d_summary-card">
           <h4>Out of Stock</h4>
-          <p>{inventoryData.TotalOutStock}</p>
+          <p>{inventoryData?.TotalOutStock || 0}</p>
         </div>
         <div className="d_summary-card">
           <h4>Low Stock</h4>
-          <p>{inventoryData.TotalLowStock}</p>
+          <p>{inventoryData?.TotalLowStock || 0}</p>
         </div>
         <div className="d_summary-card">
           <h4>Total Stock Value</h4>
-          <p>${inventoryData.TotalStockValue}</p>
+          <p>${inventoryData?.TotalStockValue || 0}</p>
         </div>
       </div>
 
@@ -364,7 +364,7 @@ console.log(productMovement)
           <div className="Z_table_header">
             <h4>All Product Inventory</h4>
             <div className="Z_table_actions">
-              <button className="Z_add_product_btn">Add Product</button>
+              <button className="Z_add_product_btn" onClick={() => navigate('/stock')}>Add Product</button>
               <select className="Z_time_filter">
                 <option>This Month</option>
                 <option>Last Month</option>
@@ -392,8 +392,8 @@ console.log(productMovement)
                     <td>
                       <div className="Z_subcategory_details_cell">
                         <img
-                          src={`http://localhost:2221/${item.productData.images[0]}`}
-                          alt={item.productData?.productName || 'Product Image'}
+                          src={`http://localhost:2221/${item.product.images[0]}`}
+                          alt={item.product?.productName || 'Product Image'}
                           className="Z_table_subcategory_img"
                           width={60}
                           height={60}
@@ -407,7 +407,7 @@ console.log(productMovement)
                             border: '1px solid #e0e0e0'
                           }}
                         />
-                        <div className="Z_table_subcategory_name">{item.productData?.productName}</div>
+                        <div className="Z_table_subcategory_name">{item.product?.productName || 'N/A'}</div>
                       </div>
                     </td>
                     {/* <td>
@@ -416,8 +416,8 @@ console.log(productMovement)
                       </div>
                     </td> */}
                     <td>{item.quantity}</td>
-                    <td>${item.productData?.price?.toFixed(2) || '0.00'}</td>
-                    <td>{item.productData?.sku || 'N/A'}</td>
+                    <td>${item.product?.price?.toFixed(2) || '0.00'}</td>
+                    <td>{item.product?.sku || 'N/A'}</td>
                     <td>
                       <div className="Z_action_buttons">
                         {/* <button className="Z_action_btn Z_view_btn">

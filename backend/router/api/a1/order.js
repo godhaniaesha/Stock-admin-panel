@@ -11,7 +11,7 @@ router.post('/add', orderController.createOrder);
 router.get('/get', orderController.getAllOrders);
 
 // // Get orders by sellerId
-router.get('/seller/:sellerId', orderController.getallorderbyseller);
+router.get('/seller',auth(['admin','seller']), orderController.getallorderbyseller);
 
 // Get order by ID
 router.get('/get/:id', orderController.getOrderById);

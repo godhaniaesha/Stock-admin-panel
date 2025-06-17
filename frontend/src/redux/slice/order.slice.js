@@ -32,9 +32,12 @@ export const fetchOrders = createAsyncThunk(
     'order/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
+            console.log('Making API call to fetch orders...');
             const { data } = await getAxios().get('/seller');
+            console.log('API response:', data);
             return data.data;
         } catch (error) {
+            console.error('Error fetching orders:', error);
             return rejectWithValue(error.response?.data?.message || error.message);
         }
     }

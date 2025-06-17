@@ -220,11 +220,114 @@ const getOrdersByUser = async (req, res) => {
     }
 };
 
+// Get all orders for a specific seller or all orders for admin
+const getallorderbyseller = async (req, res) => {
+    try {
+        const user = req.user;
+        console.log(user,"user");
+        
+
+        if (user.role === 'admin') {
+            const orders = await Order.find()
+                .populate('userId')
+                .populate('couponId')
+                .populate({
+                    path: 'items.productId',
+                    populate: [
+                        { path: 'categoryId', model: 'Category' },
+                        { path: 'subcategoryId', model: 'Subcategory' },
+                        { path: 'sellerId', model: 'usersaa' }
+                    ]
+                });
+            return res.status(200).json({
+                success: true,
+                message: 'All orders retrieved successfully for admin',
+                data: orders
+            });
+        }
+
+        if (user.role !== 'seller') {
+            return res.status(403).json({ error: "Access denied" });
+        }
+
+        const sellerId = user._id.toString();
+
+        const orders = await Order.find({ 'items.productId': { $exists: true } })
+            .populate({
+                path: 'items.productId',
+                populate: [
+                    { path: 'categoryId', model: 'Category' },
+                    { path: 'subcategoryId', model: 'Subcategory' },
+                    { path: 'sellerId', model: 'usersaa' }
+                ]
+            })
+            .populate('userId')
+            .populate('couponId');
+
+        const sellerOrders = [];
+
+        for (const order of orders) {
+            let sellerSpecificItems = [];
+            let sellerTotalAmount = 0;
+
+            for (const item of order.items) {
+                if (item.productId && item.productId.sellerId && item.productId.sellerId._id.toString() === sellerId) {
+                    sellerSpecificItems.push(item);
+                    sellerTotalAmount += item.productId.price * item.quantity;
+                }
+            }
+
+            if (sellerSpecificItems.length > 0) {
+                const sellerTax = sellerTotalAmount * 0.18;
+                const sellerDeliveryCharge = order.deliveryCharge > 0 ? order.deliveryCharge / order.items.length : 0;
+                const sellerDiscountAmount = (order.discountAmount * (sellerTotalAmount / order.totalAmount)) || 0;
+                const sellerFinalAmount = (sellerTotalAmount - sellerDiscountAmount) + sellerDeliveryCharge + sellerTax;
+
+                sellerOrders.push({
+                    ...order.toObject(),
+                    items: sellerSpecificItems,
+                    totalAmount: sellerTotalAmount,
+                    discountAmount: sellerDiscountAmount,
+                    deliveryCharge: sellerDeliveryCharge,
+                    tax: sellerTax,
+                    finalAmount: sellerFinalAmount,
+                    originalOrderTotalAmount: order.totalAmount,
+                    originalOrderFinalAmount: order.finalAmount
+                });
+            }
+        }
+
+        if (sellerOrders.length === 0) {
+            return res.status(404).json({
+                success: false,
+                message: 'No orders found for this seller.'
+            });
+        }
+
+        res.status(200).json({
+            success: true,
+            message: 'Orders for seller retrieved successfully',
+            data: sellerOrders
+        });
+    } catch (error) {
+        console.error("Error in getallorderbyseller:", error);
+        res.status(500).json({
+            success: false,
+            message: 'Error retrieving orders for seller',
+            error: error.message
+        });
+    }
+};
+
+        
 module.exports = {
     createOrder,
     getAllOrders,
     getOrderById,
     updateOrder,
     deleteOrder,
-    getOrdersByUser
+    getOrdersByUser,
+    getallorderbyseller
+
+
 };

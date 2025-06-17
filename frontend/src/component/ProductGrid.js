@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import '../styles/sales.css'
 import '../styles/Z_styles.css';
 import { Container, Row, Col, Form, InputGroup, Button, Offcanvas, Badge, Card } from 'react-bootstrap';
 import { FaFilter, FaChevronDown, FaHeart } from 'react-icons/fa';
@@ -15,7 +16,6 @@ import { addToCart, getCart } from '../redux/slice/cart.slice';
 import { addToWishlist, getAllWishlists, getWishlist, removeFromWishlist } from '../redux/slice/wishlist.slice';
 import { fetchCategories, WaccessCategories } from '../redux/slice/category.slice';
 import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
-
 function ProductGrid() {
     const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
@@ -152,7 +152,7 @@ function ProductGrid() {
     return (
         <>
             <ToastContainer />
-            <section className={`Z_product_section mx-0 mx-lg-5 my-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+            <section className={`Z_product_section mx-0 mx-lg-2 my-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <Row className="Z_topbar_wrapper">
                     {/* Search input for larger screens */}
                     <Col xl={3} lg={12} className="mb-3 mb-lg-0 d-none d-xl-block">
@@ -425,7 +425,7 @@ function ProductGrid() {
 
                         onHide={() => handleFilterChange('showOffcanvas', false)}
                         placement="start"
-                        className="Z_offcan_width"
+                        className={`Z_offcan_width ${isDarkMode ? 'd_dark' : 'd_light'}`}
                     >
                         <Offcanvas.Header closeButton>
                             <Offcanvas.Title>Filters</Offcanvas.Title>

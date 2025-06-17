@@ -5,9 +5,6 @@ import { rootReducer } from "./reducers/index";
 // import categoryReducer from './slice/category.slice'
 // import subcategoryReducer from './slice/subCategory.slice'
 // import productReducer from './slice/product.slice'
-// import categoryReducer from './slice/category.slice'
-// import subcategoryReducer from './slice/subCategory.slice'
-// import productReducer from './slice/product.slice'
 // import salesReducer from './slice/sales.slice'
 
 const persistConfig = {

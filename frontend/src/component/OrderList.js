@@ -168,7 +168,7 @@ function OrderList() {
                     {order._id ? `...${order._id.slice(-6)}` : 'N/A'}
                   </td>
                   <td className="Z_customer_name">
-                    {order.userId ? `${order.userId.username}` : 'N/A'}
+                    {order.userId ? `${order.userId.firstName}` : 'N/A'}
                   </td>
                   <td>
                     {order.createdAt ?

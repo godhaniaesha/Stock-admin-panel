@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const auth = require('../../../middleware/auth');
 
 const { orderController } = require('../../../controller');
 
@@ -8,6 +9,9 @@ router.post('/add', orderController.createOrder);
 
 // Get all orders
 router.get('/get', orderController.getAllOrders);
+
+// // Get orders by sellerId
+router.get('/seller',auth(['admin','seller']), orderController.getallorderbyseller);
 
 // Get order by ID
 router.get('/get/:id', orderController.getOrderById);

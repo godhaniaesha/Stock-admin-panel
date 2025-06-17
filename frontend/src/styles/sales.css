@@ -72,8 +72,11 @@
 .d_dark .x_upload_area:hover,
 .d_dark .x_size_buttons .x_size_btn,
 .d_dark .Z_order_card,
-.d_dark .Z_time_filter {
+.d_dark .Z_time_filter,.d_dark .Z_offcan_width.offcanvas {
   background-color: var(--dark-card-bg) !important;
+}
+.d_dark.Z_offcan_width.offcanvas.offcanvas-start.show {
+  background-color: var(--dark-bg) !important;
 }
 .d_light .d_summary-card,
 .d_light .Z_table_wrapper {
@@ -99,9 +102,10 @@
 .d_dark .Z_filter_option label,
 .d_dark .Z_order_card,
 .d_dark .Z_order_title,
-.d_dark .Z_time_filter {
+.d_dark .Z_time_filter,.d_dark.Z_offcan_width.offcanvas.offcanvas-start.show {
   color: var(--light-bg) !important;
 }
+
 .d_dark .Z_product_card .Z_product_category,
 .d_dark .Z_product_card .Z_price_original,
 .d_dark .Z_order_count,
@@ -264,7 +268,13 @@
     padding: 38px;
   }
 }
+@media (max-width: 576px) {
+  
+.d_header-section {
+  flex-direction: column;
 
+}
+}
 .d_date-filter {
   position: relative;
   display: flex;

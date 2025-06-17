@@ -170,7 +170,7 @@ function SubcategoryList() {
 
     return (
         <>
-            <section className={`Z_product_section mx-0 mx-lg-5 my-md-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+            <section className={`Z_product_section mx-0 mx-lg-2 my-md-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
                         <h4>All Subcategory List</h4>

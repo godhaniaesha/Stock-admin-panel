@@ -3,8 +3,10 @@ import '../styles/x_app.css';
 import { useOutletContext, useParams, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { Modal, Button, Spinner } from 'react-bootstrap';
-import { fetchCategories } from '../redux/slice/category.slice';
-import { fetchSubcategories } from '../redux/slice/subCategory.slice';
+// import { fetchCategories } from '../redux/slice/category.slice';
+// import { fetchSubcategories } from '../redux/slice/subCategory.slice';
+import { fetchCategories, WaccessCategories } from '../redux/slice/category.slice';
+import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
 import { fetchProducts } from '../redux/slice/product.slice';
 import { fetchInventoryById, updateInventory } from '../redux/slice/inventory.Slice';
 
@@ -36,8 +38,8 @@ const EditInventory = () => {
 
     // Fetch all necessary data
     useEffect(() => {
-        dispatch(fetchCategories());
-        dispatch(fetchSubcategories());
+        dispatch(WaccessCategories());
+        dispatch(WaccesssubCategories());
         dispatch(fetchProducts());
     }, [dispatch]);
 

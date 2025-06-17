@@ -87,9 +87,21 @@ function UserRoutes() {
                     <Route path="products/edit/:id" element={<EditProduct />} />
                     <Route path="products/view" element={<ProductList />} />
 
-                    <Route path="coupons" element={<ListCoupons />} />
-                    <Route path="coupons/add" element={<AddCoupon />} />
-                    <Route path="coupons/edit/:id" element={<EditCoupon />} />
+                    <Route path="coupons" element={
+                        <RoleCheck allowedRoles={['admin']}>
+                            <ListCoupons />
+                        </RoleCheck>
+                    } />
+                    <Route path="coupons/add" element={
+                        <RoleCheck allowedRoles={['admin']}>
+                            <AddCoupon />
+                        </RoleCheck>
+                    } />
+                    <Route path="coupons/edit/:id" element={
+                        <RoleCheck allowedRoles={['admin']}>
+                            <EditCoupon />
+                        </RoleCheck>
+                    } />
 
                     <Route path="orders" element={<OrderList />} />
                     <Route path="cart" element={<CartList />} />

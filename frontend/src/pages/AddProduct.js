@@ -44,6 +44,7 @@ const AddProduct = () => {
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
     const [error, setError] = useState('');
+    const [formErrors, setFormErrors] = useState({});
     const [isGenderOpen, setIsGenderOpen] = useState(false);
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
     const [isSubcategoryOpen, setIsSubcategoryOpen] = useState(false);
@@ -119,8 +120,39 @@ const AddProduct = () => {
 
     const handleTagInput = (e) => {
         if (e.key === 'Enter' && tagInput.trim()) {
+            // Validate tag before adding
+            if (tagInput.trim().length < 2) {
+                setFormErrors(prev => ({
+                    ...prev,
+                    tags: 'Tags must be at least 2 characters long'
+                }));
+                return;
+            }
+            if (tagInput.trim().length > 20) {
+                setFormErrors(prev => ({
+                    ...prev,
+                    tags: 'Tags cannot exceed 20 characters'
+                }));
+                return;
+            }
+            if (tags.length >= 10) {
+                setFormErrors(prev => ({
+                    ...prev,
+                    tags: 'Maximum 10 tags allowed'
+                }));
+                return;
+            }
+            if (tags.includes(tagInput.trim())) {
+                setFormErrors(prev => ({
+                    ...prev,
+                    tags: 'This tag already exists'
+                }));
+                return;
+            }
+            
             setTags([...tags, tagInput.trim()]);
             setTagInput('');
+            setFormErrors(prev => ({ ...prev, tags: '' }));
             e.preventDefault();
         }
     };
@@ -131,19 +163,126 @@ const AddProduct = () => {
 
     const handleInputChange = (e) => {
         const { name, value } = e.target;
+        let newValue = value;
+
+        // For numeric inputs, prevent negative sign
+        if (['price', 'discount', 'tax', 'stock'].includes(name)) {
+            // If the value starts with '-', remove the minus sign
+            if (value.startsWith('-')) {
+                newValue = value.replace(/^-/, '');
+            }
+        }
+
         setProductData(prev => ({
             ...prev,
-            [name]: value
+            [name]: newValue
         }));
+        // Clear error for this field when user types
+        if (formErrors[name]) {
+            setFormErrors(prev => ({
+                ...prev,
+                [name]: ''
+            }));
+        }
+    };
+
+    // Add validation handlers
+    const handleSKUInput = (e) => {
+        const value = e.target.value.toUpperCase();
+        if (value === '' || /^[A-Z0-9]{0,12}$/.test(value)) {
+            handleInputChange({ ...e, target: { ...e.target, value } });
+        }
+    };
+
+    const handleTagNumberInput = (e) => {
+        const value = e.target.value.toUpperCase();
+        if (value === '' || /^#[A-Z0-9]{0,6}$/.test(value)) {
+            handleInputChange({ ...e, target: { ...e.target, value } });
+        }
+    };
+
+    const handleStockInput = (e) => {
+        const value = e.target.value;
+        if (value === '' || /^\d+$/.test(value)) {
+            handleInputChange(e);
+        }
+    };
+
+    const handleBlur = () => {
+        validateForm();
+    };
+
+    // Validation function
+    const validateForm = () => {
+        const errors = {};
+        
+        // Required fields validation
+        if (!productData.categoryId) errors.categoryId = 'Category is required';
+        if (!productData.subcategoryId) errors.subcategoryId = 'Subcategory is required';
+        if (!productData.productName?.trim()) errors.productName = 'Product name is required';
+        if (!productData.brand?.trim()) errors.brand = 'Brand is required';
+        if (!productData.weight?.trim()) errors.weight = 'Weight is required';
+        if (!productData.gender) errors.gender = 'Gender is required';
+        if (!productData.description?.trim()) errors.description = 'Description is required';
+        if (!productData.sku?.trim()) errors.sku = 'SKU is required';
+        if (!productData.tagNumber?.trim()) errors.tagNumber = 'Tag number is required';
+        if (!productData.stock?.trim()) errors.stock = 'Stock is required';
+        if (!productData.price?.trim()) errors.price = 'Price is required';
+        if (!productImageFile) errors.image = 'Product image is required';
+
+        // Format validation
+        if (productData.price && isNaN(productData.price)) {
+            errors.price = 'Price must be a number';
+        }
+        if (productData.stock && isNaN(productData.stock)) {
+            errors.stock = 'Stock must be a number';
+        }
+
+        // Discount validation
+        if (productData.discount !== undefined && productData.discount !== null) {
+            const discountValue = Number(productData.discount);
+            if (productData.discount.trim() === '' || isNaN(discountValue)) {
+                errors.discount = '⚠️ Discount must be a number';
+            } else if (discountValue < 0) {
+                errors.discount = '⚠️ Discount cannot be negative';
+            } else if (discountValue > 100) {
+                errors.discount = '⚠️ Discount cannot exceed 100%';
+            } else if (!Number.isInteger(discountValue)) {
+                errors.discount = '⚠️ Discount must be a whole number';
+            }
+        }
+
+        // Tax validation
+        if (productData.tax !== undefined && productData.tax !== null) {
+            const taxValue = Number(productData.tax);
+            if (productData.tax.trim() === '' || isNaN(taxValue)) {
+                errors.tax = '⚠️ Tax must be a number';
+            } else if (taxValue < 0) {
+                errors.tax = '⚠️ Tax cannot be negative';
+            } else if (taxValue > 100) {
+                errors.tax = '⚠️ Tax cannot exceed 100%';
+            } else if (!Number.isInteger(taxValue)) {
+                errors.tax = '⚠️ Tax must be a whole number';
+            }
+        }
+
+        console.log('Validation errors:', errors); // Temporary log to check errors
+
+        setFormErrors(errors);
+        return Object.keys(errors).length === 0;
     };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
+        
+        if (!validateForm()) {
+            return;
+        }
 
         // Get sellerId directly from localStorage
         const sellerId = localStorage.getItem('user');
         if (!sellerId) {
-            console.error('Seller ID not found in localStorage');
+            setError('Seller ID not found. Please login again.');
             return;
         }
 
@@ -211,6 +350,12 @@ const AddProduct = () => {
         setProductData(prev => ({ ...prev, sku }));
     };
 
+    // Add error display component
+    const ErrorMessage = ({ error }) => {
+        if (!error) return null;
+        return <div className="x_error_text">{error}</div>;
+    };
+
     return (
         <div className={`x_product_page_container Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'}`}>
 
@@ -269,7 +414,12 @@ const AddProduct = () => {
                         </div>
                     </div>
                 </div>
-
+ {/* Add image error message */}
+ {formErrors.image && (
+                    <div className="x_error_message mb-3">
+                        {formErrors.image}
+                    </div>
+                )}
 
                 <div className="x_product_form">
                     <div className="x_product_info">
@@ -312,6 +462,7 @@ const AddProduct = () => {
                                             </div>
                                         )}
                                     </div>
+                                    <ErrorMessage error={formErrors.categoryId} />
                                 </div>
 
                                 <div className="x_form_group">
@@ -350,6 +501,7 @@ const AddProduct = () => {
                                             </div>
                                         )}
                                     </div>
+                                    <ErrorMessage error={formErrors.subcategoryId} />
                                 </div>
                             </div>
                             <div className="x_form_row">
@@ -361,8 +513,9 @@ const AddProduct = () => {
                                         placeholder="Items Name"
                                         value={productData.productName}
                                         onChange={handleInputChange}
-                                        className="x_input"
+                                        className={`x_input ${formErrors.productName ? 'x_input_error' : ''}`}
                                     />
+                                    <ErrorMessage error={formErrors.productName} />
                                 </div>
                                 <div className="x_form_group">
                                     <label>Brand</label>
@@ -372,8 +525,9 @@ const AddProduct = () => {
                                         placeholder="Brand Name"
                                         value={productData.brand}
                                         onChange={handleInputChange}
-                                        className="x_input"
+                                        className={`x_input ${formErrors.brand ? 'x_input_error' : ''}`}
                                     />
+                                    <ErrorMessage error={formErrors.brand} />
                                 </div>
                             </div>
 
@@ -387,8 +541,9 @@ const AddProduct = () => {
                                         placeholder="In gm & kg"
                                         value={productData.weight}
                                         onChange={handleInputChange}
-                                        className="x_input"
+                                        className={`x_input ${formErrors.weight ? 'x_input_error' : ''}`}
                                     />
+                                    <ErrorMessage error={formErrors.weight} />
                                 </div>
                                 <div className="x_form_group">
                                     <label>Gender</label>
@@ -421,6 +576,7 @@ const AddProduct = () => {
                                             </div>
                                         )}
                                     </div>
+                                    <ErrorMessage error={formErrors.gender} />
                                 </div>
                             </div>
 
@@ -452,8 +608,9 @@ const AddProduct = () => {
                                         placeholder="Short description about the product"
                                         value={productData.description}
                                         onChange={handleInputChange}
-                                        className="x_textarea"
+                                        className={`x_textarea ${formErrors.description ? 'x_input_error' : ''}`}
                                     />
+                                    <ErrorMessage error={formErrors.description} />
                                 </div>
                             </div>
 
@@ -484,8 +641,8 @@ const AddProduct = () => {
                                             name="sku"
                                             placeholder="SKU Number"
                                             value={productData.sku}
-                                            onChange={handleInputChange}
-                                            className="x_input"
+                                            onChange={handleSKUInput}
+                                            className={`x_input ${formErrors.sku ? 'x_input_error' : ''}`}
                                             readOnly
                                         />
                                         <span  type="button"
@@ -495,6 +652,7 @@ const AddProduct = () => {
                                         </span>
 
                                     </div>
+                                    <ErrorMessage error={formErrors.sku} />
                                 </div>
                                 <div className="x_form_group">
                                     <label>Tag Number</label>
@@ -503,9 +661,10 @@ const AddProduct = () => {
                                         name="tagNumber"
                                         placeholder="#******"
                                         value={productData.tagNumber}
-                                        onChange={handleInputChange}
-                                        className="x_input"
+                                        onChange={handleTagNumberInput}
+                                        className={`x_input ${formErrors.tagNumber ? 'x_input_error' : ''}`}
                                     />
+                                    <ErrorMessage error={formErrors.tagNumber} />
                                 </div>
                                 <div className="x_form_group">
                                     <label>Stock</label>
@@ -514,9 +673,11 @@ const AddProduct = () => {
                                         name="stock"
                                         placeholder="Quantity"
                                         value={productData.stock}
-                                        onChange={handleInputChange}
-                                        className="x_input"
+                                        onChange={handleStockInput}
+                                        className={`x_input ${formErrors.stock ? 'x_input_error' : ''}`}
+                                        min="0"
                                     />
+                                    <ErrorMessage error={formErrors.stock} />
                                 </div>
                             </div>
 
@@ -525,7 +686,7 @@ const AddProduct = () => {
                                     <label>Tag</label>
                                     <input
                                         type="text"
-                                        className="x_input"
+                                        className={`x_input ${formErrors.tags ? 'x_input_error' : ''}`}
                                         placeholder="Type and press Enter"
                                         value={tagInput}
                                         onChange={(e) => setTagInput(e.target.value)}
@@ -545,6 +706,7 @@ const AddProduct = () => {
                                             </div>
                                         ))}
                                     </div>
+                                    <ErrorMessage error={formErrors.tags} />
                                 </div>
                             </div>
                         </div>
@@ -568,9 +730,11 @@ const AddProduct = () => {
                                         placeholder="000"
                                         value={productData.price}
                                         onChange={handleInputChange}
-                                        className="x_input x_input_with_icon"
+                                        className={`x_input x_input_with_icon ${formErrors.price ? 'x_input_error' : ''}`}
+                                        min="0"
                                     />
                                 </div>
+                                <ErrorMessage error={formErrors.price} />
                             </div>
                             <div className="x_form_group">
                                 <label>Discount</label>
@@ -584,9 +748,17 @@ const AddProduct = () => {
                                         placeholder="000"
                                         value={productData.discount}
                                         onChange={handleInputChange}
-                                        className="x_input x_input_with_icon"
+                                        onBlur={handleBlur}
+                                        className={`x_input x_input_with_icon ${formErrors.discount ? 'x_input_error' : ''}`}
+                                        min="0"
+                                        max="100"
                                     />
                                 </div>
+                                {formErrors.discount && (
+                                    <div className="x_error_text">
+                                        {formErrors.discount}
+                                    </div>
+                                )}
                             </div>
                             <div className="x_form_group">
                                 <label>Tax</label>
@@ -600,13 +772,23 @@ const AddProduct = () => {
                                         placeholder="000"
                                         value={productData.tax}
                                         onChange={handleInputChange}
-                                        className="x_input x_input_with_icon"
+                                        onBlur={handleBlur}
+                                        className={`x_input x_input_with_icon ${formErrors.tax ? 'x_input_error' : ''}`}
+                                        min="0"
+                                        max="100"
                                     />
                                 </div>
+                                {formErrors.tax && (
+                                    <div className="x_error_text">
+                                        {formErrors.tax}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     </div>
                 </div>
+
+               
 
                 <div className="x_btn_wrapper mt-3">
                     <button

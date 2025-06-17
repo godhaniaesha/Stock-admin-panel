@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProductById, resetCurrentProduct } from '../redux/slice/product.slice';
 import { BsLightningFill } from 'react-icons/bs';
@@ -12,6 +12,7 @@ import { toast } from 'react-toastify';
 
 const ProductDetail = () => {
   const { id: productId } = useParams();
+  const { isDarkMode } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { currentProduct, isLoading, error: productError } = useSelector((state) => state.product);
@@ -127,7 +128,9 @@ const ProductDetail = () => {
       minHeight: '100vh',
       padding: '2rem 1rem',
       fontFamily: 'system-ui, -apple-system, sans-serif'
-    }}>
+    }}
+    className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'}`}
+    >
       <style jsx>{`
         :root {
           --dark-bg: #22282e;
@@ -145,508 +148,226 @@ const ProductDetail = () => {
         }
 
         .product-container {
-          max-width: 1200px;
+          max-width: 1100px;
           margin: 0 auto;
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 3rem;
+          gap: 1rem; /* Increased gap for more breathing room */
           align-items: start;
+          padding: 1rem; /* Increased padding */
+          background: var(--dark-card-bg); /* Use card background for container */
+          border-radius: 12px; /* Softer rounded corners */
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* More prominent shadow */
         }
 
         .image-section {
           position: sticky;
-          top: 2rem;
+          top: 1rem; /* Adjust sticky position */
+          background: var(--dark-card-bg);
+          padding: 1rem;
+          border-radius: 12px;
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
         }
 
         .main-image {
           position: relative;
-          border-radius: 16px;
+          border-radius: 10px; /* Consistent rounded corners */
           overflow: hidden;
-          margin-bottom: 1rem;
-          background: var(--dark-card-bg);
-          aspect-ratio: 5/5;
+          margin-bottom: 1rem; /* Increased margin */
+          background: var(--dark-bg);
+          aspect-ratio: 1;
           cursor: zoom-in;
+          box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
         }
 
         .main-image img {
           width: 100%;
           height: 100%;
           object-fit: cover;
-          transition: transform 0.3s ease;
+          transition: transform 0.4s ease-in-out; /* Smoother transition */
         }
 
         .main-image:hover img {
-          transform: scale(1.05);
-        }
-
-        .image-controls {
-          position: absolute;
-          top: 50%;
-          transform: translateY(-50%);
-          background: rgba(0, 0, 0, 0.5);
-          color: white;
-          border: none;
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          cursor: pointer;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          font-size: 18px;
-          transition: all 0.3s ease;
-          opacity: 0;
-        }
-
-        .main-image:hover .image-controls {
-          opacity: 1;
-        }
-
-        .image-controls:hover {
-          background: rgba(0, 0, 0, 0.8);
-          transform: translateY(-50%) scale(1.1);
-        }
-
-        .prev-btn {
-          left: 10px;
-        }
-
-        .next-btn {
-          right: 10px;
-        }
-
-        .image-indicators {
-          position: absolute;
-          bottom: 10px;
-          left: 50%;
-          transform: translateX(-50%);
-          display: flex;
-          gap: 8px;
-        }
-
-        .indicator {
-          width: 8px;
-          height: 8px;
-          border-radius: 50%;
-          background: rgba(255, 255, 255, 0.5);
-          cursor: pointer;
-          transition: all 0.3s ease;
-        }
-
-        .indicator.active {
-          background: var(--accent-color);
-          transform: scale(1.3);
-        }
-
-        .auto-slide-toggle {
-          position: absolute;
-          top: 10px;
-          right: 10px;
-          background: rgba(0, 0, 0, 0.7);
-          color: white;
-          border: none;
-          padding: 8px 12px;
-          border-radius: 20px;
-          font-size: 12px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          display: flex; /* Added for icon alignment */
-          align-items: center; /* Added for icon alignment */
-          gap: 5px; /* Spacing between icon and text */
-        }
-
-        .auto-slide-toggle:hover {
-          background: rgba(0, 0, 0, 0.9);
-        }
-
-        .zoom-overlay {
-          position: fixed;
-          top: 0;
-          left: 0;
-          width: 100vw;
-          height: 100vh;
-          background: rgba(0, 0, 0, 0.9);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          z-index: 1000;
-          cursor: zoom-out;
-        }
-
-        .zoom-image {
-          max-width: 90%;
-          max-height: 90%;
-          object-fit: contain;
-          border-radius: 8px;
-        }
-
-        .thumbnail-grid {
-          display: grid;
-          grid-template-columns: repeat(6, 1fr);
-          gap: 0.75rem;
-          max-height: 100px;
-          overflow-x: auto;
-          padding: 5px;
-        }
-
-        .thumbnail-grid::-webkit-scrollbar {
-          height: 4px;
-        }
-
-        .thumbnail-grid::-webkit-scrollbar-track {
-          background: var(--dark-card-bg);
-          border-radius: 2px;
-        }
-
-        .thumbnail-grid::-webkit-scrollbar-thumb {
-          background: var(--accent-color);
-          border-radius: 2px;
-        }
-
-        .thumbnail {
-          aspect-ratio: 1;
-          border-radius: 12px;
-          overflow: hidden;
-          cursor: pointer;
-          border: 2px solid transparent;
-          transition: all 0.3s ease;
-          background: var(--dark-card-bg);
-        }
-
-        .thumbnail:hover {
-          border-color: var(--accent-color);
-          transform: translateY(-2px);
-        }
-
-        .thumbnail.active {
-          border-color: var(--accent-color);
-          box-shadow: 0 0 20px rgba(123, 166, 142, 0.3);
-        }
-
-        .thumbnail img {
-          width: 100%;
-          height: 100%;
-          object-fit: cover;
-        }
-
-        .details-section {
-          padding-left: 1rem;
+          transform: scale(1.08); /* Slightly more zoom on hover */
         }
 
         .product-badge {
           background: linear-gradient(135deg, var(--accent-color), var(--accent-hover-color));
           color: white;
-          padding: 0.5rem 1rem;
-          border-radius: 25px;
-          font-size: 0.8rem;
+          padding: 0.4rem 0.9rem; /* Larger padding */
+          border-radius: 20px; /* More pill-shaped */
+          font-size: 0.8rem; /* Slightly larger font */
           font-weight: 600;
-          display: inline-block;
-          margin-bottom: 1rem;
+          display: inline-flex;
+          align-items: center;
+          gap: 6px; /* Increased gap */
+          margin-bottom: 1rem; /* Increased margin */
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .details-section {
+          padding: 1rem;
+          background: var(--dark-card-bg);
+          border-radius: 12px;
+          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Consistent prominent shadow */
         }
 
         .product-title {
-          font-size: 2rem;
-          font-weight: 700;
-          margin-bottom: 0.5rem;
+          font-size: 2rem; /* Larger title */
+          font-weight: 800; /* Bolder */
+          margin-bottom: 0.5rem; /* More spacing */
           color: var(--dark-text-secondary);
+          line-height: 1.2;
         }
 
         .product-id {
-          color: #888;
-          font-size: 0.9rem;
-          margin-bottom: 1.5rem;
+          color: #a0a0a0; /* Slightly lighter gray */
+          font-size: 0.8rem;
+          margin-bottom: 1rem; /* More spacing */
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid var(--dark-border);
         }
 
         .product-description {
           color: var(--dark-text);
-          line-height: 1.6;
-          margin-bottom: 2rem;
+          line-height: 1.6; /* Increased line height for readability */
+          margin-bottom: 1.5rem; /* More spacing */
+          font-size: 0.95rem; /* Slightly larger font */
         }
 
         .stats-card {
-          background: var(--dark-card-bg);
-          border-radius: 16px;
-          padding: 1.5rem;
-          margin-bottom: 2rem;
+          background: var(--dark-bg);
+          border-radius: 10px;
+          padding: 1rem; /* Increased padding */
+          margin-bottom: 1.5rem; /* More spacing */
           border: 1px solid var(--dark-border);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         .stats-grid {
           display: grid;
           grid-template-columns: repeat(4, 1fr);
-          gap: 1rem;
+          gap: 1rem; /* Increased gap */
         }
 
         .stat-item {
           text-align: center;
+          padding: 0.8rem; /* Increased padding */
+          background: var(--dark-card-bg);
+          border-radius: 8px; /* Softer rounded corners */
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for stat items */
+        }
+
+        .stat-item:hover {
+          transform: translateY(-8px); /* More pronounced lift on hover */
+          box-shadow: 0 8px 20px rgba(0, 0, 0, 0.25);
         }
 
         .stat-value {
-          font-size: 1.5rem;
+          font-size: 1.4rem; /* Larger stat values */
           font-weight: 700;
           color: var(--accent-color);
           display: block;
+          margin-bottom: 0.2rem;
         }
 
         .stat-label {
-          font-size: 0.75rem;
-          color: #888;
+          font-size: 0.75rem; /* Slightly larger label */
+          color: var(--dark-text);
           text-transform: uppercase;
-          letter-spacing: 0.5px;
+          letter-spacing: 0.7px; /* Increased letter spacing */
         }
 
+        .original-price {
+            text-decoration: line-through;
+            color: #888; /* Muted color for original price */
+            font-size: 0.8rem;
+            margin-top: 0.2rem;
+            display: block;
+        }
+
+        .sale-price {
+            font-size: 1.8rem; /* Larger sale price */
+            font-weight: 800;
+            color: var(--accent-color); /* Highlight with accent color */
+        }
+        
         .option-section {
-          margin-bottom: 2rem;
+          margin-bottom: 1.5rem;
+          background: var(--dark-bg);
+          padding: 1rem;
+          border-radius: 10px;
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         .option-label {
           font-weight: 600;
-          margin-bottom: 1rem;
+          margin-bottom: 0.8rem;
           color: var(--dark-text-secondary);
+          font-size: 1rem;
         }
 
         .size-options {
           display: flex;
-          gap: 0.75rem;
-          margin-bottom: 2rem;
+          gap: 0.7rem; /* Increased gap */
+          margin-bottom: 1.2rem;
+          flex-wrap: wrap;
         }
 
         .size-btn {
-          padding: 0.75rem 1.25rem;
-          border: 2px solid var(--dark-border);
+          padding: 0.4rem 0.9rem; /* Larger padding */
+          border: 1px solid var(--dark-border);
           background: var(--dark-card-bg);
           color: var(--dark-text);
-          border-radius: 10px;
+          border-radius: 6px; /* Softer rounded corners */
           cursor: pointer;
           transition: all 0.3s ease;
           font-weight: 500;
+          min-width: 50px; /* Slightly larger minimum width */
+          text-align: center;
         }
 
         .size-btn:hover {
           border-color: var(--accent-color);
-          transform: translateY(-2px);
+          transform: translateY(-3px); /* More pronounced lift */
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
         }
 
         .size-btn.active {
           border-color: var(--accent-color);
           background: var(--accent-color);
           color: white;
-        }
-
-        .color-options {
-          display: flex;
-          gap: 1rem;
-        }
-
-        .color-dot {
-          width: 40px;
-          height: 40px;
-          border-radius: 50%;
-          cursor: pointer;
-          border: 3px solid transparent;
-          transition: all 0.3s ease;
-          position: relative;
-        }
-
-        .color-dot:hover {
-          transform: scale(1.1);
-        }
-
-        .color-dot.active {
-          border-color: white;
-          box-shadow: 0 0 20px rgba(255, 255, 255, 0.3);
-        }
-
-        .info-card {
-          background: var(--dark-card-bg);
-          border-radius: 16px;
-          padding: 1.5rem;
-          margin-bottom: 1.5rem;
-          border: 1px solid var(--dark-border);
-        }
-
-        .info-title {
-          font-weight: 600;
-          margin-bottom: 1rem;
-          color: var(--dark-text-secondary);
-        }
-
-        .info-table {
-          width: 100%;
-        }
-
-        .info-table tr {
-          border-bottom: 1px solid var(--dark-border);
-        }
-
-        .info-table td {
-          padding: 0.75rem 0;
-          vertical-align: top;
-        }
-
-        .info-table td:first-child {
-          font-weight: 500;
-          color: #888;
-          width: 30%;
-        }
-
-        .rating-header {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 1.5rem;
-        }
-
-        .rating-score {
-          background: var(--accent-color);
-          color: white;
-          padding: 0.5rem 1rem;
-          border-radius: 10px;
-          font-weight: 700;
-          font-size: 1.1rem;
-        }
-
-        .rating-text {
-          color: #888;
-        }
-
-        .rating-bars {
-          margin-bottom: 1.5rem;
-        }
-
-        .rating-row {
-          display: flex;
-          align-items: center;
-          gap: 1rem;
-          margin-bottom: 0.5rem;
-        }
-
-        .rating-stars {
-          color: #888;
-          font-size: 0.9rem;
-          width: 60px;
-          display: flex; /* Added for icon alignment */
-          align-items: center; /* Added for icon alignment */
-          gap: 3px; /* Spacing between icon and text */
-        }
-
-        .progress-bar-bg {
-          flex: 1;
-          height: 8px;
-          background: #333;
-          border-radius: 4px;
-          overflow: hidden;
-        }
-
-        .progress-bar-fill {
-          height: 100%;
-          background: linear-gradient(90deg, var(--accent-color), var(--accent-hover-color));
-          transition: width 0.8s ease;
-        }
-
-        .review-item {
-          padding: 1rem 0;
-          border-bottom: 1px solid var(--dark-border);
-        }
-
-        .reviewer-name {
-          font-weight: 600;
-          margin-bottom: 0.5rem;
-          color: var(--dark-text-secondary);
-        }
-
-        .review-text {
-          color: var(--dark-text);
-          margin-bottom: 1rem;
-          line-height: 1.5;
-        }
-
-        .review-images {
-          display: flex;
-          gap: 0.5rem;
-          margin-bottom: 0.5rem;
-        }
-
-        .review-image {
-          width: 50px;
-          height: 50px;
-          border-radius: 8px;
-          object-fit: cover;
-          border: 1px solid var(--dark-border);
-        }
-
-        .action-buttons {
-          display: flex;
-          gap: 1rem;
-          margin: 2rem 0;
-        }
-
-        .primary-btn {
-          flex: 1;
-          padding: 1rem 2rem;
-          background: linear-gradient(135deg, var(--accent-color), var(--accent-hover-color));
-          color: white;
-          border: none;
-          border-radius: 12px;
-          font-weight: 600;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-size: 1rem;
-          display: flex; /* Added for icon alignment */
-          align-items: center; /* Added for icon alignment */
-          justify-content: center; /* Center content */
-          gap: 8px; /* Spacing between icon and text */
-        }
-
-        .primary-btn:hover {
-          transform: translateY(-2px);
-          box-shadow: 0 8px 25px rgba(123, 166, 142, 0.3);
-        }
-
-        .secondary-btn {
-          padding: 1rem;
-          background: var(--dark-card-bg);
-          color: var(--dark-text);
-          border: 2px solid var(--dark-border);
-          border-radius: 12px;
-          cursor: pointer;
-          transition: all 0.3s ease;
-          font-size: 1.2rem;
-        }
-
-        .secondary-btn:hover {
-          border-color: var(--accent-color);
-          transform: translateY(-2px);
-        }
-
-        .secondary-btn.active {
-          background: var(--accent-color);
-          color: white;
-          border-color: var(--accent-color);
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
         }
 
         .quantity-selector {
           display: flex;
           align-items: center;
-          gap: 1rem;
+          gap: 1rem; /* Increased gap */
           margin: 1rem 0;
+          background: var(--dark-bg);
+          padding: 0.8rem; /* Increased padding */
+          border-radius: 10px;
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         .quantity-controls {
           display: flex;
           align-items: center;
           background: var(--dark-card-bg);
-          border-radius: 10px;
+          border-radius: 6px;
           border: 1px solid var(--dark-border);
+          overflow: hidden;
         }
 
         .quantity-btn {
           background: none;
           border: none;
           color: var(--dark-text);
-          padding: 0.5rem 1rem;
+          padding: 0.4rem 0.9rem; /* Larger padding */
           cursor: pointer;
-          font-size: 1.2rem;
+          font-size: 1.1rem; /* Larger font size */
           transition: all 0.2s ease;
         }
 
@@ -660,99 +381,364 @@ const ProductDetail = () => {
           border: none;
           color: var(--dark-text);
           text-align: center;
-          width: 60px;
-          padding: 0.5rem;
-          font-size: 1rem;
+          width: 35px; /* Slightly wider */
+          padding: 0.3rem;
+          font-size: 0.9rem;
+          font-weight: 500;
         }
 
-        .quantity-input:focus {
-          outline: none;
-        }
-
-        .feature-tags {
+        .action-buttons {
           display: flex;
-          flex-wrap: wrap;
-          gap: 0.5rem;
+          align-items: center;
+          gap: 0.8rem; /* Increased gap */
           margin: 1rem 0;
+          background: var(--dark-bg);
+          padding: 0.8rem; /* Increased padding */
+          border-radius: 10px;
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
-        .feature-tag {
-          background: rgba(123, 166, 142, 0.1);
-          color: var(--accent-color);
-          padding: 0.3rem 0.8rem;
-          border-radius: 15px;
+        .action-buttons .quantity-selector {
+          flex: 0 0 auto;
+          margin: 0;
+          padding: 0;
+          background: none;
+          box-shadow: none;
+          gap: 0.5rem; /* Reduced gap within selector for compactness */
+        }
+
+        .action-buttons .quantity-selector .option-label {
+          margin-bottom: 0;
+          margin-right: 0.5rem; /* Increased margin */
+          white-space: nowrap;
+          align-self: center;
+          font-size: 0.9rem; /* Adjusted font size */
+        }
+
+        .action-buttons .quantity-selector .quantity-controls {
+          border: 1px solid var(--dark-border); /* Re-added border for controls */
+          background: var(--dark-card-bg); /* Re-added background */
+        }
+
+        .action-buttons .quantity-selector .quantity-btn {
+          padding: 0.3rem 0.6rem; /* Adjusted padding */
+          font-size: 0.9rem; /* Adjusted font size */
+        }
+
+        .action-buttons .quantity-selector .quantity-input {
+          width: 30px; /* Adjusted width */
+          padding: 0.2rem;
           font-size: 0.8rem;
-          border: 1px solid rgba(123, 166, 142, 0.3);
-          display: flex; /* Added for icon alignment */
-          align-items: center; /* Added for icon alignment */
-          gap: 5px; /* Spacing between icon and text */
+        }
+
+        .primary-btn {
+          flex: 1;
+          max-width: none;
+          padding: 0.8rem 1.2rem; /* Larger padding */
+          background: linear-gradient(135deg, var(--accent-color), var(--accent-hover-color));
+          color: white;
+          border: none;
+          border-radius: 6px;
+          font-weight: 600;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-size: 0.9rem; /* Slightly larger font */
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 6px;
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+        }
+
+        .primary-btn:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 10px 30px rgba(92, 184, 92, 0.4); /* More vivid shadow */
+        }
+
+        .secondary-btn {
+          flex: 0 0 auto;
+          max-width: 90px; /* Slightly wider */
+          padding: 0.8rem; /* Increased padding */
+          background: var(--dark-card-bg);
+          color: var(--dark-text);
+          border: 1px solid var(--dark-border);
+          border-radius: 6px;
+          cursor: pointer;
+          transition: all 0.3s ease;
+          font-size: 0.9rem; /* Slightly larger font */
+          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        .secondary-btn:hover {
+          border-color: var(--accent-color);
+          transform: translateY(-3px);
+          box-shadow: 0 10px 30px rgba(92, 184, 92, 0.3);
+        }
+
+        .secondary-btn.active {
+          background: var(--accent-color);
+          color: white;
+          border-color: var(--accent-color);
         }
 
         .shipping-info {
-          background: var(--dark-card-bg);
-          border-radius: 12px;
+          background: var(--dark-bg);
+          border-radius: 10px;
           padding: 1rem;
           margin: 1rem 0;
-          border-left: 4px solid var(--accent-color);
+          border-left: 3px solid var(--accent-color); /* Thicker accent border */
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         .shipping-row {
           display: flex;
           justify-content: space-between;
           align-items: center;
-          margin-bottom: 0.5rem;
+          margin-bottom: 0.8rem; /* More spacing */
+          padding: 0.5rem; /* Increased padding */
+          background: var(--dark-card-bg);
+          border-radius: 6px;
+          transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+
+        .shipping-row:hover {
+          transform: translateX(8px); /* More pronounced slide */
+          box-shadow: 0 4px 8px rgba(0, 0, 0, 0.15);
         }
 
         .shipping-row:last-child {
           margin-bottom: 0;
         }
 
-        .pulse-animation {
-          animation: pulse 2s infinite;
+        .info-card {
+          background: var(--dark-bg);
+          border-radius: 10px;
+          padding: 1rem;
+          margin-bottom: 1rem;
+          border: 1px solid var(--dark-border);
+          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
-        @keyframes pulse {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.05); }
-          100% { transform: scale(1); }
+        .info-title {
+          font-weight: 700;
+          margin-bottom: 1rem;
+          color: var(--dark-text-secondary);
+          font-size: 1.1rem;
+          padding-bottom: 0.5rem;
+          border-bottom: 1px solid var(--dark-border);
         }
 
-        .slide-animation {
-          animation: slideIn 0.5s ease-out;
+        .info-table {
+          width: 100%;
         }
 
-        @keyframes slideIn {
-          from {
-            opacity: 0;
-            transform: translateX(20px);
-          }
-          to {
-            opacity: 1;
-            transform: translateX(0);
-          }
+        .info-table tr {
+          border-bottom: 1px solid var(--dark-border);
+        }
+
+        .info-table tr:last-child {
+            border-bottom: none; /* No border for the last row */
+        }
+
+        .info-table td {
+          padding: 0.8rem 0; /* More padding */
+          vertical-align: top;
+        }
+
+        .info-table td:first-child {
+          font-weight: 500;
+          color: var(--dark-text);
+          width: 35%; /* Slightly wider first column */
+        }
+
+        .feature-tags {
+          display: flex;
+          flex-wrap: wrap;
+          gap: 0.5rem; /* Increased gap */
+          margin: 1rem 0;
+        }
+
+        .feature-tag {
+          background: rgba(92, 184, 92, 0.15); /* Use more vibrant accent color for background */
+          color: var(--accent-color);
+          padding: 0.3rem 0.7rem; /* Larger padding */
+          border-radius: 15px; /* More pill-shaped */
+          font-size: 0.8rem;
+          border: 1px solid rgba(92, 184, 92, 0.4); /* Stronger border */
+          display: flex;
+          align-items: center;
+          gap: 5px;
+          transition: all 0.3s ease;
+        }
+
+        .feature-tag:hover {
+          transform: translateY(-3px);
+          box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+
+        .rating-header {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            margin-bottom: 1rem;
+            padding-bottom: 0.8rem;
+            border-bottom: 1px solid var(--dark-border);
+        }
+
+        .rating-score {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: var(--accent-color);
+        }
+
+        .rating-text {
+            color: var(--dark-text);
+            font-size: 0.9rem;
+        }
+
+        .rating-bars {
+            margin-bottom: 1.5rem;
+        }
+
+        .rating-row {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-bottom: 0.4rem;
+        }
+
+        .rating-stars {
+            font-size: 0.85rem;
+            color: var(--dark-text);
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            width: 50px; /* Fixed width for stars */
+            justify-content: flex-end; /* Align stars to the right */
+        }
+
+        .progress-bar-bg {
+            flex-grow: 1;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .progress-bar-fill {
+            height: 100%;
+            background: var(--accent-color);
+            border-radius: 4px;
+            transition: width 0.5s ease-out;
+        }
+
+        .review-item {
+            background: var(--dark-card-bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            border: 1px solid var(--dark-border);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .reviewer-name {
+            font-weight: 600;
+            color: var(--dark-text-secondary);
+            margin-bottom: 0.4rem;
+        }
+
+        .review-text {
+            color: var(--dark-text);
+            font-size: 0.9rem;
+            line-height: 1.5;
+            margin-bottom: 0.6rem;
+        }
+
+        .review-images {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .review-image {
+            width: 70px;
+            height: 70px;
+            object-fit: cover;
+            border-radius: 4px;
+            border: 1px solid var(--dark-border);
+        }
+
+        .review-date {
+            font-size: 0.75rem;
+            color: #a0a0a0;
+            margin-top: 0.6rem;
+            text-align: right;
         }
 
         @media (max-width: 768px) {
           .product-container {
             grid-template-columns: 1fr;
-            gap: 2rem;
-          }
-          
-          .image-section {
-            position: static;
-          }
-          
-          .stats-grid {
-            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+            padding: 0.8rem;
           }
           
           .product-title {
-            font-size: 1.5rem;
+            font-size: 1.8rem;
+          }
+
+          .stats-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 0.8rem;
+          }
+
+          .image-section,
+          .details-section,
+          .stats-card,
+          .option-section,
+          .quantity-selector,
+          .action-buttons,
+          .shipping-info,
+          .info-card {
+            padding: 0.8rem;
+          }
+
+          .product-badge {
+            font-size: 0.7rem;
+            padding: 0.3rem 0.8rem;
+          }
+
+          .stat-value {
+            font-size: 1.3rem;
+          }
+
+          .stat-label {
+            font-size: 0.65rem;
+          }
+
+          .primary-btn,
+          .secondary-btn {
+            font-size: 0.8rem;
+            padding: 0.7rem 1rem;
+          }
+
+          .quantity-selector .option-label {
+            font-size: 0.8rem;
+          }
+
+          .quantity-selector .quantity-btn {
+            font-size: 0.85rem;
+            padding: 0.25rem 0.5rem;
+          }
+
+          .quantity-selector .quantity-input {
+            width: 28px;
+            font-size: 0.7rem;
           }
         }
       `}</style>
 
-      <div className="product-container">
+      <div className={`product-container `}>
         {/* Image Section */}
         <div className="image-section">
           <div className="product-badge"><MdStars></MdStars>  Premium Quality</div>
@@ -817,8 +803,8 @@ const ProductDetail = () => {
           <div className="stats-card">
             <div className="stats-grid">
               <div className="stat-item">
-                <span className="stat-value">$120.40</span>
-                <span className="stat-label">${currentProduct.price?.toFixed(2)}</span>
+                <span className="sale-price">${currentProduct.price?.toFixed(2)}</span>
+                <span className="original-price">$700.00</span> {/* Hardcoded for now, will connect to backend if available */}
               </div>
               <div className="stat-item">
                 <span className="stat-value">{currentProduct.stock}</span>
@@ -835,22 +821,7 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          {availableSizes.length > 0 && (
-          <div className="option-section">
-            <div className="option-label">Size</div>
-            <div className="size-options">
-              {availableSizes.map((size) => (
-                <button
-                  key={size}
-                  className={`size-btn ${selectedSize === size ? 'active' : ''}`}
-                  onClick={() => setSelectedSize(size)}
-                >
-                  {size}
-                </button>
-              ))}
-            </div>
-          </div>
-          )}
+      
        
           {/* Feature Tags */}
           {currentProduct.tags && currentProduct.tags.length > 0 && (
@@ -861,34 +832,32 @@ const ProductDetail = () => {
           </div>
           )}
 
-          {/* Quantity Selector */}
-          <div className="quantity-selector">
-            <div className="option-label">Quantity:</div>
-            <div className="quantity-controls">
-              <button 
-                className="quantity-btn" 
-                onClick={() => setQuantity(Math.max(1, quantity - 1))}
-              >
-                −
-              </button>
-              <input 
-                type="number" 
-                className="quantity-input" 
-                value={quantity} 
-                onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
-                min="1"
-              />
-              <button 
-                className="quantity-btn" 
-                onClick={() => setQuantity(quantity + 1)}
-              >
-                +
-              </button>
-            </div>
-          </div>
-
           {/* Action Buttons */}
           <div className="action-buttons">
+            <div className="quantity-selector">
+              <div className="option-label">Quantity:</div>
+              <div className="quantity-controls">
+                <button 
+                  className="quantity-btn" 
+                  onClick={() => setQuantity(Math.max(1, quantity - 1))}
+                >
+                  −
+                </button>
+                <input 
+                  type="number" 
+                  className="quantity-input" 
+                  value={quantity} 
+                  onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
+                  min="1"
+                />
+                <button 
+                  className="quantity-btn" 
+                  onClick={() => setQuantity(quantity + 1)}
+                >
+                  +
+                </button>
+              </div>
+            </div>
             <button className="primary-btn pulse-animation">
               <FaShoppingCart /> Add to Cart
             </button>

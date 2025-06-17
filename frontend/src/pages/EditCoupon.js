@@ -176,8 +176,8 @@ const EditCoupon = () => {
                                     type="radio"
                                     name="status"
                                     label="Future Plan"
-                                    checked={couponData.status === 'future'}
-                                    onChange={() => handleStatusChange('future')}
+                                    checked={couponData.status === 'futureplan'}
+                                    onChange={() => handleStatusChange('futureplan')}
                                     className="Z_filter_option"
                                 />
                             </div>

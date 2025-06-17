@@ -1,11 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Table } from 'react-bootstrap';
+import { Table, Modal, Button, Spinner } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import '../styles/Z_styles.css';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchInventories } from '../redux/slice/inventory.Slice';
+import { fetchInventories, deleteInventory } from '../redux/slice/inventory.Slice';
 import { FaCaretDown } from 'react-icons/fa';
 
 const StockOverview = () => {
@@ -13,6 +13,8 @@ const StockOverview = () => {
       const [timeFilter, setTimeFilter] = useState('thisMonth');
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const { inventory, isLoading, error } = useSelector((state) => state.inventory);
   console.log(inventory, "inventory");
@@ -51,6 +53,23 @@ const StockOverview = () => {
         setTimeFilter(e.target.value);
     };
 const filteredCategories = filterInventoriesByTime(inventory);
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (productToDelete) {
+      try {
+        await dispatch(deleteInventory(productToDelete._id)).unwrap();
+        setShowDeleteModal(false);
+        setProductToDelete(null);
+      } catch (error) {
+        console.error('Failed to delete inventory:', error);
+      }
+    }
+  };
+
   return (
     <section className={`Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-2 my-md-3`}>
       <div className="Z_table_wrapper">
@@ -131,9 +150,12 @@ const filteredCategories = filterInventoriesByTime(inventory);
                           >
                             <TbEdit size={22} />
                           </button>
-                          <button className="Z_action_btn Z_delete_btn">
-                            <RiDeleteBin6Line size={22} />
-                          </button>
+                          <button 
+                          className="Z_action_btn Z_delete_btn"
+                          onClick={() => handleDeleteClick(product)}
+                        >
+                          <RiDeleteBin6Line size={22} />
+                        </button>
                         </div>
                       </td>
                     </tr>
@@ -144,6 +166,35 @@ const filteredCategories = filterInventoriesByTime(inventory);
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete product "{productToDelete?.productData?.productName}"? This action cannot be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={handleDeleteConfirm}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Deleting...
+              </>
+            ) : (
+              'Delete'
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </section>
   );
 };

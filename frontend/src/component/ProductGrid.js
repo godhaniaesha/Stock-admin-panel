@@ -27,7 +27,6 @@ function ProductGrid() {
         selectedCategories: [],
         selectedSubcategories: [],
         selectedPriceRange: '',
-        selectedRating: '',
         searchQuery: ''
     });
 
@@ -77,9 +76,7 @@ function ProductGrid() {
                 (filters.selectedPriceRange === 'over200' && product.price > 200)
             );
 
-            const ratingMatch = !filters.selectedRating || product.rating >= parseInt(filters.selectedRating);
-
-            return searchMatch && categoryMatch && subcategoryMatch && priceMatch && ratingMatch;
+            return searchMatch && categoryMatch && subcategoryMatch && priceMatch;
         });
     };
 
@@ -134,13 +131,16 @@ function ProductGrid() {
         if (localWishlist.length > 0) {
             return localWishlist.includes(productId);
         }
-        return wishlistItems.some(item => item.productId._id === productId);
+        return wishlistItems.some(item => {
+            console.log('Checking wishlist item:', item);
+            console.log('Item productId:', item ? item.productId : 'item is null');
+            return item && item.productId && item.productId._id === productId;
+        });
     };
     useEffect(() => {
         if (wishlistItems && wishlistItems.length > 0) {
-            setLocalWishlist(wishlistItems.map(item => item.productId._id));
-
-
+            console.log('Wishlist items on useEffect update:', wishlistItems);
+            setLocalWishlist(wishlistItems.map(item => item && item.productId ? item.productId._id : null).filter(Boolean));
         }
     }, [wishlistItems]);
 
@@ -174,9 +174,9 @@ function ProductGrid() {
                     </Col>
 
                     <Col xl={9} lg={12} className="d_show_result d-flex justify-content-between align-items-center" style={{ background: '#fff', padding: '10px 12px', borderRadius: '8px' }}>
-                        <div className="">
-                            <span>Categories</span>
-                            <span className="mx-2">›</span>
+                        <div className="Z_preview_path">
+                            {/* <span>Categories</span>
+                            <span className="mx-2">›</span> */}
                             <span>All Product</span>
                             <div className="Z_results me-3">
                                 Showing all {products?.length || 0} items results
@@ -184,7 +184,8 @@ function ProductGrid() {
                         </div>
                         <div className="Z_right_actions d-flex align-items-center">
                             <Button variant="outline-secondary" className="Z_filter_btn me-2 d-xl-none" onClick={() => handleFilterChange('showOffcanvas', true)}>
-                                <FaFilter /> Filters
+                                <FaFilter />
+                                <span className='Z_filterResp'> Filters</span>
                             </Button>
                             <div>
                                 <span
@@ -321,6 +322,7 @@ function ProductGrid() {
                                     <Form.Check
                                         type="radio"
                                         name="price"
+                                        id="price-under50"
                                         label="Under $50"
                                         className="Z_filter_option"
                                         checked={filters.selectedPriceRange === 'under50'}
@@ -329,6 +331,7 @@ function ProductGrid() {
                                     <Form.Check
                                         type="radio"
                                         name="price"
+                                        id="price-50to100"
                                         label="$50 - $100"
                                         className="Z_filter_option"
                                         checked={filters.selectedPriceRange === '50to100'}
@@ -337,6 +340,7 @@ function ProductGrid() {
                                     <Form.Check
                                         type="radio"
                                         name="price"
+                                        id="price-100to200"
                                         label="$100 - $200"
                                         className="Z_filter_option"
                                         checked={filters.selectedPriceRange === '100to200'}
@@ -345,55 +349,11 @@ function ProductGrid() {
                                     <Form.Check
                                         type="radio"
                                         name="price"
+                                        id="price-over200"
                                         label="Over $200"
                                         className="Z_filter_option"
                                         checked={filters.selectedPriceRange === 'over200'}
                                         onChange={() => handleFilterChange('selectedPriceRange', 'over200')}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Rating Filter */}
-                            <div className="Z_filter_group">
-                                <button
-                                    className="Z_filter_button"
-                                    onClick={() => handleFilterChange('expandedFilter', filters.expandedFilter === 'rating' ? null : 'rating')}
-                                >
-                                    Rating
-                                    <FaChevronDown className={`Z_chevron ${filters.expandedFilter === 'rating' ? 'Z_chevron_rotated' : ''}`} />
-                                </button>
-                                <div className={`Z_filter_content ${filters.expandedFilter === 'rating' ? 'Z_filter_content_show' : ''}`}>
-                                    <Form.Check
-                                        type="radio"
-                                        name="rating"
-                                        label={<>1 ★ & Above</>}
-                                        className="Z_rating_option"
-                                        checked={filters.selectedRating === '1'}
-                                        onChange={() => handleFilterChange('selectedRating', '1')}
-                                    />
-                                    <Form.Check
-                                        type="radio"
-                                        name="rating"
-                                        label={<>2 ★ & Above</>}
-                                        className="Z_rating_option"
-                                        checked={filters.selectedRating === '2'}
-                                        onChange={() => handleFilterChange('selectedRating', '2')}
-                                    />
-                                    <Form.Check
-                                        type="radio"
-                                        name="rating"
-                                        label={<>3 ★ & Above</>}
-                                        className="Z_rating_option"
-                                        checked={filters.selectedRating === '3'}
-                                        onChange={() => handleFilterChange('selectedRating', '3')}
-                                    />
-                                    <Form.Check
-                                        type="radio"
-                                        name="rating"
-                                        label={<>4 ★ & Above</>}
-                                        className="Z_rating_option"
-                                        checked={filters.selectedRating === '4'}
-                                        onChange={() => handleFilterChange('selectedRating', '4')}
                                     />
                                 </div>
                             </div>
@@ -404,15 +364,24 @@ function ProductGrid() {
                                 }}>
                                     Apply
                                 </button>
-                                <button className="Z_reset_button" onClick={() => handleFilterChange('filters', {
-                                    expandedFilter: null,
-                                    showOffcanvas: false,
-                                    selectedCategories: [],
-                                    selectedSubcategories: [],
-                                    selectedPriceRange: '',
-                                    selectedRating: '',
-                                    searchQuery: ''
-                                })}>
+                                <button className="Z_reset_button" onClick={() => {
+                                    // Reset all filters
+                                    setFilters({
+                                        expandedFilter: null,
+                                        showOffcanvas: false,
+                                        selectedCategories: [],
+                                        selectedSubcategories: [],
+                                        selectedPriceRange: '',
+                                        searchQuery: ''
+                                    });
+                                    // Reset all form checkboxes
+                                    document.querySelectorAll('.Z_filter_option input[type="checkbox"]').forEach(checkbox => {
+                                        checkbox.checked = false;
+                                    });
+                                    document.querySelectorAll('.Z_filter_option input[type="radio"]').forEach(radio => {
+                                        radio.checked = false;
+                                    });
+                                }}>
                                     Reset
                                 </button>
                             </div>
@@ -534,7 +503,8 @@ function ProductGrid() {
                                     <div className={`Z_filter_content ${filters.expandedFilter === 'price' ? 'Z_filter_content_show' : ''}`}>
                                         <Form.Check
                                             type="radio"
-                                            name="price"
+                                            name="price-mobile"
+                                            id="price-under50-mobile"
                                             label="Under $50"
                                             className="Z_filter_option"
                                             checked={filters.selectedPriceRange === 'under50'}
@@ -542,7 +512,8 @@ function ProductGrid() {
                                         />
                                         <Form.Check
                                             type="radio"
-                                            name="price"
+                                            name="price-mobile"
+                                            id="price-50to100-mobile"
                                             label="$50 - $100"
                                             className="Z_filter_option"
                                             checked={filters.selectedPriceRange === '50to100'}
@@ -550,7 +521,8 @@ function ProductGrid() {
                                         />
                                         <Form.Check
                                             type="radio"
-                                            name="price"
+                                            name="price-mobile"
+                                            id="price-100to200-mobile"
                                             label="$100 - $200"
                                             className="Z_filter_option"
                                             checked={filters.selectedPriceRange === '100to200'}
@@ -558,56 +530,12 @@ function ProductGrid() {
                                         />
                                         <Form.Check
                                             type="radio"
-                                            name="price"
+                                            name="price-mobile"
+                                            id="price-over200-mobile"
                                             label="Over $200"
                                             className="Z_filter_option"
                                             checked={filters.selectedPriceRange === 'over200'}
                                             onChange={() => handleFilterChange('selectedPriceRange', 'over200')}
-                                        />
-                                    </div>
-                                </div>
-
-                                {/* Rating Filter */}
-                                <div className="Z_filter_group">
-                                    <button
-                                        className="Z_filter_button"
-                                        onClick={() => handleFilterChange('expandedFilter', filters.expandedFilter === 'rating' ? null : 'rating')}
-                                    >
-                                        Rating
-                                        <FaChevronDown className={`Z_chevron ${filters.expandedFilter === 'rating' ? 'Z_chevron_rotated' : ''}`} />
-                                    </button>
-                                    <div className={`Z_filter_content ${filters.expandedFilter === 'rating' ? 'Z_filter_content_show' : ''}`}>
-                                        <Form.Check
-                                            type="radio"
-                                            name="rating"
-                                            label={<>1 ★ & Above</>}
-                                            className="Z_rating_option"
-                                            checked={filters.selectedRating === '1'}
-                                            onChange={() => handleFilterChange('selectedRating', '1')}
-                                        />
-                                        <Form.Check
-                                            type="radio"
-                                            name="rating"
-                                            label={<>2 ★ & Above</>}
-                                            className="Z_rating_option"
-                                            checked={filters.selectedRating === '2'}
-                                            onChange={() => handleFilterChange('selectedRating', '2')}
-                                        />
-                                        <Form.Check
-                                            type="radio"
-                                            name="rating"
-                                            label={<>3 ★ & Above</>}
-                                            className="Z_rating_option"
-                                            checked={filters.selectedRating === '3'}
-                                            onChange={() => handleFilterChange('selectedRating', '3')}
-                                        />
-                                        <Form.Check
-                                            type="radio"
-                                            name="rating"
-                                            label={<>4 ★ & Above</>}
-                                            className="Z_rating_option"
-                                            checked={filters.selectedRating === '4'}
-                                            onChange={() => handleFilterChange('selectedRating', '4')}
                                         />
                                     </div>
                                 </div>
@@ -618,15 +546,24 @@ function ProductGrid() {
                                     }}>
                                         Apply
                                     </button>
-                                    <button className="Z_reset_button" onClick={() => handleFilterChange('filters', {
-                                        expandedFilter: null,
-                                        showOffcanvas: false,
-                                        selectedCategories: [],
-                                        selectedSubcategories: [],
-                                        selectedPriceRange: '',
-                                        selectedRating: '',
-                                        searchQuery: ''
-                                    })}>
+                                    <button className="Z_reset_button" onClick={() => {
+                                        // Reset all filters
+                                        setFilters({
+                                            expandedFilter: null,
+                                            showOffcanvas: false,
+                                            selectedCategories: [],
+                                            selectedSubcategories: [],
+                                            selectedPriceRange: '',
+                                            searchQuery: ''
+                                        });
+                                        // Reset all form checkboxes
+                                        document.querySelectorAll('.Z_filter_option input[type="checkbox"]').forEach(checkbox => {
+                                            checkbox.checked = false;
+                                        });
+                                        document.querySelectorAll('.Z_filter_option input[type="radio"]').forEach(radio => {
+                                            radio.checked = false;
+                                        });
+                                    }}>
                                         Reset
                                     </button>
                                 </div>
@@ -636,60 +573,67 @@ function ProductGrid() {
 
                     <Col xl={9} lg={12} md={12}>
                         <Row>
-                            {filteredProducts.map((product) => (
-                                <Col key={product._id} lg={4} md={6} sm={6} xs={12} className="mb-4">
-                                    <Card className="h-100 Z_product_card">
-                                        <div className="Z_product_image">
-                                            <img
-                                                src={`http://localhost:2221/${product.images?.[0]}`}
-                                                // src={product.images?.[0] || 'https://via.placeholder.com/400x400'} 
-                                                alt={product.productName}
-                                            />
-                                        </div>
-                                        <div className="Z_product_info">
-                                            <h3 className="Z_product_title">{product.productName}</h3>
-                                            <div className="Z_product_category">
-                                                {product.categoryId && categories.find(cat => cat._id === product.categoryId._id)?.title || 'No Category'}
+                            {filteredProducts.length > 0 ? (
+                                filteredProducts.map((product) => (
+                                    <Col key={product._id} lg={4} md={6} sm={6} xs={12} className="mb-4">
+                                        <Card className="h-100 Z_product_card">
+                                            <div className="Z_product_image">
+                                                <img
+                                                    src={`http://localhost:2221/${product.images?.[0]}`}
+                                                    alt={product.productName}
+                                                />
                                             </div>
-                                            <div className="Z_product_price">
-                                                <span className="Z_price_current">${product.price}</span>
-                                                {product.discount > 0 && (
-                                                    <>
-                                                        <span className="Z_price_original">
-                                                            ${(product.price * (1 + product.discount / 100)).toFixed(2)}
-                                                        </span>
-                                                        <span className="Z_discount">({product.discount}% Off)</span>
-                                                    </>
-                                                )}
-                                            </div>
-                                            <div className="Z_product_rating">
-                                                <span>{product.rating || 0} ★</span>
-                                                <span className="Z_rating_count">({product.reviews || 0} Reviews)</span>
-                                            </div>
-                                            <div className="Z_product_actions d-flex justify-content-between">
-
-                                                <Button
-                                                    className="Z_add_to_cart_btn"
-                                                    onClick={() => handleAddToCart(product)}
-                                                >
-                                                    Add To Cart
-                                                </Button>
-                                                <Button
-                                                    variant="link"
-                                                    className="Z_wishlist_btn"
-                                                    onClick={() => handleWishlistToggle(product)}
-                                                >
-                                                    {isProductInWishlist(product._id) ? (
-                                                        <IoMdHeart size={24} color="red" />
-                                                    ) : (
-                                                        <IoMdHeartEmpty size={24} />
+                                            <div className="Z_product_info">
+                                                <h3 className="Z_product_title">{product.productName}</h3>
+                                                <div className="Z_product_category">
+                                                    {product.categoryId && categories.find(cat => cat._id === product.categoryId._id)?.title || 'No Category'}
+                                                </div>
+                                                <div className="Z_product_price">
+                                                    <span className="Z_price_current">${product.price}</span>
+                                                    {product.discount > 0 && (
+                                                        <>
+                                                            <span className="Z_price_original">
+                                                                ${(product.price * (1 + product.discount / 100)).toFixed(2)}
+                                                            </span>
+                                                            <span className="Z_discount">({product.discount}% Off)</span>
+                                                        </>
                                                     )}
-                                                </Button>
+                                                </div>
+                                                <div className="Z_product_actions gap-2 d-flex align-items-center justify-content-between">
+                                                    <Button
+                                                        className="Z_add_to_cart_btn"
+                                                        onClick={() => handleAddToCart(product)}
+                                                    >
+                                                        Add To Cart
+                                                    </Button>
+                                                    <div
+                                                        className="Z_wishlist_btn"
+                                                        onClick={() => handleWishlistToggle(product)}
+                                                    >
+                                                        {isProductInWishlist(product._id) ? (
+                                                            <IoMdHeart size={24} color="red" />
+                                                        ) : (
+                                                            <IoMdHeartEmpty size={24} />
+                                                        )}
+                                                    </div>
+                                                </div>
                                             </div>
-                                        </div>
-                                    </Card>
+                                        </Card>
+                                    </Col>
+                                ))
+                            ) : (
+                                <Col xs={12} className="text-center py-5">
+                                    <div className="Z_no_data_wrapper">
+                                        <img 
+                                            src="https://cdni.iconscout.com/illustration/premium/thumb/no-data-found-3678255-3098784.png" 
+                                            alt="No Products Found"
+                                            className="Z_no_data_image"
+                                        />
+                                        <h3 className="Z_no_data_title">No Products Found</h3>
+                                        <p className="Z_no_data_text">Try adjusting your search or filter to find what you're looking for.</p>
+                                    </div>
                                 </Col>
-                            ))}
+                            )}
                         </Row>
                     </Col>
                 </Row>

@@ -1,204 +1,173 @@
+const moment = require('moment'); 
 const Payment = require('../model/payment.model');
 const Order = require('../model/order.model');
 const Products = require('../model/product.model');
 const User = require('../model/Register.model');
 const mongoose = require('mongoose');
-const moment = require('moment'); 
+const InventoryModel = require('../model/inventory.model');
+const CategoryModel = require('../model/category.model');
+
 
 const dashboard = async (req, res) => {
     try {
-        
-        console.log("-----------------------------------------",req.user);  
-        const userId = req.user._id; // Make sure userId is available via auth middleware
-
+        const userId = req.user._id;
         const isAdmin = req.user.role === 'admin';
-  
-        const matchStage = isAdmin
-          ? {} // No seller filter for admin
-          : { 'product.sellerId': mongoose.Types.ObjectId(userId) };
+        
+        const matchStage = isAdmin ? {} : { 'products.sellerId': new mongoose.Types.ObjectId(userId) };
 
-          
-        // 1. User-wise Revenue
-        // const userRevenueResult = await Payment.aggregate([
-        //     {
-        //         $match: { status: 'success' }
-        //     },
-        //     {
-        //         $lookup: {
-        //             from: 'orders',
-        //             localField: 'orderId',
-        //             foreignField: '_id',
-        //             as: 'order'
-        //         }
-        //     },
-        //     { $unwind: '$order' },
-        //     {
-        //         $match: {
-        //             'order.userId': new mongoose.Types.ObjectId(userId),
-        //             'order.status': { $nin: ['cancelled', 'pending'] }
-        //         }
-        //     },
-        //     {
-        //         $group: {
-        //             _id: null,
-        //             total: { $sum: '$amount' }
-        //         }
-        //     }
-        // ]);
+        // 1. Get basic counts
+        const [totalUsers, totalOrders, totalProducts] = await Promise.all([
+            User.countDocuments(),
+            Order.countDocuments(),
+            isAdmin ? Products.countDocuments() : Products.countDocuments({ sellerId: userId })
+        ]);
 
-        const userRevenueResult = await Payment.aggregate([
-            // {
-            //     $match: { 
-            //         status: 'success' 
-            //     }
-            // },
-            {
-                $lookup: {
-                    from: 'orders',
-                    localField: 'orderId',
-                    foreignField: '_id',
-                    as: 'order'
-                }
-            },
-            { $unwind: '$order' },
-            {
-                $lookup: {
-                    from: 'products',
-                    localField: 'order.items.productId',
-                    foreignField: '_id',
-                    as: 'products'
-                }
-            },
-            { $unwind: '$products' },
-            {
-                $match: {
-                    // 'order.userId': new mongoose.Types.ObjectId(userId),
-                    // 'order.status': { $nin: ['cancelled', 'pending'] },
-                    'products.sellerId':  new mongoose.Types.ObjectId(userId)
-                }
-            },
-            {
-                $addFields: {
-                    matchedItem: {
-                        $arrayElemAt: [
-                            {
-                                $filter: {
-                                    input: '$order.items',
-                                    as: 'item',
-                                    cond: { $eq: ['$$item.productId', '$products._id'] }
-                                }
-                            },
-                            0
-                        ]
+        // 2. Get revenue data
+        const [userRevenueResult, overallRevenueResult] = await Promise.all([
+            // User revenue calculation
+            Payment.aggregate([
+                {
+                    $match: { status: 'success' }
+                },
+                {
+                    $lookup: {
+                        from: 'orders',
+                        localField: 'orderId',
+                        foreignField: '_id',
+                        as: 'order'
                     }
-                }
-            },
-            {
-                $group: {
-                    _id: null,
-                    total: {
-                        $sum: {
-                            $multiply: [
-                                '$matchedItem.quantity',
+                },
+                { $unwind: '$order' },
+                {
+                    $lookup: {
+                        from: 'products',
+                        localField: 'order.items.productId',
+                        foreignField: '_id',
+                        as: 'products'
+                    }
+                },
+                { $unwind: '$products' },
+                { $match: matchStage },
+                {
+                    $addFields: {
+                        matchedItem: {
+                            $arrayElemAt: [
                                 {
-                                    $subtract: [
-                                        '$products.price',
-                                        { $multiply: [
-                                            '$products.price',
-                                            { $divide: ['$order.discountAmount', '$order.totalAmount'] }
-                                        ]}
-                                    ]
-                                }
+                                    $filter: {
+                                        input: '$order.items',
+                                        as: 'item',
+                                        cond: { $eq: ['$$item.productId', '$products._id'] }
+                                    }
+                                },
+                                0
                             ]
                         }
                     }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        total: {
+                            $sum: {
+                                $multiply: [
+                                    '$matchedItem.quantity',
+                                    {
+                                        $subtract: [
+                                            '$products.price',
+                                            { $multiply: [
+                                                '$products.price',
+                                                { $divide: ['$order.discountAmount', '$order.totalAmount'] }
+                                            ]}
+                                        ]
+                                    }
+                                ]
+                            }
+                        }
+                    }
                 }
-            }
+            ]),
+            // Overall revenue calculation
+            Payment.aggregate([
+                {
+                    $match: { status: 'success' }
+                },
+                {
+                    $lookup: {
+                        from: 'orders',
+                        localField: 'orderId',
+                        foreignField: '_id',
+                        as: 'order'
+                    }
+                },
+                { $unwind: '$order' },
+                {
+                    $match: {
+                        'order.status': { $nin: ['cancelled', 'pending'] }
+                    }
+                },
+                {
+                    $group: {
+                        _id: null,
+                        total: { $sum: '$amount' }
+                    }
+                }
+            ])
         ]);
 
-        // 2. Overall Revenue
-        const overallRevenueResult = await Payment.aggregate([
-            {
-                $match: { status: 'success' }
-            },
+        // sellingRate 
+        const thirtyDaysAgo = new Date();
+        thirtyDaysAgo.setDate(thirtyDaysAgo.getDate() - 30);
+ 
+        const recentOrders = await Order.aggregate([
             {
                 $lookup: {
-                    from: 'orders',
-                    localField: 'orderId',
+                    from: 'products',
+                    localField: 'items.productId',
                     foreignField: '_id',
-                    as: 'order'
+                    as: 'product'
                 }
             },
-            { $unwind: '$order' },
+            { $unwind: '$product' },
             {
                 $match: {
-                    'order.status': { $nin: ['cancelled', 'pending'] }
+                    ...(isAdmin ? {} : { 'products.sellerId': new mongoose.Types.ObjectId(userId) }),
+                    createdAt: { $gte: thirtyDaysAgo },
+                    status: { $nin: ['cancelled', 'pending'] }
                 }
             },
             {
                 $group: {
-                    _id: null,
-                    total: { $sum: '$amount' }
+                    _id: { $dateToString: { format: "%Y-%m-%d", date: "$createdAt" } },
+                    count: { $sum: 1 }
                 }
+            },
+            {
+                $sort: { _id: 1 }
             }
         ]);
 
-        // 3. Get total users count
-        const totalUsers = await User.countDocuments();
+        const totalDays = recentOrders.length;
+        const totalRecentOrders = recentOrders.reduce((sum, day) => sum + day.count, 0);
+        const sellingRate = totalDays > 0 ? (totalRecentOrders / totalDays).toFixed(2) : 0;
+ 
 
-        // 4. Get total orders count
-        const totalOrders = await Order.countDocuments();
-
-        // Get total products count based on user role
-        const totalProducts = req.user.role === 'admin' 
-            ? await Products.countDocuments() 
-            : await Products.countDocuments({ sellerId: userId }); 
-
-        const userRevenue = userRevenueResult[0]?.total ? parseInt(userRevenueResult[0].total.toFixed(2)) : 0;
-
-        const overallRevenue = overallRevenueResult[0]?.total || 0;
-
-        res.status(200).json({
-            userRevenue,
-            overallRevenue,
-            totalUsers,
-            totalOrders,
-            totalProducts
-        });
-
-    } catch (error) {
-        console.log(error);
-        res.status(500).json({ error: error.message });
-    }
-};
-
-const Sales_Performance = async (req, res) => {
-    try {
-        const userId = req.user._id;
-        const isAdmin = req.user.role === 'admin';
-  
-        const matchStage = isAdmin
-          ? {} // No seller filter for admin
-          : { 'products.sellerId':  new mongoose.Types.ObjectId(userId) };
-
+        // 3. Get sales performance data
         const today = moment().endOf('day');
         const numWeeks = 4;
         const daysPerWeek = 7;
-
-      
-        const weekRanges = [];
-        for (let i = 0; i < numWeeks; i++) {
+        const weekRanges = Array.from({ length: numWeeks }, (_, i) => {
             const end = moment(today).subtract(i, 'weeks').endOf('day');
             const start = moment(end).subtract(daysPerWeek - 1, 'days').startOf('day');
-            weekRanges.unshift({ start: start.toDate(), end: end.toDate() }); // unshift to keep oldest first
-        }
+            return { start: start.toDate(), end: end.toDate() };
+        }).reverse();
 
-     
-        const allOrders = await Order.aggregate([
+        const salesPerformance = await Order.aggregate([
             {
                 $match: {
-                    createdAt: { $gte: weekRanges[0].start, $lte: weekRanges[weekRanges.length - 1].end },
-                    // status: { $nin: ['cancelled', 'pending'] }
+                    createdAt: { 
+                        $gte: weekRanges[0].start, 
+                        $lte: weekRanges[weekRanges.length - 1].end 
+                    }
                 }
             },
             { $unwind: '$items' },
@@ -212,7 +181,6 @@ const Sales_Performance = async (req, res) => {
             },
             { $unwind: '$product' },
             { $match: matchStage },
-
             {
                 $addFields: {
                     discountMultiplier: {
@@ -239,140 +207,241 @@ const Sales_Performance = async (req, res) => {
             }
         ]);
 
-        // Organize data into weeks and days
-        const result = weekRanges.map(({ start, end }) => {
-           
-            const days = [];
-            for (let i = 0; i < daysPerWeek; i++) {
-                const dayStart = moment(start).add(i, 'days').startOf('day');
-                const dayEnd = moment(dayStart).endOf('day');
+        // 4. Get low stock products
+        const matchStageforStock = isAdmin ? {} : { 'sellerId': new mongoose.Types.ObjectId(userId) };
+        const lowStockItems = await InventoryModel.aggregate([
+            {
+                $match: {
+                    $expr: { $lte: ["$quantity", "$lowStockLimit"] }
+                }
+            },
+            { $match: matchStageforStock }, // Match sellerId directly from inventory
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'product',
+                    foreignField: '_id',
+                    as: 'productData'
+                }
+            },
+            { $unwind: '$productData' },
+            {
+                $lookup: {
+                    from: 'categories',
+                    localField: 'category',
+                    foreignField: '_id',
+                    as: 'categoryData'
+                }
+            },
+            { $unwind: '$categoryData' },
+            {
+                $lookup: {
+                    from: 'subcategories',
+                    localField: 'subcategory',
+                    foreignField: '_id',
+                    as: 'subcategoryData'
+                }
+            },
+            { $unwind: '$subcategoryData' },
+            {
+                $project: {
+                    _id: 1,
+                    productName: '$productData.productName',
+                    currentStock: '$quantity',
+                    lowStockLimit: '$lowStockLimit',
+                    category: '$categoryData.title',
+                    subcategory: '$subcategoryData.subcategoryTitle',
+                    productId: '$productData._id',
+                    sellerId: '$sellerId', // Use sellerId directly from inventory
+                    productImage: '$productData.images'
+                }
+            },
+            { $sort: { currentStock: 1 } }
+        ]);
+
+        // 5. Get seller orders
+        const sellerOrders = await Order.aggregate([
+            { $unwind: '$items' },
+            {
+                $lookup: {
+                    from: 'products',
+                    localField: 'items.productId',
+                    foreignField: '_id',
+                    as: 'products'
+                }
+            },
+            { $unwind: '$products' },
+            { $match: matchStage },
+            {
+                $group: {
+                    _id: '$_id',
+                    orderDetails: { $first: '$$ROOT' },
+                    sellerItems: {
+                        $push: {
+                            productId: '$items.productId',
+                            quantity: '$items.quantity',
+                            price: '$product.price',
+                            productName: '$product.productName'
+                        }
+                    },
+                    sellerTotal: {
+                        $sum: {
+                            $multiply: [
+                                '$items.quantity',
+                                '$product.price'
+                            ]
+                        }
+                    }
+                }
+            },
+            {
+                $addFields: {
+                    discountRatio: {
+                        $cond: [
+                            { $gt: ['$orderDetails.totalAmount', 0] },
+                            { $divide: ['$sellerTotal', '$orderDetails.totalAmount'] },
+                            0
+                        ]
+                    },
+                    orderDiscount: '$orderDetails.discountAmount'
+                }
+            },
+            {
+                $addFields: {
+                    sellerDiscount: { $multiply: ['$orderDiscount', '$discountRatio'] },
+                    sellerTotalAfterDiscount: { 
+                        $subtract: [
+                            '$sellerTotal', 
+                            { $multiply: ['$orderDiscount', '$discountRatio'] }
+                        ] 
+                    }
+                }
+            },
+            {
+                $project: {
+                    _id: 1,
+                    orderDetails: {
+                        firstName: '$orderDetails.firstName',
+                        lastName: '$orderDetails.lastName',
+                        email: '$orderDetails.email',
+                        createdAt: '$orderDetails.createdAt',
+                        status: '$orderDetails.status',
+                        deliveryCharge: '$orderDetails.deliveryCharge',
+                        paymentStatus: '$orderDetails.paymentStatus'
+                    },
+                    sellerItems: 1,
+                    sellerTotal: 1,
+                    sellerDiscount: 1,
+                    sellerTotalAfterDiscount: 1
+                }
+            },
+            { $sort: { 'orderDetails.createdAt': -1 } }
+        ]);
+
+        const ConfirmOrder = sellerOrders.filter((v)=> (
+            // v.orderDetails.status != "pending" && 
+            v.orderDetails.status != "cancelled")).length
+
             
-                const ordersForDay = allOrders.filter(order =>
-                    moment(order.createdAt).isBetween(dayStart, dayEnd, null, '[]')
-                );
-              
-                const uniqueOrderIds = new Set(ordersForDay.map(o => o.orderId.toString()));
-            
-                const value = ordersForDay.reduce((sum, o) => sum + o.value, 0);
-                days.push({
-                    date: dayStart.format('YYYY-MM-DD'),
-                    value: Math.round(value * 100) / 100,
-                    orders: uniqueOrderIds.size
-                });
-            }
-            return days;
+        // 6. Category Wise Products
+        const categories = await CategoryModel.find();
+ 
+        // Get all orders with their items and products
+        const orders = await Order.find({ status: 'delivered' })
+            .populate({
+                path: 'items.productId',
+                populate: {
+                    path: 'categoryId',
+                    model: 'Category'
+                }
+            });
+ 
+        // Calculate total sales amount
+        const totalSales = orders.reduce((sum, order) => sum + order.finalAmount, 0);
+ 
+        // Calculate sales per category
+        const categorySales = {};
+        orders.forEach(order => {
+            order.items.forEach(item => {
+                const categoryId = item.productId.categoryId._id.toString();
+                const itemTotal = item.productId.price * item.quantity;
+ 
+                if (!categorySales[categoryId]) {
+                    categorySales[categoryId] = 0;
+                }
+                categorySales[categoryId] += itemTotal;
+            });
+        });
+ 
+        // Create simplified response with only category name and sales percentage
+        const categoryStats = categories.map(category => {
+            const categoryId = category._id.toString();
+            const salesAmount = categorySales[categoryId] || 0;
+            const salesPercentage = totalSales > 0 ? ((salesAmount / totalSales) * 100).toFixed(2) : 0;
+ 
+            return {
+                categoryName: category.title,
+                image:category.image,
+                salesPercentage: `${salesPercentage}%`
+            };
         });
 
-        res.status(200).json(result); 
+        // Process sales performance data
+        const salesPerformanceData = {
+            '7d': Array.from({ length: 7 }, (_, i) => {
+                const dayStart = moment(weekRanges[weekRanges.length - 1].start).add(i, 'days').startOf('day');
+                const dayEnd = moment(dayStart).endOf('day');
+                
+                const ordersForDay = salesPerformance.filter(order =>
+                    moment(order.createdAt).isBetween(dayStart, dayEnd, null, '[]')
+                );
+                
+                const uniqueOrderIds = new Set(ordersForDay.map(o => o.orderId.toString()));
+                const value = ordersForDay.reduce((sum, o) => sum + o.value, 0);
+                
+                return {
+                    name: dayStart.format('ddd'), // Gets short day name (Mon, Tue, etc.)
+                    value: Math.round(value * 100) / 100,
+                    orders: uniqueOrderIds.size
+                };
+            }),
+            '30d': weekRanges.map((week, index) => {
+                const weekStart = moment(week.start).startOf('day');
+                const weekEnd = moment(week.end).endOf('day');
+                
+                const ordersForWeek = salesPerformance.filter(order =>
+                    moment(order.createdAt).isBetween(weekStart, weekEnd, null, '[]')
+                );
+                
+                const uniqueOrderIds = new Set(ordersForWeek.map(o => o.orderId.toString()));
+                const value = ordersForWeek.reduce((sum, o) => sum + o.value, 0);
+                
+                return {
+                    name: `Week ${index + 1}`,
+                    value: Math.round(value * 100) / 100,
+                    orders: uniqueOrderIds.size
+                };
+            })
+        };
+
+        res.status(200).json({
+            userRevenue: userRevenueResult[0]?.total ? parseInt(userRevenueResult[0].total.toFixed(2)) : 0,
+            overallRevenue: overallRevenueResult[0]?.total || 0,
+            totalUsers,
+            totalOrders,
+            totalProducts,
+            salesPerformance: salesPerformanceData,
+            lowStockProducts: lowStockItems,
+            sellerOrders,
+            categoryStats,
+            ConfirmOrder,
+            sellingRate
+        });
+
     } catch (error) {
         console.error(error);
         res.status(500).json({ error: error.message });
     }
 };
 
-const getAllSellerOrder = async (req, res) => {
-   
-    try {
-    const userId = req.user._id;
-    const isAdmin = req.user.role === 'admin';
-  
-    const matchStage = isAdmin
-      ? {} // No seller filter for admin
-      : { 'products.sellerId':  new mongoose.Types.ObjectId(userId) };
-  
-    const orders = await Order.aggregate([
-      // 1. Unwind items to process each product in the order
-      { $unwind: '$items' },
-      // 2. Lookup product details
-      {
-        $lookup: {
-          from: 'products',
-          localField: 'items.productId',
-          foreignField: '_id',
-          as: 'product'
-        }
-      },
-      { $unwind: '$product' },
-      // 3. Match based on user role
-      { $match: matchStage },
-      // 4. Group items back by order, collecting only the seller's products
-      {
-        $group: {
-          _id: '$_id',
-          orderDetails: { $first: '$$ROOT' }, // Keep order-level fields
-          sellerItems: {
-            $push: {
-              productId: '$items.productId',
-              quantity: '$items.quantity',
-              price: '$product.price',
-              productName: '$product.productName'
-            }
-          },
-          sellerTotal: {
-            $sum: {
-              $multiply: [
-                '$items.quantity',
-                '$product.price'
-              ]
-            }
-          }
-        }
-      },
-      // 5. Calculate discount for seller's items
-      {
-        $addFields: {
-          discountRatio: {
-            $cond: [
-              { $gt: ['$orderDetails.totalAmount', 0] },
-              { $divide: ['$sellerTotal', '$orderDetails.totalAmount'] },
-              0
-            ]
-          },
-          orderDiscount: '$orderDetails.discountAmount'
-        }
-      },
-      {
-        $addFields: {
-          sellerDiscount: { $multiply: ['$orderDiscount', '$discountRatio'] },
-          sellerTotalAfterDiscount: { $subtract: ['$sellerTotal', { $multiply: ['$orderDiscount', '$discountRatio'] }] }
-        }
-      },
-      // 6. Project the final output
-      {
-        $project: {
-          _id: 1,
-          orderDetails: {
-            firstName: '$orderDetails.firstName',
-            lastName: '$orderDetails.lastName',
-            email: '$orderDetails.email',
-            createdAt: '$orderDetails.createdAt',
-            status: '$orderDetails.status',
-            // totalAmount: '$orderDetails.totalAmount',
-            // discountAmount: '$orderDetails.discountAmount',
-            deliveryCharge: '$orderDetails.deliveryCharge',
-            // tax: '$orderDetails.tax',
-            // finalAmount: '$orderDetails.finalAmount',
-            paymentStatus: '$orderDetails.paymentStatus'
-          },
-          sellerItems: 1,
-          sellerTotal: 1,
-          sellerDiscount: 1,
-          sellerTotalAfterDiscount: 1
-        }
-      },
-      // 7. Sort by createdAt in descending order (newest first)
-      { $sort: { 'orderDetails.createdAt': -1 } }
-    ]);
-  
-    res.status(200).json(orders);
-} catch (error) {
-    console.error(error);
-    res.status(500).json({ error: error.message });
-}
-};
-
-module.exports = {
-    dashboard,
-    Sales_Performance,
-    getAllSellerOrder
-};
+module.exports = { dashboard };

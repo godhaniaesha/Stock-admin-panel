@@ -7,6 +7,8 @@ export const getHeaderdata = createAsyncThunk(
         try {
             const response = await getAxios().get('/dashboard/get')
         
+            console.log(response.data);
+            
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
@@ -42,24 +44,25 @@ export const getAllSellerOrder = createAsyncThunk(
 
 
 const dashboardSlice = createSlice({
-    name: 'product',
+    name: 'dashboard',
     initialState: {
-        dashboardHeader: null,
+        dashboardHeader: {},
         dashboardSales: null,
         recentOrder: null,
         error: null,
-        // success: false
+        isLoading:false,
+        success: false
     },
     reducers: {},
     extraReducers: (builder) => {
         builder
-
             .addCase(getHeaderdata.pending, (state) => {
                 state.isLoading = true;
                 state.error = null;
                 state.success = false;
             })
             .addCase(getHeaderdata.fulfilled, (state, action) => {
+                console.log(action.payload,"sdddddddddddddddd");
                 state.isLoading = false;
                 state.dashboardHeader = action.payload;
                 state.success = true;

@@ -15,8 +15,8 @@ const payment = require("./payment");
 const register = require("./Register");
 const forgotPassword = require("./forgotPassword.route");
 const dashboard = require("./dashboard")
-
 const saless = require("./sales");
+
 
 
 router.use("/user", user); 

@@ -39,7 +39,7 @@ import {
     Sparkles
 } from 'lucide-react';
 import { PiHandWavingDuotone } from "react-icons/pi";
-import { FaDesktop, FaMobileAlt, FaTabletAlt } from 'react-icons/fa';
+import { FaDesktop, FaMobileAlt, FaShoppingBag, FaTabletAlt } from 'react-icons/fa';
 import { MdShoppingCart, MdPerson, MdRateReview, MdEmail } from 'react-icons/md';
 import { GiTargetDummy } from 'react-icons/gi';
 import { IoMdFlash } from 'react-icons/io';
@@ -47,7 +47,7 @@ import { BsStars } from 'react-icons/bs';
 import { FaUserTie, FaUserCog, FaUserNinja, FaUserCheck } from 'react-icons/fa';
 import { MdMeetingRoom, MdLaunch, MdCall } from 'react-icons/md';
 import './Dashboard.css';
-import { useOutletContext } from 'react-router-dom';
+import { useNavigate, useOutletContext } from 'react-router-dom';
 import { BiRightArrow } from 'react-icons/bi';
 import { getAxios } from '../utils/axios';
 import { useDispatch, useSelector } from 'react-redux';
@@ -56,6 +56,7 @@ import { Sales_Performance,getHeaderdata,getAllSellerOrder } from '../redux/slic
 
 const Dashboard = () => {
     const dispatch = useDispatch();
+    const naviget = useNavigate();
     const { isDarkMode } = useOutletContext();
     const [currentTime, setCurrentTime] = useState(new Date());
     const [notifications, setNotifications] = useState(5);
@@ -67,20 +68,11 @@ const Dashboard = () => {
         overallRevenue: 0
     });
 
-    const {dashboardHeader,dashboardSales,recentOrder} = useSelector(state => state.dashboard)
+    const userName = localStorage.getItem('userName')
 
-    // useEffect(() => {
-    //     const fetchDashboardData = async () => {
-    //         try {
-    //             const { data } = await getAxios().get('/dashboard/get');
-    //             setDashboardData(data);
-    //         } catch (error) {
-    //             console.error('Error fetching dashboard data:', error);
-    //         }
-    //     };
+    const [categoryWiseProducts , setCategoryWiseProducts] = useState([]);
 
-    //     fetchDashboardData();
-    // }, []);
+    const {sellingRate,ConfirmOrder,categoryStats,lowStockProducts,salesPerformance,sellerOrders,totalOrders,totalProducts,totalUsers,userRevenue} = useSelector(state => state.dashboard.dashboardHeader)
 
     useEffect(() => {
         const timer = setInterval(() => setCurrentTime(new Date()), 1000);
@@ -89,91 +81,31 @@ const Dashboard = () => {
 
     useEffect(() => {
       dispatch(getHeaderdata());
-      dispatch(Sales_Performance());
-      dispatch(getAllSellerOrder());
   }, []);
 
+  useEffect(() => {
+    if (categoryStats && categoryStats.length > 0) {
+        const colors = ['var(--accent-color)', '#8BBEA8', '#A8D5BA', '#FFB6C1']; 
+        const icons = [<FaDesktop />, <FaMobileAlt />, <FaTabletAlt />, <FaShoppingBag />]; 
 
+        const transformedData = categoryStats.map((category, index) => ({
+            name: category.categoryName,
+            image:category.image,
+            value: parseFloat(category.salesPercentage),
+            color: colors[index % colors.length], 
+            icon: icons[index % icons.length] 
+        }));
 
-    const salesData = {
-        '7d': [
-            { name: 'Mon', value: 4000, orders: 120, users: 450 },
-            { name: 'Tue', value: 3000, orders: 98, users: 380 },
-            { name: 'Wed', value: 5000, orders: 150, users: 520 },
-            { name: 'Thu', value: 2780, orders: 89, users: 310 },
-            { name: 'Fri', value: 1890, orders: 67, users: 280 },
-            { name: 'Sat', value: 2390, orders: 78, users: 340 },
-            { name: 'Sun', value: 3490, orders: 110, users: 420 }
-        ],
-        '30d': [
-            { name: 'Week 1', value: 24000, orders: 580, users: 2100 },
-            { name: 'Week 2', value: 18000, orders: 420, users: 1800 },
-            { name: 'Week 3', value: 32000, orders: 720, users: 2400 },
-            { name: 'Week 4', value: 28000, orders: 650, users: 2200 }
-        ]
-    };
-
-    const pieData = [
-        { name: 'category1', value: 45, color: 'var(--accent-color)', icon: <FaDesktop /> },
-        { name: 'category2', value: 35, color: '#8BBEA8', icon: <FaMobileAlt /> },
-        { name: 'category3', value: 20, color: '#A8D5BA', icon: <FaTabletAlt /> },
-    ];
-
-    const recentActivities = [
-        { id: 1, user: 'John Doe', action: 'Made a purchase', time: '2 hours ago', amount: '$234.50', type: 'purchase', status: 'completed', icon: <MdShoppingCart /> },
-        { id: 2, user: 'Sarah Wilson', action: 'Updated profile', time: '4 hours ago', amount: null, type: 'profile', status: 'completed', icon: <MdPerson /> },
-        { id: 3, user: 'Mike Johnson', action: 'Left a review', time: '6 hours ago', amount: null, type: 'review', status: 'pending', icon: <MdRateReview /> },
-        { id: 4, user: 'Emma Davis', action: 'Made a purchase', time: '8 hours ago', amount: '$89.99', type: 'purchase', status: 'completed', icon: <MdShoppingCart /> },
-        { id: 5, user: 'Alex Chen', action: 'Subscribed to newsletter', time: '12 hours ago', amount: null, type: 'subscribe', status: 'completed', icon: <MdEmail /> },
-    ];
-
-    const topProducts = [
-        { id: 1, name: 'Premium Widget', sales: 245, revenue: '$12,450', trend: '+15%', image: <GiTargetDummy /> },
-        { id: 2, name: 'Smart Device', sales: 189, revenue: '$9,870', trend: '+8%', image: <IoMdFlash /> },
-        { id: 3, name: 'Digital Service', sales: 156, revenue: '$7,800', trend: '-3%', image: <BsStars /> },
-    ];
-
-    const teamMembers = [
-        { id: 1, name: 'Alice Johnson', role: 'Product Manager', status: 'online', avatar: <FaUserTie /> },
-        { id: 2, name: 'Bob Smith', role: 'Developer', status: 'away', avatar: <FaUserCog /> },
-        { id: 3, name: 'Carol White', role: 'Designer', status: 'online', avatar: <FaUserNinja /> },
-        { id: 4, name: 'David Brown', role: 'Marketing', status: 'offline', avatar: <FaUserCheck /> },
-    ];
-
-    const upcomingEvents = [
-        { id: 1, title: 'product1', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
-        { id: 2, title: 'product2', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
-        { id: 3, title: 'product3', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
-        { id: 4, title: 'product4', time: '2:00 PM', date: 'Tomorrow', type: 'launch', icon: <MdLaunch /> },
-        { id: 5, title: 'product5', time: '4:30 PM', date: 'Today', type: 'call', icon: <MdCall /> },
-        { id: 6, title: 'product6', time: '10:00 AM', date: 'Today', type: 'meeting', icon: <MdMeetingRoom /> },
-
-    ];
-    const toggleTheme = () => {
-        // This function should be handled by the parent component
-        // Remove this function if not needed
-    };
-
-    const refreshData = () => {
-        setIsLoading(true);
-        setTimeout(() => setIsLoading(false), 1500);
-    };
+        setCategoryWiseProducts(transformedData);
+    }
+}, [categoryStats]);
 
     const getStatusIcon = (status) => {
         switch (status) {
-            case 'completed': return <CheckCircle size={16} className="text-success" />;
+            case 'delivered': return <CheckCircle size={16} className="text-success" />;
             case 'pending': return <AlertCircle size={16} className="text-warning" />;
-            case 'failed': return <XCircle size={16} className="text-danger" />;
+            case 'cancelled': return <XCircle size={16} className="text-danger" />;
             default: return <Clock size={16} className="opacity-50" />;
-        }
-    };
-
-    const getStatusColor = (status) => {
-        switch (status) {
-            case 'online': return '#4ade80';
-            case 'away': return '#fbbf24';
-            case 'offline': return '#6b7280';
-            default: return '#6b7280';
         }
     };
 
@@ -200,10 +132,9 @@ const Dashboard = () => {
                       ! <PiHandWavingDuotone></PiHandWavingDuotone>{" "}
                     </h2>
                     <p className="mb-md-3 mb-2 opacity-90">
-                      Here's what's happening with your business today. You have
-                      3 meetings scheduled and 12 pending tasks.
+                      Welcome, {userName}! Here's a summary of your business activities today.
                     </p>
-                    <div className="d-flex gap-2">
+                    {/* <div className="d-flex gap-2">
                       <button className="btn btn-light btn-sm">
                         <Calendar size={16} className="me-1" />
                         View Schedule
@@ -212,7 +143,7 @@ const Dashboard = () => {
                         <Download size={16} className="me-1" />
                         Export Data
                       </button>
-                    </div>
+                    </div> */}
                   </div>
                   <div className="col-md-4 text-end d-none d-md-block">
                     <div className="fs-1 fw-bold opacity-75">
@@ -235,11 +166,10 @@ const Dashboard = () => {
                   <div className="d_icon-wrapper">
                     <DollarSign size={24} />
                   </div>
-                  
                 </div>
-                <h3 className="h4 fw-bold mb-1">$24,780</h3>
+                <h3 className="h4 fw-bold mb-1">${userRevenue}</h3>
                 <p className="mb-2 opacity-75">Total Revenue</p>
-                <div className="d-flex align-items-center justify-content-between">
+                {/* <div className="d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-center gap-1">
                     <ArrowUp size={16} className="d_metric-positive" />
                     <span className="d_metric-positive fw-medium">+12.5%</span>
@@ -250,7 +180,7 @@ const Dashboard = () => {
                       style={{ width: "75%" }}
                     ></div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -260,11 +190,10 @@ const Dashboard = () => {
                   <div className="d_icon-wrapper">
                     <Users size={24} />
                   </div>
-                  
                 </div>
-                <h3 className="h4 fw-bold mb-1">1,429</h3>
+                <h3 className="h4 fw-bold mb-1">{totalProducts}</h3>
                 <p className="mb-2 opacity-75">Total Products</p>
-                <div className="d-flex align-items-center justify-content-between">
+                {/* <div className="d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-center gap-1">
                     <ArrowUp size={16} className="d_metric-positive" />
                     <span className="d_metric-positive fw-medium">+8.2%</span>
@@ -275,7 +204,7 @@ const Dashboard = () => {
                       style={{ width: "65%" }}
                     ></div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -285,11 +214,10 @@ const Dashboard = () => {
                   <div className="d_icon-wrapper">
                     <ShoppingCart size={24} />
                   </div>
-                  
                 </div>
-                <h3 className="h4 fw-bold mb-1">856</h3>
+                <h3 className="h4 fw-bold mb-1">{ConfirmOrder}</h3>
                 <p className="mb-2 opacity-75">Confirm Order</p>
-                <div className="d-flex align-items-center justify-content-between">
+                {/* <div className="d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-center gap-1">
                     <ArrowDown size={16} className="d_metric-negative" />
                     <span className="d_metric-negative fw-medium">-3.1%</span>
@@ -300,7 +228,7 @@ const Dashboard = () => {
                       style={{ width: "45%" }}
                     ></div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
 
@@ -310,12 +238,11 @@ const Dashboard = () => {
                   <div className="d_icon-wrapper">
                     <TrendingUp size={24} />
                   </div>
-                  
                 </div>
-                <h3 className="h4 fw-bold mb-1">94.2%</h3>
+                <h3 className="h4 fw-bold mb-1">{sellingRate} %</h3>
                 {/* // total stock quantity compare to total sold quantity */}
-                <p className="mb-2 opacity-75">Selling rate</p>  
-                <div className="d-flex align-items-center justify-content-between">
+                <p className="mb-2 opacity-75">Selling rate</p>
+                {/* <div className="d-flex align-items-center justify-content-between">
                   <div className="d-flex align-items-center gap-1">
                     <ArrowUp size={16} className="d_metric-positive" />
                     <span className="d_metric-positive fw-medium">+5.7%</span>
@@ -326,7 +253,7 @@ const Dashboard = () => {
                       style={{ width: "94%" }}
                     ></div>
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -363,12 +290,12 @@ const Dashboard = () => {
                         30D
                       </button>
                     </div>
-                    <button
+                    {/* <button
                       className="d_btn-ghost btn-sm"
                       style={{ color: isDarkMode ? "#fff" : "inherit" }}
                     >
                       <Download size={16} />
-                    </button>
+                    </button> */}
                   </div>
                 </div>
                 <div
@@ -381,7 +308,7 @@ const Dashboard = () => {
                 >
                   <ResponsiveContainer width="100%" height="100%">
                     <BarChart
-                      data={salesData[selectedPeriod]}
+                      data={salesPerformance?.[selectedPeriod]}
                       margin={{ top: 20, right: 30, left: 20, bottom: 20 }}
                     >
                       <CartesianGrid
@@ -474,18 +401,18 @@ const Dashboard = () => {
                   <div>
                     <h5 className="fw-bold mb-0">Category Wise Products</h5>
                     <p className="mb-0 opacity-75 small">
-                    Product Distribution by Category
+                      Product Distribution by Category
                     </p>
                   </div>
-                  <button className="d_btn-ghost btn-sm">
+                  {/* <button className="d_btn-ghost btn-sm">
                     <PieChartIcon size={16} />
-                  </button>
+                  </button> */}
                 </div>
                 <div style={{ height: "280px" }}>
                   <ResponsiveContainer width="100%" height="100%">
                     <PieChart>
                       <Pie
-                        data={pieData}
+                        data={categoryWiseProducts}
                         cx="50%"
                         cy="50%"
                         innerRadius={60}
@@ -493,7 +420,7 @@ const Dashboard = () => {
                         paddingAngle={5}
                         dataKey="value"
                       >
-                        {pieData.map((entry, index) => (
+                        {categoryWiseProducts.map((entry, index) => (
                           <Cell key={`cell-${index}`} fill={entry.color} />
                         ))}
                       </Pie>
@@ -502,24 +429,45 @@ const Dashboard = () => {
                           background: isDarkMode
                             ? "var(--dark-card-bg)"
                             : "var(--light-card-bg)",
+                          color: isDarkMode
+                            ? "var(--dark-text)"
+                            : "var(--light-text)",
                           border: `1px solid var(--${
                             isDarkMode ? "dark" : "light"
                           }-border)`,
-                          borderRadius: "8px",
+                          borderRadius: "5px",
                         }}
                       />
                     </PieChart>
                   </ResponsiveContainer>
                 </div>
-                <div className="mt-3">
-                  {pieData.map((item, index) => (
+                <div
+                  className="mt-3 overflow-y-scroll"
+                  style={{
+                    height: "250px",
+                    maxHeight: "250px",
+                  }}
+                >
+                  {categoryWiseProducts.map((item, index) => (
                     <div
                       key={index}
                       className="d-flex justify-content-between align-items-center mb-3 p-2 rounded"
                       style={{ background: `${item.color}15` }}
                     >
                       <div className="d-flex align-items-center gap-3">
-                        <span style={{ fontSize: "20px" }}>{item.icon}</span>
+                        <span style={{ fontSize: "20px" }}>
+                          {" "}
+                          <img
+                            src={
+                              item?.image
+                                ? `http://localhost:2221/${item?.image}`
+                                : "placeholder.jpg"
+                            }
+                            // alt={item?.name}
+                            className="Z_table_product_img"
+                            style={{maxWidth: "50px"}}
+                          />
+                        </span>
                         <div>
                           <div className="fw-medium">{item.name}</div>
                           <div className="small opacity-75">
@@ -547,22 +495,27 @@ const Dashboard = () => {
                   <div>
                     <h5 className="fw-bold mb-0">Recent Order</h5>
                     <p className="mb-0 opacity-75 small">
-                    Latest Orders and Transactions
+                      Latest Orders and Transactions
                     </p>
                   </div>
                   <div className="d-flex gap-2">
-                    <button className="d_btn-ghost btn-sm">
+                    {/* <button className="d_btn-ghost btn-sm">
                       <Filter size={16} />
-                    </button>
-                    <button className="d_btn-primary btn-sm">
+                    </button> */}
+                    <button
+                      className="d_btn-primary btn-sm"
+                      onClick={() => {
+                        naviget("/orders");
+                      }}
+                    >
                       <Eye size={16} className="me-1" />
                       View All
                     </button>
                   </div>
                 </div>
                 <div>
-                  {recentActivities.map((activity) => (
-                    <div key={activity.id} className="d_activity-item">
+                  {sellerOrders?.slice(0, 5)?.map((activity) => (
+                    <div key={activity._id} className="d_activity-item">
                       <div className="d-flex justify-content-between align-items-start">
                         <div className="d-flex gap-3">
                           <div
@@ -577,30 +530,58 @@ const Dashboard = () => {
                               flexShrink: 0,
                             }}
                           >
-                            {activity.type === "purchase" ? (
-                              <MdShoppingCart />
-                            ) : activity.type === "profile" ? (
+                            {/* {activity.type === "purchase" ? ( */}
+                            <MdShoppingCart />
+                            {/* ) : activity.type === "profile" ? (
                               <MdPerson />
                             ) : activity.type === "review" ? (
                               <MdRateReview />
                             ) : (
                               <MdEmail />
-                            )}
+                            )} */}
                           </div>
                           <div>
                             <div className="d-flex align-items-center gap-2 mb-1">
                               <h6 className="fw-medium mb-0">
-                                {activity.user}
+                                {activity?.orderDetails?.firstName}{" "}
+                                {activity?.orderDetails?.lastName}
                               </h6>
-                              {getStatusIcon(activity.status)}
+                              {getStatusIcon(activity?.orderDetails?.status)}
                             </div>
-                            <p className="mb-1 opacity-75">{activity.action}</p>
+                            <p className="mb-1 opacity-75">Made as Perches</p>
                             <div className="d-flex align-items-center gap-3">
                               <span className="small opacity-75 d-flex align-items-center gap-1">
                                 <Clock size={12} />
-                                {activity.time}
+                                {new Date(activity?.orderDetails?.createdAt) ===
+                                new Date()
+                                  ? "Today"
+                                  : new Date(
+                                      activity?.orderDetails?.createdAt
+                                    ) ===
+                                    new Date(
+                                      new Date().setDate(
+                                        new Date().getDate() - 1
+                                      )
+                                    )
+                                  ? "1 day ago"
+                                  : new Date(
+                                      activity?.orderDetails?.createdAt
+                                    ) ===
+                                    new Date(
+                                      new Date().setDate(
+                                        new Date().getDate() - 2
+                                      )
+                                    )
+                                  ? "2 days ago"
+                                  : new Date(
+                                      activity?.orderDetails?.createdAt
+                                    ).toLocaleDateString("en-US", {
+                                      day: "2-digit",
+                                      month: "2-digit",
+                                      year: "2-digit",
+                                    })}
                               </span>
-                              {activity.amount && (
+                              {activity?.sellerTotalAfterDiscount && (
                                 <span
                                   className="badge"
                                   style={{
@@ -608,20 +589,22 @@ const Dashboard = () => {
                                     color: "white",
                                   }}
                                 >
-                                  {activity.amount}
+                                  {(activity?.sellerTotalAfterDiscount).toFixed(
+                                    2
+                                  )}
                                 </span>
                               )}
                             </div>
                           </div>
                         </div>
-                        <div className="d-flex gap-1">
+                        {/* <div className="d-flex gap-1">
                           <button className="d_btn-ghost btn-sm">
                             <Heart size={14} />
                           </button>
                           <button className="d_btn-ghost btn-sm">
                             <Share2 size={14} />
                           </button>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   ))}
@@ -635,69 +618,97 @@ const Dashboard = () => {
                   <div>
                     <h5 className="fw-bold mb-0">Low stocks</h5>
                     <p className="mb-0 opacity-75 small">
-                    Items running low in inventory
+                      Items running low in inventory
                     </p>
                   </div>
-                  <button className="d_btn-ghost btn-sm">
+                  {/* <button className="d_btn-ghost btn-sm">
                     <Calendar size={16} />
-                  </button>
+                  </button> */}
                 </div>
-                <div>
-                  {upcomingEvents.map((event) => (
-                    <div
-                      key={event.id}
-                      className="d-flex align-items-center gap-3 mb-3 p-3 rounded"
-                      style={{
-                        background: `var(--${
-                          isDarkMode ? "dark" : "light"
-                        }-border)`,
-                      }}
-                    >
+                <div
+                  style={{
+                    height: "575px",
+                    maxHeight: "575px",
+                    display: "flex",
+                    justifyContent: "center",
+                    alignItems: "center",
+                  }}
+                >
+                  {lowStockProducts?.length > 0 ? (
+                    lowStockProducts.map((event) => (
                       <div
-                        className="d-flex align-items-center justify-content-center"
+                        key={event._id}
+                        className="d-flex align-items-center gap-3 mb-3 p-3 rounded"
                         style={{
-                          width: "40px",
-                          height: "40px",
-                          borderRadius: "10px",
-                          background:
-                            event.type === "meeting"
-                              ? "var(--accent-color)"
-                              : event.type === "launch"
-                              ? "#8BBEA8"
-                              : "#A8D5BA",
-                          color: "white",
+                          background: `var(--${
+                            isDarkMode ? "dark" : "light"
+                          }-border)`,
                         }}
                       >
-                        {event.type === "meeting" ? (
-                          <MdMeetingRoom />
-                        ) : event.type === "launch" ? (
-                          <MdLaunch />
-                        ) : (
-                          <MdCall />
-                        )}
-                      </div>
-                      <div className="flex-grow-1">
-                        <div className="fw-medium">{event.title}</div>
-                        <div className="small opacity-75">
-                          {event.date} at {event.time}
+                        <div
+                          className="d-flex align-items-center justify-content-center"
+                          style={{
+                            width: "40px",
+                            height: "40px",
+                            borderRadius: "10px",
+                            background:
+                              event.type === "meeting"
+                                ? "var(--accent-color)"
+                                : event.type === "launch"
+                                ? "#8BBEA8"
+                                : "#A8D5BA",
+                            color: "white",
+                          }}
+                        >
+                          {/* <img src={event.productImage} /> */}
+                          <img
+                            src={
+                              event?.productImage
+                                ? `http://localhost:2221/${event?.productImage[0]}`
+                                : "placeholder.jpg"
+                            }
+                            alt={event?.productName}
+                            className="Z_table_product_img"
+                          />
+                          {/* {event.type === "meeting" ? (
+                            <MdMeetingRoom />
+                          ) : event.type === "launch" ? (
+                            <MdLaunch />
+                          ) : (
+                            <MdCall />
+                          )} */}
                         </div>
+                        <div className="flex-grow-1">
+                          <div className="fw-medium">{event?.productName}</div>
+                          <div className="small opacity-75">
+                            {/* {event.date} at {event.time} */}
+                            Quantity : {event?.currentStock}
+                          </div>
+                        </div>
+                        {/* <button className="d_btn-ghost btn-sm">
+                          <ArrowUp
+                            size={14}
+                            style={{ transform: "rotate(45deg)" }}
+                          />
+                        </button> */}
                       </div>
-                      <button className="d_btn-ghost btn-sm">
-                        <ArrowUp
-                          size={14}
-                          style={{ transform: "rotate(45deg)" }}
-                        />
-                      </button>
+                    ))
+                  ) : (
+                    <div className="text-center">
+                      <p>No low stock products to show.</p>
                     </div>
-                  ))}
+                  )}
                 </div>
-                <button className="d_btn-primary w-100 mt-2">
+                <button
+                  className="d_btn-primary w-100 mt-2"
+                  onClick={() => {
+                    naviget("/stock/alerts");
+                  }}
+                >
                   <BiRightArrow size={16} className="me-1" />
-                 View All
+                  View All
                 </button>
               </div>
-
-           
             </div>
           </div>
         </div>
@@ -705,9 +716,13 @@ const Dashboard = () => {
         {/* Floating Action Button */}
         <button
           className="d_floating-action"
-          onClick={() => setNotifications(0)}
+          style={{
+            display: window.scrollY > 0 ? "block" : "none",
+            transform: "rotate(0deg)",
+          }}
+          onClick={() => window.scrollTo(0, 0)}
         >
-          <Plus size={24} />
+          <ArrowUp size={24} />
         </button>
       </div>
     );

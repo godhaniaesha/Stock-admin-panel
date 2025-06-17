@@ -13,9 +13,10 @@ exports.auth = (roles = []) => {
                     return res.status(404).json({ status: 404, message: "Token Is Required" })
                 }
 
-                let checkToken = jwt.verify(token, process.env.ACCESS_TOKEN_KEY)
-                
+                let checkToken = jwt.verify(token, process.env.REFRESH_TOKEN_KEY)
 
+                console.log(checkToken);
+                
                 let checkUser = await User.findById(checkToken)
 
                 req.user = checkUser;

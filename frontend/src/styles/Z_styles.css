@@ -2290,9 +2290,4 @@
 .z_delete_modal.show{
   background-color: rgba(0, 0, 0, 0.6) !important;
 }
-@media  (min-width:'1200px') {
-  .Z_offcan_width.offcanvas.show{
-    display: none !important;
-    visibility: hidden !important ;
-  }
-}
+

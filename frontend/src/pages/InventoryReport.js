@@ -1,5 +1,4 @@
-import React, { useEffect } from 'react';
-import { useDispatch, useSelector } from 'react-redux';
+import React, { useEffect, useState } from 'react';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import '../styles/sales.css';
 import '../styles/Z_styles.css';
@@ -22,7 +21,6 @@ import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchInventoryMetrics, fetchProductMovement } from '../redux/slice/sales.slice';
 import { fetchInventories, deleteInventory } from '../redux/slice/inventory.Slice';
-import { fetchProductMovement } from '../redux/slice/sales.slice';
 
 ChartJS.register(LineElement, BarElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, ArcElement);
 

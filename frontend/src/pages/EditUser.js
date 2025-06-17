@@ -1,12 +1,13 @@
 import React, { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useParams, useNavigate } from 'react-router-dom';
+import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import '../styles/x_app.css';
 import { db_fetchUserById, db_updateUser } from '../redux/slice/userSlice';
 
 const EditUser = () => {
     const { id } = useParams();
     const navigate = useNavigate();
+    const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
     const { selectedUser, isLoading, error: reduxError } = useSelector(state => state.user);
 
@@ -162,7 +163,7 @@ const EditUser = () => {
 
     if (isLoading) {
         return (
-            <div className="d-flex justify-content-center align-items-center" style={{ minHeight: '400px' }}>
+            <div className="d-flex justify-content-center align-items-center " style={{ minHeight: '400px' }}>
                 <div className="spinner-border" role="status">
                     <span className="visually-hidden">Loading...</span>
                 </div>
@@ -171,7 +172,7 @@ const EditUser = () => {
     }
 
     return (
-        <div className="x_product_page_container Z_product_section">
+        <div className={`x_product_page_container Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'}    `}>
             <div className="x_add_product_container">
                 {/* Image Upload Section */}
                 <div className="x_upload_section">

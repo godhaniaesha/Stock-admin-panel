@@ -22,6 +22,18 @@ const Sidebar = ({ show, isDarkMode }) => {
   const [userRole, setUserRole] = useState(null);
   const dispatch = useDispatch();
 
+  useEffect(() => {
+    // When the sidebar is 'shown' (e.g., as an offcanvas on smaller screens),
+    // ensure it is expanded internally to display all menu items.
+    if (show) {
+      setIsExpanded(true);
+    } else {
+      // When the sidebar is hidden (e.g., offcanvas closes), reset to collapsed
+      // state for desktop view or next open.
+      setIsExpanded(false);
+    }
+  }, [show]); // Depend on 'show' prop to react to offcanvas visibility changes
+
   const toggleFavorite = (path) => {
     setFavorites(prev => prev.includes(path) ? prev.filter(p => p !== path) : [...prev, path]);
   };
@@ -213,12 +225,14 @@ const Sidebar = ({ show, isDarkMode }) => {
   return (
     <div 
       className={`sidebar overflow-hidden ${show ? 'show' : ''} ${isExpanded ? 'expanded' : 'collapsed'} ${!isDarkMode ? 'light-mode' : ''}`}
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+      onMouseEnter={() => !show && setIsExpanded(true)} // Only expand on hover if not in offcanvas mode
+      onMouseLeave={() => !show && setIsExpanded(false)} // Only collapse on leave if not in offcanvas mode
       style={{ 
         backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`,
         color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
-        borderRight: `1px solid var(${isDarkMode ? '--dark-border' : '--light-border'})`
+        borderRight: `1px solid var(${isDarkMode ? '--dark-border' : '--light-border'})`,
+        // zIndex:'11111',
+        // marginTop:'4.6rem'
       }}
     >
       <div className="sidebar-header p-3 border-bottom" style={{ borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})` }}>

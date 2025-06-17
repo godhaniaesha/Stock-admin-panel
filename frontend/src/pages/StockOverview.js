@@ -1,26 +1,43 @@
-import React, { useEffect } from 'react';
-import { Table } from 'react-bootstrap';
+import React, { useEffect, useState } from 'react';
+import { Table, Modal, Button, Spinner } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import '../styles/Z_styles.css';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
-import { fetchInventories } from '../redux/slice/inventory.Slice';
+import { fetchInventories, deleteInventory } from '../redux/slice/inventory.Slice';
 import { FaCaretDown } from 'react-icons/fa';
 
 const StockOverview = () => {
   const { isDarkMode } = useOutletContext();
   const dispatch = useDispatch();
-    const navigate = useNavigate(); // ✅ Initialize navigate
-
+  const navigate = useNavigate();
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [productToDelete, setProductToDelete] = useState(null);
 
   const { inventory, isLoading, error } = useSelector((state) => state.inventory);
   console.log(inventory, "inventory");
 
-
   useEffect(() => {
     dispatch(fetchInventories());
   }, [dispatch]);
+
+  const handleDeleteClick = (product) => {
+    setProductToDelete(product);
+    setShowDeleteModal(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (productToDelete) {
+      try {
+        await dispatch(deleteInventory(productToDelete._id)).unwrap();
+        setShowDeleteModal(false);
+        setProductToDelete(null);
+      } catch (error) {
+        console.error('Failed to delete inventory:', error);
+      }
+    }
+  };
 
   return (
     <section className={`Z_product_section  ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-5 my-md-3`}>
@@ -63,8 +80,7 @@ const StockOverview = () => {
                     <td>
                       <div className="Z_product_info_cell">
                         <img
-                        src={`http://localhost:2221/${product.productData?.images[0]}`}
-                          // src={product.productData?.images[0] || 'https://via.placeholder.com/60'}
+                          src={`http://localhost:2221/${product.productData?.images[0]}`}
                           alt={product.productData?.productName || 'N/A'}
                           className="Z_table_product_img"
                         />
@@ -84,13 +100,16 @@ const StockOverview = () => {
                     </td>
                     <td>
                       <div className="Z_action_buttons">
-                     
-                        <button className="Z_action_btn Z_edit_btn"
-                         onClick={() => navigate(`/stock/edit/${product._id}`)} // ✅ Navigate on click
-                         >
+                        <button 
+                          className="Z_action_btn Z_edit_btn"
+                          onClick={() => navigate(`/stock/edit/${product._id}`)}
+                        >
                           <TbEdit size={22} />
                         </button>
-                        <button className="Z_action_btn Z_delete_btn">
+                        <button 
+                          className="Z_action_btn Z_delete_btn"
+                          onClick={() => handleDeleteClick(product)}
+                        >
                           <RiDeleteBin6Line size={22} />
                         </button>
                       </div>
@@ -98,11 +117,39 @@ const StockOverview = () => {
                   </tr>
                 ))}
               </tbody>
-
             </Table>
           </div>
         )}
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+        <Modal.Header closeButton>
+          <Modal.Title>Confirm Delete</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete product "{productToDelete?.productData?.productName}"? This action cannot be undone.
+        </Modal.Body>
+        <Modal.Footer>
+          <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+            Cancel
+          </Button>
+          <Button
+            variant="danger"
+            onClick={handleDeleteConfirm}
+            disabled={isLoading}
+          >
+            {isLoading ? (
+              <>
+                <Spinner animation="border" size="sm" className="me-2" />
+                Deleting...
+              </>
+            ) : (
+              'Delete'
+            )}
+          </Button>
+        </Modal.Footer>
+      </Modal>
     </section>
   );
 };

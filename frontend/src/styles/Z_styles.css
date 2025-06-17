@@ -30,8 +30,14 @@
   padding: 0 15px;
 }
 
+/* .Z_input_grp InputGroup {
+  border: 1px solid white !important;
+  border-radius: 6px !important;
+} */
+
 .Z_search_input:focus {
-  border-color: none !important;
+  border: 1px solid #e0e0e0 !important;
+  border-right: none !important;
 }
 
 .Z_search_input {
@@ -43,12 +49,12 @@
   width: calc(100% - 50px);
 }
 
-.Z_search_input:focus {
+/* .Z_search_input:focus {
   background-color: #fff;
   border-color: #e0e0e0;
   box-shadow: none;
   color: #212121;
-}
+} */
 
 .Z_search_input::placeholder {
   color: #9e9e9e;
@@ -138,6 +144,7 @@
   .Z_right_actions button {
     padding: 6px 12px;
     font-size: 0.8rem;
+    margin-right: 0 !important;
   }
   .Z_offcan_width {
     width: 60% !important;
@@ -194,12 +201,12 @@
 }
 
 .Z_apply_button {
-  width: 100%;
+  width: 50%;
   background-color: var(--accent-color);
   color: #fff;
 
   border: none;
-  padding: 12px;
+  /* padding: 12px; */
   border-radius: 6px;
   font-weight: 500;
   cursor: pointer;
@@ -375,6 +382,21 @@
   background: #22282e;
   color: #ff8585;
   border-color: #22282e;
+}
+
+.d_show_result {
+  white-space: nowrap;
+}
+
+.Z_wishlist_btn {
+  border: 1px solid #6a9c89;
+  padding: 6px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.Z_wishlist_btn svg {
+  color: #6a9c89;
 }
 
 @media (max-width: 1200px) {
@@ -2036,6 +2058,10 @@
   .Z_offcan_width {
     width: 70% !important;
   }
+  .d_show_result {
+    flex-direction: column;
+    align-items: start !important;
+  }
 }
 
 @media (max-width: 375px) {
@@ -2049,7 +2075,7 @@
   .Z_time_filter {
     padding-right: 30px;
   }
-  .Z_table_actions{
+  .Z_table_actions {
     flex-direction: column;
     align-items: start;
   }
@@ -2143,11 +2169,13 @@
 
 .Z_reset_button {
   padding: 8px 20px;
-  background-color: #dc3545;
+  /* background-color: #dc3545; */
+  background-color:  #6a9c89;;
   color: white;
   border: none;
   border-radius: 4px;
   cursor: pointer;
+  width: 50%;
   transition: background-color 0.3s ease;
 }
 
@@ -2167,4 +2195,85 @@
   color: var(--accent-hover-color); /* Or your desired hover color */
   transform: scale(1.1);
   outline: none; /* Remove default focus outline if you add custom focus styles */
+}
+
+.Z_no_data_wrapper {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+}
+
+.Z_no_data_image {
+  width: 200px;
+  height: auto;
+  margin-bottom: 20px;
+}
+
+.Z_no_data_title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.Z_no_data_text {
+  font-size: 16px;
+  color: #666;
+  text-align: center;
+  max-width: 400px;
+}
+
+/* Dark mode styles */
+.d_dark .Z_no_data_title {
+  color: #fff;
+}
+
+.d_dark .Z_no_data_text {
+  color: #ccc;
+}
+
+@media (max-width: 576px) {
+  .Z_no_data_image {
+    width: 150px;
+  }
+  
+  .Z_no_data_title {
+    font-size: 20px;
+  }
+  
+  .Z_no_data_text {
+    font-size: 14px;
+  }
+}
+
+
+/* Modal Footer Button Styles */
+.z_delete_modal.modal{
+  background-color: var(--dark-bg) !important;
+}
+.z_delete_modal .modal-footer {
+    display: flex;
+    gap: 10px;
+    width: 100%;
+    padding: 15px;
+    border-top: 1px solid #e0e0e0;
+}
+
+.z_delete_modal .modal-footer .Z_btn {
+    flex: 1;
+    width: 50%;
+    margin: 0;
+    padding: 10px;
+    text-align: center;
+}
+.z_delete_modal.show{
+  background-color: rgba(0, 0, 0, 0.6) !important;
+}
+@media  (min-width:'1200px') {
+  .Z_offcan_width.offcanvas.show{
+    display: none !important;
+    visibility: hidden !important ;
+  }
 }

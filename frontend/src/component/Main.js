@@ -40,7 +40,7 @@
         >
           <Sidebar show={showSidebar} isDarkMode={isDarkMode} toggleSidebar={toggleSidebar} />
           <div 
-            className="content-wrapper" 
+            className="content-wrapper " 
             onClick={handleContentClick}
             style={{ 
               backgroundColor: `var(${isDarkMode ? '--dark-bg' : '--light-bg'})`,

@@ -236,7 +236,7 @@ function ProductList() {
                 show={showDeleteModal}
                 onHide={handleDeleteCancel}
                 centered
-                className={`${isDarkMode ? 'd_dark' : 'd_light'}`}
+                className={`z_delete_modal ${isDarkMode ? 'd_dark' : 'd_light'}`}
             >
                 <Modal.Header closeButton>
                     <Modal.Title>Delete Product</Modal.Title>
@@ -255,7 +255,7 @@ function ProductList() {
                 show={showBulkDeleteModal}
                 onHide={() => setShowBulkDeleteModal(false)}
                 centered
-                className={`${isDarkMode ? 'd_dark' : 'd_light'}`}
+                className={`z_delete_modal ${isDarkMode ? 'd_dark' : 'd_light'}`}
             >
                 <Modal.Header closeButton>
                     <Modal.Title>Delete Selected Products</Modal.Title>

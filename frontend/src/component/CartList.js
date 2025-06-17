@@ -78,9 +78,9 @@ const CartList = () => {
     setIsOpen(false);
   };
 
-  if (loading) {
-    return <div className="text-center p-5">Loading...</div>;
-  }
+  // if (loading) {
+  //   return <div className="text-center p-5">Loading...</div>;
+  // }
 
   // if (error) {
   //   return <div className="text-center p-5 text-danger">Error: {error}</div>;

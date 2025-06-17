@@ -5,8 +5,8 @@
   margin-bottom: 2rem;
 }
 .d_sales-report-container {
-    padding: 0.5rem;
-  }
+  padding: 0.5rem;
+}
 .d_main-title {
   font-size: 2rem;
   font-weight: 700;
@@ -76,7 +76,8 @@
   background-color: var(--dark-card-bg) !important;
 }
 .d_light .d_summary-card,
-.d_light .Z_table_wrapper {
+.d_light .Z_table_wrapper ,.d_light.Z_product_section .main-image,.d_light.Z_product_section .stats-card,.d_light.Z_product_section .shipping-info,.d_light.Z_product_section .info-card
+{
   background-color: var(--light-card-bg) !important;
 }
 .d_dark .Z_product_card .Z_product_title,
@@ -114,6 +115,13 @@
   border: 1px solid var(--accent-color) !important;
   color: var(--accent-color) !important;
 }
+.d_light.Z_product_section .shipping-info,.d_light.Z_product_section .info-card{
+  color: var(--dark-bg);
+}
+/* .d_dark .Z_add_to_cart_btn :hover {
+  background: var(--accent-color)  !important;
+  color: #fff !important;
+} */
 .d_dark .Z_card_wishlist_btn {
   border: 1px solid var(--accent-color) !important;
 }
@@ -171,45 +179,50 @@
   }
 }
 
-
-
 .d_chart-container {
-    background-color: var(--card-bg-color); /* Assuming you have CSS variables for colors */
-    padding: 20px;
-    border-radius: 8px;
-    box-shadow: var(--shadow-small);
-    height: 400px; /* Example height, adjust as needed */
-    display: flex;
-    flex-direction: column;
-    justify-content: center; /* Center content vertically */
-    align-items: center; /* Center content horizontally */
+  background-color: var(
+    --card-bg-color
+  ); /* Assuming you have CSS variables for colors */
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: var(--shadow-small);
+  height: 400px; /* Example height, adjust as needed */
+  display: flex;
+  flex-direction: column;
+  justify-content: center; /* Center content vertically */
+  align-items: center; /* Center content horizontally */
 }
 
 .d_chart-title {
-    margin-bottom: 20px;
-    color: var(--text-color);
+  margin-bottom: 20px;
+  color: var(--text-color);
 }
 
 /* Dark mode specific adjustments */
 .d_dark .d_chart-container {
-    background-color: var(--dark-card-bg-color);
-    box-shadow: var(--dark-shadow-small);
+  background-color: var(--dark-card-bg-color);
+  box-shadow: var(--dark-shadow-small);
 }
 
 .d_dark .d_chart-title {
-    color: var(--dark-text-color);
+  color: var(--dark-text-color);
 }
 /* Existing styles for d_summary-cards and d_summary-card */
 
 .d_summary-cards {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); /* Adjusted min-width for slightly larger cards */
+  grid-template-columns: repeat(
+    auto-fit,
+    minmax(200px, 1fr)
+  ); /* Adjusted min-width for slightly larger cards */
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 .d_summary-card {
-  background-color: var(--light-card-bg); /* Use light card background by default */
+  background-color: var(
+    --light-card-bg
+  ); /* Use light card background by default */
   padding: 1.5rem; /* Increased padding for more breathing room */
   border-radius: 12px; /* Slightly more rounded corners */
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Stronger, softer shadow */
@@ -239,11 +252,15 @@
   font-size: 1.1rem; /* Slightly larger heading */
   font-weight: 600;
   margin-bottom: 0.75rem; /* Space between title and value */
-  color: var(--text-color-light); /* Use a slightly lighter text color for the heading */
+  color: var(
+    --text-color-light
+  ); /* Use a slightly lighter text color for the heading */
 }
 
 .d_dark .d_summary-card h4 {
-  color: var(--light-bg) !important; /* Ensure heading color is light in dark mode */
+  color: var(
+    --light-bg
+  ) !important; /* Ensure heading color is light in dark mode */
 }
 
 .d_summary-card p {
@@ -254,11 +271,12 @@
 }
 
 .d_dark .d_summary-card p {
-  color: var(--light-bg) !important; /* Ensure value color is light in dark mode */
+  color: var(
+    --light-bg
+  ) !important; /* Ensure value color is light in dark mode */
 }
 
 @media (max-width: 768px) {
-  
   .d_chart-container {
     margin: 10px 0px;
     padding: 38px;

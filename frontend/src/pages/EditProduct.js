@@ -58,9 +58,7 @@ const EditProduct = () => {
 
     // Fetch categories and subcategories
     useEffect(() => {
-
         dispatch(WaccessCategories());
-      
         dispatch(WaccesssubCategories());
     }, [dispatch]);
 
@@ -392,8 +390,6 @@ const EditProduct = () => {
                                                 onClick={() => setIsCategoryOpen(!isCategoryOpen)}
                                             >
                                                 <span>
-
-
                                                     {categoriesLoading ? 'Loading categories...' : getCategoryName(productData.categoryId)}
                                                 </span>
                                                 <svg
@@ -515,7 +511,6 @@ const EditProduct = () => {
                                     </div>
                                 </div>
 
-
                                 {/* Description */}
                                 <div className="x_form_row">
                                     <div className="x_form_group x_full_width">
@@ -605,7 +600,6 @@ const EditProduct = () => {
                                         />
                                     </div>
                                 </div>
-                     
                             </div>
                         </div>
                     </div>

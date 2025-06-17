@@ -34,7 +34,7 @@
   position: fixed;
   left: -280px;
   top: 0;
-  z-index: 1000;
+  z-index: 1001;
   box-shadow: 2px 0 5px var(--dark-border);
 }
 

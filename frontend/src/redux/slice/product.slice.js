@@ -1,17 +1,14 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
-const API_URL = 'http://localhost:2221/api/a1/product';
+import axiosInstance from '../../utils/axiosInstance';
 
 // Create product
 export const createProduct = createAsyncThunk(
     'product/create',
     async (productData, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.post(`${API_URL}/addProduct`, productData, {
+            const response = await axiosInstance.post('/product/addProduct', productData, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
                 }
             });
@@ -21,17 +18,12 @@ export const createProduct = createAsyncThunk(
         }
     }
 );
+
 export const getallwAccess = createAsyncThunk(
     'product/getallwAccess',
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/getall`, {
-               headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await axiosInstance.get('/product/getall');
             console.log(response.data, "get all products with access");
             return response.data;
         } catch (error) {
@@ -39,22 +31,15 @@ export const getallwAccess = createAsyncThunk(
         }
     }
 );
-                    
+
 // Get all products
 export const fetchProducts = createAsyncThunk(
     'product/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/getProduct`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            console.log(response.data,"fetch product");
+            const response = await axiosInstance.get('/product/getProduct');
+            console.log(response.data, "fetch product");
             return response.data;
-            
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch products');
         }
@@ -66,12 +51,7 @@ export const fetchProductById = createAsyncThunk(
     'product/fetchById',
     async (id, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/get/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await axiosInstance.get(`/product/get/${id}`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch product');
@@ -84,10 +64,8 @@ export const updateProduct = createAsyncThunk(
     'product/update',
     async ({ id, productData }, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.put(`${API_URL}/update/${id}`, productData, {
+            const response = await axiosInstance.put(`/product/update/${id}`, productData, {
                 headers: {
-                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'multipart/form-data'
                 }
             });
@@ -103,12 +81,7 @@ export const deleteProduct = createAsyncThunk(
     'product/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.delete(`${API_URL}/delete/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            await axiosInstance.delete(`/product/delete/${id}`);
             return id;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to delete product');

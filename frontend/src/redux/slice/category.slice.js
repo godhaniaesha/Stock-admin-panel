@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance';
 
 const API_URL = 'http://localhost:2221/api/a1/category';
 
@@ -8,10 +9,8 @@ export const fetchCategories = createAsyncThunk(
   'category/fetchAll',
   async (_, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await axios.get(API_URL, {
+      const response = await axiosInstance.get("/category", {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -26,9 +25,8 @@ export const WaccessCategories = createAsyncThunk(
   async (_, { rejectWithValue }) => {
     try {
       const token = localStorage.getItem('token');
-      const response = await axios.get(API_URL + '/getall', {
+      const response = await axiosInstance.get('/category/getall', {
         headers: {
-          'Authorization': `Bearer ${token}`,
           'Content-Type': 'application/json'
         }
       });
@@ -43,27 +41,15 @@ export const updateCategory = createAsyncThunk(
   'category/update',
   async ({ id, formData }, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
       console.log("Sending update request with data:", formData);
       
-      const response = await fetch(`http://localhost:2221/api/a1/category/${id}`, {
-        method: 'PUT',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-        },
-        body: formData
-      });
-
-      const data = await response.json();
-      console.log("Update response:", data);
+      const response = await axiosInstance.put(`/category/${id}`, formData);
+      console.log("Update response:", response.data);
       
-      if (!response.ok) {
-        throw new Error(data.error || data.message || 'Failed to update category');
-      }
-      return data;
+      return response.data;
     } catch (error) {
       console.error("Update error:", error);
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || 'Failed to update category');
     }
   }
 );
@@ -73,22 +59,10 @@ export const deleteCategory = createAsyncThunk(
   'category/delete',
   async (id, { rejectWithValue }) => {
     try {
-      const token = localStorage.getItem('token');
-      const response = await fetch(`http://localhost:2221/api/a1/category/${id}`, {
-        method: 'DELETE',
-        headers: {
-          'Authorization': `Bearer ${token}`,
-          'Content-Type': 'application/json'
-        }
-      });
-
-      const data = await response.json();
-      if (!response.ok) {
-        throw new Error(data.error || data.message || 'Failed to delete category');
-      }
+      const response = await axiosInstance.delete(`/category/${id}`);
       return id; // Return the deleted category's ID
     } catch (error) {
-      return rejectWithValue(error.message);
+      return rejectWithValue(error.response?.data?.message || 'Failed to delete category');
     }
   }
 );

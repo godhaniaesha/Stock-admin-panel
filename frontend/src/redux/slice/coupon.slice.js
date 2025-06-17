@@ -1,26 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:2221/api/a1/coupon';
-
-// Axios instance with auth header
-const getAxios = () => {
-    const token = localStorage.getItem('token');
-    return axios.create({
-        baseURL: API_BASE_URL,
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-};
+import axiosInstance from '../../utils/axiosInstance';
 
 // Fetch all coupons
 export const fetchCoupons = createAsyncThunk(
     'coupon/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().get('/get');
+            const { data } = await axiosInstance.get('/coupon/get');
             console.log(data.data,"data");
             return data.data;
         } catch (error) {
@@ -34,7 +21,7 @@ export const fetchCouponById = createAsyncThunk(
     'coupon/fetchById',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().get(`/get/${id}`);
+            const { data } = await axiosInstance.get(`/coupon/get/${id}`);
             console.log(data.data,"data");
             return data.data;
         } catch (error) {
@@ -48,7 +35,7 @@ export const createCoupon = createAsyncThunk(
     'coupon/create',
     async (formData, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().post('/add', formData);
+            const { data } = await axiosInstance.post('/coupon/add', formData);
             return data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
@@ -61,7 +48,7 @@ export const updateCoupon = createAsyncThunk(
     'coupon/update',
     async ({ id, formData }, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().put(`/update/${id}`, formData);
+            const { data } = await axiosInstance.put(`/coupon/update/${id}`, formData);
             return data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
@@ -74,7 +61,7 @@ export const deleteCoupon = createAsyncThunk(
     'coupon/delete',
     async (id, { rejectWithValue }) => {
         try {
-            await getAxios().delete(`/delete/${id}`);
+            await axiosInstance.delete(`/delete/${id}`);
             return id;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
@@ -87,7 +74,7 @@ export const activateCoupon = createAsyncThunk(
     'coupon/activate',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().post('/active', { id });
+            const { data } = await axiosInstance.post('/coupon/active', { id });
             return data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);

@@ -1,43 +1,56 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
-const API_URL = 'http://localhost:2221/api/a1/wishlist';
+import axiosInstance from '../../utils/axiosInstance';
 
 // Async thunks for API calls
 export const addToWishlist = createAsyncThunk(
     'wishlist/addToWishlist',
-    async ({ userId, productId }) => {
-        const response = await axios.post(`${API_URL}/addWishlist`, { userId, productId });
-        console.log(response, "response.data");
-        
-        return response.data;
+    async ({ userId, productId }, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.post('/wishlist/addWishlist', { userId, productId });
+            console.log(response, "response.data");
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to add to wishlist');
+        }
     }
 );
 
 export const getAllWishlists = createAsyncThunk(
     'wishlist/getAllWishlists',
-    async () => {
-        const response = await axios.get(`${API_URL}/getAllWishlists`);
-        return response.data;
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.get('/wishlist/getAllWishlists');
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch wishlists');
+        }
     }
 );
-
 
 // Get wishlist product by ID
 export const getWishlist = createAsyncThunk(
     'wishlist/getWishlist',
-    async (userId) => {
-        console.log(userId, "userId");
-        const response = await axios.get(`${API_URL}/getWishlist/${userId}`);
-        return response.data;
+    async (userId, { rejectWithValue }) => {
+        try {
+            console.log(userId, "userId");
+            const response = await axiosInstance.get(`/wishlist/getWishlist/${userId}`);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch wishlist');
+        }
     }
 );
 
 export const removeFromWishlist = createAsyncThunk(
     'wishlist/removeFromWishlist',
-    async (id) => {
-        const response = await axios.delete(`${API_URL}/removeWishlist/${id}`);
-        return response.data;
+    async (id, { rejectWithValue }) => {
+        try {
+            const response = await axiosInstance.delete(`/wishlist/removeWishlist/${id}`);
+            return response.data;
+        } catch (error) {
+            return rejectWithValue(error.response?.data?.message || 'Failed to remove from wishlist');
+        }
     }
 );
 

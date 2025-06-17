@@ -71,3 +71,97 @@ input:focus-visible,.nav-item:focus-visible{
   font-size: 12px;
   color: #666;
 }
+
+
+
+/* General autofill styles for all inputs */
+input:-webkit-autofill,
+input:-webkit-autofill:hover,
+input:-webkit-autofill:focus,
+input:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--dark-text) !important; /* Text color inside the autofilled input */
+  background-color: var(--card-bg) !important;       /* Background color */
+  box-shadow: 0 0 0 30px var(--card-bg) inset !important; /* Shadow to simulate autofill effect */
+  transition: background-color 5000s ease-in-out 0s; /* Prevent autofill flicker */
+}
+ 
+input:-moz-autofill,
+input:-moz-autofill:hover,
+input:-moz-autofill:focus,
+input:-moz-autofill:active {
+  -moz-text-fill-color: var(--dark-text) !important; /* Text color inside the autofilled input */
+  background-color: var(--card-bg) !important;       /* Background color */
+  box-shadow: 0 0 0 30px var(--card-bg) inset !important; /* Shadow to simulate autofill effect */
+  transition: background-color 5000s ease-in-out 0s; /* Prevent autofill flicker */
+}
+ 
+/* Autofill styles specifically for inputs with the Bootstrap form-control class */
+input.form-control:-webkit-autofill,
+input.form-control:-webkit-autofill:hover,
+input.form-control:-webkit-autofill:focus,
+input.form-control:-webkit-autofill:active {
+  -webkit-text-fill-color: var(--dark-text) !important; /* Ensure consistency for form-control */
+  background-color: var(--card-bg) !important;       /* Same background color */
+  box-shadow: 0 0 0 30px var(--card-bg) inset !important;
+  transition: background-color 5000s ease-in-out 0s;
+}
+ 
+input::selection {
+  background-color: rgba(255, 255, 255, 0.2) !important;
+}
+ 
+input:autofill,
+input:autofill:hover,
+input:autofill:focus,
+input:autofill:active {
+  -webkit-text-fill-color: var( --dark-text) !important; /* Text color inside the autofilled input */
+  background-color: var(--card-bg) !important;       /* Background color */
+  box-shadow: 0 0 0 30px var(--card-bg) inset !important; /* Shadow to simulate autofill effect */
+  transition: background-color 5000s ease-in-out 0s; /* Prevent autofill flicker */
+}
+ 
+/* Dark theme autofill styles */
+[data-theme="dark"] input:-webkit-autofill,
+[data-theme="dark"] input:-webkit-autofill:hover,
+[data-theme="dark"] input:-webkit-autofill:focus,
+[data-theme="dark"] input:-webkit-autofill:active,
+[data-theme="dark"] input:-moz-autofill,
+[data-theme="dark"] input:-moz-autofill:hover,
+[data-theme="dark"] input:-moz-autofill:focus,
+[data-theme="dark"] input:-moz-autofill:active,
+[data-theme="dark"] input.form-control:-webkit-autofill,
+[data-theme="dark"] input.form-control:-webkit-autofill:hover,
+[data-theme="dark"] input.form-control:-webkit-autofill:focus,
+[data-theme="dark"] input.form-control:-webkit-autofill:active,
+[data-theme="dark"] input:autofill,
+[data-theme="dark"] input:autofill:hover,
+[data-theme="dark"] input:autofill:focus,
+[data-theme="dark"] input:autofill:active {
+  -webkit-text-fill-color: var( --dark-text) !important;
+  -moz-text-fill-color: var(--dark-text) !important;
+  background-color: var(--dark-card-bg) !important;
+  box-shadow: 0 0 0 30px var(--dark-card-bg) inset !important;
+}
+ 
+/* Light theme autofill styles */
+[data-theme="light"] input:-webkit-autofill,
+[data-theme="light"] input:-webkit-autofill:hover,
+[data-theme="light"] input:-webkit-autofill:focus,
+[data-theme="light"] input:-webkit-autofill:active,
+[data-theme="light"] input:-moz-autofill,
+[data-theme="light"] input:-moz-autofill:hover,
+[data-theme="light"] input:-moz-autofill:focus,
+[data-theme="light"] input:-moz-autofill:active,
+[data-theme="light"] input.form-control:-webkit-autofill,
+[data-theme="light"] input.form-control:-webkit-autofill:hover,
+[data-theme="light"] input.form-control:-webkit-autofill:focus,
+[data-theme="light"] input.form-control:-webkit-autofill:active,
+[data-theme="light"] input:autofill,
+[data-theme="light"] input:autofill:hover,
+[data-theme="light"] input:autofill:focus,
+[data-theme="light"] input:autofill:active {
+  -webkit-text-fill-color: var(--light-text) !important;
+  -moz-text-fill-color: var(--light-text) !important;
+  background-color: var(--light-card-bg) !important;
+  box-shadow: 0 0 0 30px var(--light-card-bg) inset !important;
+}

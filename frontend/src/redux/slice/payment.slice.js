@@ -1,20 +1,13 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
-const API_URL = 'http://localhost:2221/api/a1/payment';
+import axiosInstance from '../../utils/axiosInstance';
 
 // Create payment
 export const createPayment = createAsyncThunk(
     'payment/create',
     async (paymentData, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.post(`${API_URL}/add`, paymentData, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await axiosInstance.post('/payment/add', paymentData);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to create payment');
@@ -27,13 +20,7 @@ export const fetchPayments = createAsyncThunk(
     'payment/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/get`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await axiosInstance.get('/payment/get');
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch payments');
@@ -46,12 +33,7 @@ export const fetchPaymentById = createAsyncThunk(
     'payment/fetchById',
     async (id, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/get/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await axiosInstance.get(`/payment/get/${id}`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch payment');
@@ -64,13 +46,7 @@ export const updatePaymentStatus = createAsyncThunk(
     'payment/updateStatus',
     async ({ id, status }, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.put(`${API_URL}/update/${id}`, { status }, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await axiosInstance.put(`/payment/update/${id}`, { status });
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to update payment status');
@@ -83,12 +59,7 @@ export const deletePayment = createAsyncThunk(
     'payment/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.delete(`${API_URL}/delete/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            await axiosInstance.delete(`/payment/delete/${id}`);
             return id;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to delete payment');

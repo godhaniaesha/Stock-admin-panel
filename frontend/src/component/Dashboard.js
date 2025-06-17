@@ -629,8 +629,8 @@ const Dashboard = () => {
                   style={{
                     height: "575px",
                     maxHeight: "575px",
-                    display: "flex",
-                    justifyContent: "center",
+                    // display: "flex",
+                    // justifyContent: "center",
                     alignItems: "center",
                   }}
                 >
@@ -638,7 +638,7 @@ const Dashboard = () => {
                     lowStockProducts.map((event) => (
                       <div
                         key={event._id}
-                        className="d-flex align-items-center gap-3 mb-3 p-3 rounded"
+                        className="d-flex align-items-center gap-3 mb-3 p-3 rounded w-100"
                         style={{
                           background: `var(--${
                             isDarkMode ? "dark" : "light"

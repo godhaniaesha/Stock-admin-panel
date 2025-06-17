@@ -1,4 +1,5 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axiosInstance from '../../utils/axiosInstance';
 
 const BASE_URL = 'http://localhost:2221/api/a1';
 
@@ -26,19 +27,16 @@ export const registerUser = createAsyncThunk('auth/register', async (userData, {
 
 export const loginUser = createAsyncThunk('auth/login', async (credentials, { rejectWithValue }) => {
   try {
-    const response = await fetch(`${BASE_URL}/register/login`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
-    });
-    const data = await response.json();
-    if (!response.ok || !data.success) {
+    const response = await axiosInstance.post(`/register/login`, credentials);
+    const data = response.data;
+    
+    if (!data.success) {
       throw new Error(data.message || 'Login failed');
     }
     console.log(data,"data");
     localStorage.setItem("user",data.finduser._id)
-    // localStorage.setItem("token",data.accessToken)
-    localStorage.setItem("token",data.refreshToken)
+    localStorage.setItem("token",data.accessToken)
+
     localStorage.setItem("userName",data.finduser.username)
     return data;
   } catch (err) {
@@ -146,6 +144,7 @@ export const logoutUser = createAsyncThunk('auth/logout', async (userId, { rejec
     }
     localStorage.removeItem('token');
     localStorage.removeItem('user');
+    
     return data;
   } catch (err) {
     return rejectWithValue(err.message || 'An unknown error occurred during logout.');

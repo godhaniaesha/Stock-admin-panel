@@ -1,45 +1,27 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import axiosInstance from '../../utils/axiosInstance';
 
 // Fetch all subcategories
 export const fetchSubcategories = createAsyncThunk(
     'subcategory/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:2221/api/a1/subcategory/getSubcategories', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to fetch subcategories');
-            }
-            return data;
+            const response = await axiosInstance.get('/subcategory/getSubcategories');
+            return response.data;
         } catch (error) {
-            return rejectWithValue(error.message);
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch subcategories');
         }
     }
 );
+
 export const WaccesssubCategories = createAsyncThunk(
     'subcategory/WaccesssubCategories',
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:2221/api/a1/subcategory/getall', {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to fetch subcategories');
-            }
-            return data;
+            const response = await axiosInstance.get('/subcategory/getall');
+            return response.data;
         } catch (error) {
-            return rejectWithValue(error.message);
+            return rejectWithValue(error.response?.data?.message || 'Failed to fetch subcategories');
         }
     }
 );
@@ -49,21 +31,10 @@ export const createSubcategory = createAsyncThunk(
     'subcategory/create',
     async (formData, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch('http://localhost:2221/api/a1/subcategory/CreateSubcat', {
-                method: 'POST',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to create subcategory');
-            }
-            return data;
+            const response = await axiosInstance.post('/subcategory/CreateSubcat', formData);
+            return response.data;
         } catch (error) {
-            return rejectWithValue(error.message);
+            return rejectWithValue(error.response?.data?.message || 'Failed to create subcategory');
         }
     }
 );
@@ -73,21 +44,10 @@ export const deleteSubcategory = createAsyncThunk(
     'subcategory/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:2221/api/a1/subcategory/deleteSubcategory/${id}`, {
-                method: 'DELETE',
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to delete subcategory');
-            }
+            await axiosInstance.delete(`/subcategory/deleteSubcategory/${id}`);
             return id;
         } catch (error) {
-            return rejectWithValue(error.message);
+            return rejectWithValue(error.response?.data?.message || 'Failed to delete subcategory');
         }
     }
 );
@@ -97,21 +57,10 @@ export const updateSubcategory = createAsyncThunk(
     'subcategory/update',
     async ({ id, formData }, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:2221/api/a1/subcategory/updateSubcategory/${id}`, {
-                method: 'PUT',
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
-            const data = await response.json();
-            if (!response.ok) {
-                throw new Error(data.message || 'Failed to update subcategory');
-            }
-            return data;
+            const response = await axiosInstance.put(`/subcategory/updateSubcategory/${id}`, formData);
+            return response.data;
         } catch (error) {
-            return rejectWithValue(error.message);
+            return rejectWithValue(error.response?.data?.message || 'Failed to update subcategory');
         }
     }
 );

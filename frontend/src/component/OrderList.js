@@ -145,7 +145,7 @@ function OrderList() {
 
         <Table className="Z_order_table">
           <thead>
-            <tr>
+            <tr style={{textWrap :"nowrap"}}>
               <th>Order ID</th>
               <th>Customer</th>
               <th>Created at</th>

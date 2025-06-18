@@ -811,7 +811,7 @@
 .Z_filter_option .form-check-input {
   width: 20px;
   height: 20px;
-  margin-right: 10px;
+  /* margin-right: 10px; */
   border: 2px solid #ddd;
   background-color: transparent;
   transition: all 0.3s ease;
@@ -943,7 +943,8 @@
   background-color: transparent;
   color: #000;
   transition: background-color 0.2s;
-  padding: 8px 10px;
+  padding: 8px 2px;
+  font-size: 14px;
 }
 
 .d_dark .Z_add_to_cart_btn:hover {
@@ -969,6 +970,10 @@
   background: #22282e;
   color: #ff8585;
   border-color: #22282e;
+}
+.Z_category_description_cell{
+  width: 90%;
+  text-wrap: wrap;
 }
 
 @media (max-width: 1200px) {
@@ -2332,6 +2337,9 @@
   .Z_no_data_text {
     font-size: 14px;
   }
+.Z_product_section {
+  padding: 2px;
+}
 }
 
 /* Modal Footer Button Styles */
@@ -2419,3 +2427,6 @@
         cursor: pointer;
     }
   }
+.Z_select_caret svg{
+  color: #666 !important;
+}

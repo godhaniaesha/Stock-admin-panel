@@ -56,12 +56,7 @@ function StockAlert() {
             <Table className="Z_product_table p-1">
               <thead>
                 <tr>
-                  <th>
-                    <div className="Z_custom_checkbox">
-                      <input type="checkbox" id="selectAll" className="Z_checkbox_input" />
-                      <label htmlFor="selectAll" className="Z_checkbox_label"></label>
-                    </div>
-                  </th>
+                 
                   <th>Product Name & Size</th>
                   {/* <th>Price</th> */}
                   <th>Stock Status</th>
@@ -73,12 +68,7 @@ function StockAlert() {
               <tbody>
                 {lowInventory.map((item, index) => (
                   <tr key={item._id || index}>
-                    <td>
-                      <div className="Z_custom_checkbox">
-                        <input type="checkbox" id={`checkbox-${index}`} className="Z_checkbox_input" />
-                        <label htmlFor={`checkbox-${index}`} className="Z_checkbox_label"></label>
-                      </div>
-                    </td>
+                   
                     <td>
                       <div className="Z_product_info_cell">
                         <img
@@ -116,21 +106,14 @@ function StockAlert() {
                     </td>
                     <td>
                       <div className="Z_action_buttons">
-                        <button className="Z_action_btn Z_view_btn">
-                          <TbEye size={22} />
-                        </button>
+                      
                         <button
                           className="Z_action_btn Z_edit_btn"
                           onClick={() => handleEditClick(item)}
                         >
                           <TbEdit size={22} />
                         </button>
-                        <button
-                          className="Z_action_btn Z_delete_btn"
-                          onClick={() => handleDeleteClick(item._id)}
-                        >
-                          <RiDeleteBin6Line size={22} />
-                        </button>
+                      
                       </div>
                     </td>
                   </tr>

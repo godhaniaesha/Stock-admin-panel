@@ -1,6 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import '../styles/Z_styles.css';
 import { Table } from 'react-bootstrap';
+import { ToastContainer } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css'
+
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
 import { useOutletContext } from 'react-router-dom';
@@ -10,11 +13,14 @@ import { IoMdCart } from 'react-icons/io';
 import { addToCart, getCart } from '../redux/slice/cart.slice';
 import { FaCaretDown } from 'react-icons/fa';
 import { IMG_URL } from '../utils/baseUrl';
+import { toast } from 'react-toastify';
 
 function Wishlist() {
     const { isDarkMode } = useOutletContext();
     const dispatch = useDispatch();
     const { items: wishlistItems, loading, error } = useSelector((state) => state.wishlist);
+    const [showToast, setShowToast] = useState(false);
+    const [toastMessage, setToastMessage] = useState('');
 
     const [timeFilter, setTimeFilter] = useState('thisMonth');
     const handleTimeFilterChange = (e) => setTimeFilter(e.target.value);
@@ -50,7 +56,8 @@ function Wishlist() {
 
     console.log(wishlistItems, " wishlistItems");
     useEffect(() => {
-        dispatch(getAllWishlists());
+        const userId = localStorage.getItem('user');
+        if (userId) dispatch(getWishlist(userId));
     }, [dispatch]);
 
     const handleDelete = (id) => {
@@ -64,22 +71,56 @@ function Wishlist() {
     if (error) {
         return <div className="text-center p-5 text-danger">Error: {error}</div>;
     }
+    // const handleMoveToCart = async (item) => {
+    //     const userId = localStorage.getItem('user');
+    //     if (!userId) return;
+
+    //     // 1. Remove from wishlist
+    //     await dispatch(removeFromWishlist(item._id));
+
+    //     // 2. Add to cart (default quantity 1)
+    //     await dispatch(addToCart({ userId, productId: item.productId._id, quantity: 1 }));
+
+    //     // 3. Optionally refresh wishlist and cart
+    //     dispatch(getWishlist(userId));
+    //     // dispatch(getCart(userId));
+    // };
+
     const handleMoveToCart = async (item) => {
         const userId = localStorage.getItem('user');
         if (!userId) return;
 
-        // 1. Remove from wishlist
-        await dispatch(removeFromWishlist(item._id));
+        try {
+            const resultAction = await dispatch(addToCart({
+                userId,
+                productId: item.productId._id,
+                quantity: 1
+            }));
+            console.log(addToCart.fulfilled.match(resultAction), "dfer");
 
-        // 2. Add to cart (default quantity 1)
-        await dispatch(addToCart({ userId, productId: item.productId._id, quantity: 1 }));
+            // Check if addToCart action was successful
+            if (addToCart.fulfilled.match(resultAction)) {
+                await dispatch(removeFromWishlist(item._id));
+                await dispatch(getWishlist(userId));
 
-        // 3. Optionally refresh wishlist and cart
-        dispatch(getWishlist(userId));
-        // dispatch(getCart(userId));
+                // Delay the toast slightly to ensure it doesn't get lost during re-render
+                setTimeout(() => {
+                    toast.success('Product added to cart successfully and removed from wishlist!');
+                }, 10);
+            }else {
+                toast.error(resultAction?.error?.message || 'Failed to add product to cart!');
+            }
+
+        } catch (error) {
+            toast.error('Something went wrong while moving to cart!');
+            console.error(error);
+        }
     };
+
+
     return (
         <>
+            <ToastContainer />
             <section className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'} mx-lg-2 my-md-3`}>
                 <div className="Z_table_wrapper">
                     <div className="Z_table_header">
@@ -112,7 +153,7 @@ function Wishlist() {
                                     <th>Price</th>
                                     <th>Stock</th>
                                     <th>Category</th>
-                                    <th>Rating</th>
+
                                     <th>Action</th>
                                 </tr>
                             </thead>
@@ -150,15 +191,7 @@ function Wishlist() {
                                             </div>
                                         </td>
                                         <td>{item.productId?.categoryId?.title || 'No Category'}</td>
-                                        <td>
-                                            <div className="Z_rating_cell">
-                                                <div className="Z_rating_wrapper">
-                                                    <span className="Z_rating_star">★</span>
-                                                    <span className="Z_rating_value">{item.productId?.rating || 0}</span>
-                                                    <span className="Z_review_count">{item.productId?.reviews || 0} Review</span>
-                                                </div>
-                                            </div>
-                                        </td>
+
                                         <td>
                                             <div className="Z_action_buttons">
                                                 <button className="Z_action_btn Z_view_btn" onClick={() => handleMoveToCart(item)}>

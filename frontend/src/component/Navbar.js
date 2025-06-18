@@ -1,16 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Navbar, Container, Nav, Dropdown } from 'react-bootstrap';
 import { FaBars, FaUserCircle, FaBell, FaCog, FaSignOutAlt, FaMoon, FaSun } from 'react-icons/fa';
-import { useDispatch } from 'react-redux';
+import { useSelector, useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
 import { logoutUser } from '../redux/slice/auth.slice';
+import { db_fetchUserById } from '../redux/slice/userSlice';
 import { MdLightMode } from 'react-icons/md';
 
 const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef(null);
+  const dispatch = useDispatch();
+  const { selectedUser, isLoading: userProfileLoading } = useSelector(state => state.user);
 
   useEffect(() => {
+    const userId = localStorage.getItem('user');
+    if (userId && (!selectedUser || selectedUser._id !== userId)) {
+      dispatch(db_fetchUserById(userId));
+    }
     const handleClickOutside = (event) => {
       if (dropdownRef.current && !dropdownRef.current.contains(event.target)) {
         setIsDropdownOpen(false);
@@ -21,15 +28,25 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
-  }, []);
+  }, [dispatch, selectedUser]); // Added selectedUser to dependencies
 
-  const dispatch = useDispatch();
   const navigate = useNavigate();
+  const userNameFromStorage = localStorage.getItem('userName'); // Fallback from login
 
   const handleLogout = () => {
     dispatch(logoutUser());
     navigate('/login'); // or your desired route
   };
+
+  let displayName = "Admin"; // Default
+  if (userProfileLoading && !selectedUser && !userNameFromStorage) {
+    displayName = "Loading...";
+  } else if (selectedUser) {
+    displayName = selectedUser.username || selectedUser.firstName || userNameFromStorage || "User";
+  } else if (userNameFromStorage) {
+    displayName = userNameFromStorage;
+  }
+
   return (
     <Navbar 
       style={{
@@ -124,7 +141,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
                   transition: 'color 0.3s ease'
                 }} 
               />
-              <span className="">Admin</span>
+              <span className="">{displayName}</span>
             </button>
             {isDropdownOpen && (
               <div 

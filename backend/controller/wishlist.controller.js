@@ -48,42 +48,74 @@ const getWishlist = async (req, res) => {
       });
     }
 
-    const items = await Wishlist.find({ userId }).populate('productId');
-    res.status(200).json({ success: true, data: items });
+    const items = await Wishlist.find({ userId })
+      .populate({
+        path: 'productId',
+        populate: {
+          path: 'categoryId',
+          model: 'Category'
+        }
+      });
+
+    const itemsWithCategory = items.map(item => {
+      const itemObj = item.toObject();
+      return {
+        ...itemObj,
+        CategoryData: itemObj.productId?.categoryId || null
+      };
+    });
+
+    res.status(200).json({
+      success: true,
+      data: itemsWithCategory
+    });
   } catch (error) {
-    res.status(500).json({ success: false, message: 'Error retrieving wishlist', error: error.message });
+    res.status(500).json({
+      success: false,
+      message: 'Error retrieving wishlist',
+      error: error.message
+    });
   }
 };
+
 
 const getAllWishlists = async (req, res) => {
   try {
     const items = await Wishlist.find()
       .populate({
         path: 'productId',
-        populate: { path: 'categoryId' }
+        populate: {
+          path: 'categoryId',
+          model: 'Category',
+        },
       })
       .populate('userId', 'name email')
       .sort({ createdAt: -1 });
 
-    // Add CategoryData field to each item
-    const itemsWithCategory = items.map(item => ({
-      ...item.toObject(),
-      CategoryData: item.productId?.categoryId || null
-    }));
+    const itemsWithCategory = items.map((item) => {
+      const itemObj = item.toObject();
+      const categoryData = itemObj.productId?.categoryId || null;
+
+      return {
+        ...itemObj,
+        CategoryData: categoryData, // full category info here
+      };
+    });
 
     res.status(200).json({
       success: true,
       data: itemsWithCategory,
-      count: itemsWithCategory.length
+      count: itemsWithCategory.length,
     });
   } catch (error) {
     res.status(500).json({
       success: false,
       message: 'Error retrieving all wishlists',
-      error: error.message
+      error: error.message,
     });
   }
 };
+
 
 const removeFromWishlist = async (req, res) => {
   try {

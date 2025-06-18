@@ -266,7 +266,7 @@ const AddInventory = () => {
         </div>
 
         {/* Buttons */}
-        <div className="x_btn_wrapper mt-3">
+        <div className="x_btn_wrapper  justify-content-center mt-3">
           <button className="x_btn x_btn_create" onClick={handleSubmit}>Create Stock</button>
           <button className="x_btn x_btn_cancel" onClick={() => navigate(-1)}>Cancel</button>
         </div>

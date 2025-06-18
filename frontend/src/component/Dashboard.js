@@ -94,7 +94,7 @@ const Dashboard = () => {
     return (
       <div
         className={`d_dashboard w-100 ${
-          isDarkMode ? "d_theme-dark" : "d_theme-light"
+          isDarkMode ? "" : "d_theme-light"
         }`}
       >
         <div className="container-fluid px-md-4  py-md-4 p-1">
@@ -424,11 +424,13 @@ const Dashboard = () => {
                   </ResponsiveContainer>
                 </div>
                 <div
-                  className="category-wise-products-list mt-3 flex-grow-1"
-                  style={{
-                    height: "250px",
-                    maxHeight: "250px",
-                  }}
+                  // className="category-wise-products-list mt-3 flex-grow-1"
+                  // style={{
+                  //   height: "250px",
+                  //   maxHeight: "250px",
+                  // }}
+                  className="mt-3 overflow-y-scroll"
+                  style={{maxHeight: "250px"}}
                 >
                   {categoryWiseProducts.map((item, index) => (
                     <div

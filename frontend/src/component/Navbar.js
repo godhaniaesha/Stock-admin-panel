@@ -54,9 +54,9 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
         backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`,
         color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
         padding: '16px 0',
-        // position:'fixed',
-        // width:"-webkit-fill-available",
-        // zIndex:'1111'
+        position:'fixed',
+        width:"-webkit-fill-available",
+        zIndex:'100'
       }}
       className={`mb-0 border-bottom ${isDarkMode ? 'border-secondary' : 'border-gray'} shadow-sm`}
     >

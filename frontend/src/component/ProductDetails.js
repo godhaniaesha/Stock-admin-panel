@@ -129,7 +129,7 @@ const ProductDetail = () => {
       padding: '2rem 1rem',
       fontFamily: 'system-ui, -apple-system, sans-serif'
     }}
-    className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'}`}
+      className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'}`}
     >
       <style jsx>{`
         :root {
@@ -735,6 +735,40 @@ const ProductDetail = () => {
             width: 28px;
             font-size: 0.7rem;
           }
+            .zoom-modal-overlay {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+}
+.zoom-modal-content {
+  position: relative;
+  background: #222;
+  padding: 1rem;
+  border-radius: 8px;
+  max-width: 95vw;
+  max-height: 95vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+.zoom-modal-close {
+  position: absolute;
+  top: 8px; right: 12px;
+  background: transparent;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  cursor: pointer;
+}
+.zoomed-image {
+  max-width: 90vw;
+  max-height: 80vh;
+  border-radius: 8px;
+}
         }
       `}</style>
 
@@ -748,46 +782,46 @@ const ProductDetail = () => {
             ) : (
               <img src="https://via.placeholder.com/500x500?text=No+Image" alt="Placeholder" />
             )}
-            
+
             {productImages.length > 1 && (<>
-            <button className="image-controls prev-btn" onClick={(e) => { e.stopPropagation(); prevImage(); }}>
-              <IoMdArrowDropleft />
-            </button>
-            <button className="image-controls next-btn" onClick={(e) => { e.stopPropagation(); nextImage(); }}>
-              <IoMdArrowDropright />
-            </button>
-            
-            <button 
-              className="auto-slide-toggle"
-              onClick={(e) => { e.stopPropagation(); setAutoSlide(!autoSlide); }}
-            >
-              {autoSlide ? <><FaPause /> Pause</> : <><FaPlay /> Play</>}
-            </button>
-            
-            <div className="image-indicators">
-              {productImages.map((_, index) => (
-                <div
-                  key={index}
-                  className={`indicator ${selectedImageIndex === index ? 'active' : ''}`}
-                  onClick={(e) => { e.stopPropagation(); handleImageClick(index); }}
-                />
-              ))}
-            </div>
+              <button className="image-controls prev-btn" onClick={(e) => { e.stopPropagation(); prevImage(); }}>
+                <IoMdArrowDropleft />
+              </button>
+              <button className="image-controls next-btn" onClick={(e) => { e.stopPropagation(); nextImage(); }}>
+                <IoMdArrowDropright />
+              </button>
+
+              <button
+                className="auto-slide-toggle"
+                onClick={(e) => { e.stopPropagation(); setAutoSlide(!autoSlide); }}
+              >
+                {autoSlide ? <><FaPause /> Pause</> : <><FaPlay /> Play</>}
+              </button>
+
+              <div className="image-indicators">
+                {productImages.map((_, index) => (
+                  <div
+                    key={index}
+                    className={`indicator ${selectedImageIndex === index ? 'active' : ''}`}
+                    onClick={(e) => { e.stopPropagation(); handleImageClick(index); }}
+                  />
+                ))}
+              </div>
             </>)}
           </div>
-          
+
           {productImages.length > 1 && (
-          <div className="thumbnail-grid">
-            {productImages.map((img, index) => (
-              <div
-                key={index}
-                className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
-                onClick={() => handleImageClick(index)}
-              >
-                <img src={img} alt={`View ${index + 1} of ${currentProduct.productName}`} />
-              </div>
-            ))}
-          </div>
+            <div className="thumbnail-grid">
+              {productImages.map((img, index) => (
+                <div
+                  key={index}
+                  className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
+                  onClick={() => handleImageClick(index)}
+                >
+                  <img src={img} alt={`View ${index + 1} of ${currentProduct.productName}`} />
+                </div>
+              ))}
+            </div>
           )}
         </div>
 
@@ -795,7 +829,7 @@ const ProductDetail = () => {
         <div className="details-section">
           <h1 className="product-title">{currentProduct.productName}</h1>
           <p className="product-id">Product ID: {currentProduct.SKU || currentProduct._id}</p>
-          
+
           <p className="product-description">
             {currentProduct.description || 'No description available.'}
           </p>
@@ -811,7 +845,7 @@ const ProductDetail = () => {
                 <span className="stat-label">In Stock</span>
               </div>
               <div className="stat-item">
-                <span className="stat-value">{currentProduct.averageRating || 'N/A'} <FaStar size={14}/></span>
+                <span className="stat-value">{currentProduct.averageRating || 'N/A'} <FaStar size={14} /></span>
                 <span className="stat-label">Rating</span>
               </div>
               <div className="stat-item">
@@ -821,15 +855,15 @@ const ProductDetail = () => {
             </div>
           </div>
 
-      
-       
+
+
           {/* Feature Tags */}
           {currentProduct.tags && currentProduct.tags.length > 0 && (
-          <div className="feature-tags">
-            {currentProduct.tags.map(tag => (
-              <span className="feature-tag" key={tag}><GiStarFormation /> {tag}</span>
-            ))}
-          </div>
+            <div className="feature-tags">
+              {currentProduct.tags.map(tag => (
+                <span className="feature-tag" key={tag}><GiStarFormation /> {tag}</span>
+              ))}
+            </div>
           )}
 
           {/* Action Buttons */}
@@ -837,21 +871,21 @@ const ProductDetail = () => {
             <div className="quantity-selector">
               <div className="option-label">Quantity:</div>
               <div className="quantity-controls">
-                <button 
-                  className="quantity-btn" 
+                <button
+                  className="quantity-btn"
                   onClick={() => setQuantity(Math.max(1, quantity - 1))}
                 >
                   −
                 </button>
-                <input 
-                  type="number" 
-                  className="quantity-input" 
-                  value={quantity} 
+                <input
+                  type="number"
+                  className="quantity-input"
+                  value={quantity}
                   onChange={(e) => setQuantity(Math.max(1, parseInt(e.target.value) || 1))}
                   min="1"
                 />
-                <button 
-                  className="quantity-btn" 
+                <button
+                  className="quantity-btn"
                   onClick={() => setQuantity(quantity + 1)}
                 >
                   +
@@ -861,7 +895,7 @@ const ProductDetail = () => {
             <button className="primary-btn pulse-animation">
               <FaShoppingCart /> Add to Cart
             </button>
-            <button 
+            <button
               className={`secondary-btn ${isWishlist ? 'active' : ''}`}
               onClick={() => setIsWishlist(!isWishlist)}
             >
@@ -897,69 +931,77 @@ const ProductDetail = () => {
                 {currentProduct.brand && <tr><td>Brand</td><td>{currentProduct.brand}</td></tr>}
                 {currentProduct.originCountry && <tr><td>Origin</td><td>{currentProduct.originCountry}</td></tr>}
                 {currentProduct.specifications && Object.entries(currentProduct.specifications).map(([key, value]) => (
-                    <tr key={key}>
-                        <td>{key.charAt(0).toUpperCase() + key.slice(1)}</td>
-                        <td>{value}</td>
-                    </tr>
+                  <tr key={key}>
+                    <td>{key.charAt(0).toUpperCase() + key.slice(1)}</td>
+                    <td>{value}</td>
+                  </tr>
                 ))}
               </tbody>
             </table>
           </div>
 
           {(currentProduct.averageRating || reviews.length > 0) && (
-          <div className="info-card">
-            <h3 className="info-title">Ratings & Reviews</h3>
-            {currentProduct.averageRating && (
-            <div className="rating-header">
-              <div className="rating-score">{currentProduct.averageRating.toFixed(1)}</div>
-              <div className="rating-text">Based on {reviews.length} rating{reviews.length !== 1 && 's'}</div>
-            </div>
-            )}
-            
-            {currentProduct.ratingBreakdown && (
-            <div className="rating-bars">
-              {ratingData.map((rating) => (
-                <div key={rating.stars} className="rating-row">
-                  <div className="rating-stars">{rating.stars} <FaStar /></div>
-                  <div className="progress-bar-bg">
-                    <div 
-                      className="progress-bar-fill"
-                      style={{ width: `${rating.percentage}%` }}
-                    />
+            <div className="info-card">
+              <h3 className="info-title">Ratings & Reviews</h3>
+              {currentProduct.averageRating && (
+                <div className="rating-header">
+                  <div className="rating-score">{currentProduct.averageRating.toFixed(1)}</div>
+                  <div className="rating-text">Based on {reviews.length} rating{reviews.length !== 1 && 's'}</div>
+                </div>
+              )}
+
+              {currentProduct.ratingBreakdown && (
+                <div className="rating-bars">
+                  {ratingData.map((rating) => (
+                    <div key={rating.stars} className="rating-row">
+                      <div className="rating-stars">{rating.stars} <FaStar /></div>
+                      <div className="progress-bar-bg">
+                        <div
+                          className="progress-bar-fill"
+                          style={{ width: `${rating.percentage}%` }}
+                        />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+
+              {reviews.map((review, index) => (
+                <div key={review._id || index} className="review-item">
+                  <div className="reviewer-name">{review.userName || review.userId?.name || 'Anonymous'}</div>
+                  <div className="d-flex align-items-center mb-1">
+                    {[...Array(5)].map((_, i) => (
+                      <FaStar key={i} color={i < review.rating ? '#ffc107' : '#e0e0e0'} />
+                    ))}
                   </div>
+                  <div className="review-text">{review.comment}</div>
+                  {review.images && review.images.length > 0 && (
+                    <div className="review-images">
+                      {review.images.map((img, imgIdx) => (
+                        <img key={imgIdx} src={`http://localhost:2221/${img}`} alt={`Review image ${imgIdx + 1}`} className="review-image" />
+                      ))}
+                    </div>
+                  )}
+                  <div className="review-date">{new Date(review.createdAt).toLocaleDateString()}</div>
                 </div>
               ))}
             </div>
-            )}
-
-            {reviews.map((review, index) => (
-              <div key={review._id || index} className="review-item">
-                <div className="reviewer-name">{review.userName || review.userId?.name || 'Anonymous'}</div>
-                 <div className="d-flex align-items-center mb-1">
-                    {[...Array(5)].map((_, i) => (
-                        <FaStar key={i} color={i < review.rating ? '#ffc107' : '#e0e0e0'} />
-                    ))}
-                </div>
-                <div className="review-text">{review.comment}</div>
-                {review.images && review.images.length > 0 && (
-                  <div className="review-images">
-                    {review.images.map((img, imgIdx) => (
-                      <img key={imgIdx} src={`http://localhost:2221/${img}`} alt={`Review image ${imgIdx + 1}`} className="review-image" />
-                    ))}
-                  </div>
-                )}
-                <div className="review-date">{new Date(review.createdAt).toLocaleDateString()}</div>
-              </div>
-            ))}
-          </div>
           )}
         </div>
       </div>
 
-      {/* Zoom Overlay */}
-      {showZoom && productImages.length > 0 && (
-        <div className="zoom-overlay" onClick={() => setShowZoom(false)}>
-          <img src={productImages[selectedImageIndex]} alt={`Zoomed ${currentProduct.productName}`} className="zoom-image" />
+      {/* Modal for zoomed image */}
+      {showZoom && (
+        <div className={`zoom-modal-overlay`} onClick={() => setShowZoom(false)}>
+          <div className="zoom-modal-content" onClick={e => e.stopPropagation()}>
+            <button className="zoom-modal-close" onClick={() => setShowZoom(false)}>×</button>
+            <img
+              src={productImages[selectedImageIndex]}
+              alt={currentProduct.productName}
+              className="zoomed-image"
+              style={{ maxWidth: '70vw', maxHeight: '70vh' }}
+            />
+          </div>
         </div>
       )}
     </div>

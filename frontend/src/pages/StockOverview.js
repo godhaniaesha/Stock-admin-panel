@@ -29,7 +29,8 @@ const StockOverview = () => {
         const currentMonth = now.getMonth();
         const currentYear = now.getFullYear();
 
-        return Inventories.filter(inventory => {
+        return (Inventories || []).filter(inventory => {
+            if (!inventory || !inventory.createdAt) return false;
             const inventoryDate = new Date(inventory.createdAt);
             const inventoryMonth = inventoryDate.getMonth();
             const inventoryYear = inventoryDate.getFullYear();

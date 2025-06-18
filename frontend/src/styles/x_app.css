@@ -917,7 +917,7 @@
 
 @media (max-width: 375px) {
   .x_btn_wrapper {
-    flex-direction: column;
+    /* flex-direction: column; */
     align-items: center;
   }
 }
@@ -955,4 +955,35 @@
 .d_dark .x_error_message {
   background-color: rgba(255, 77, 79, 0.1);
   border-color: #ff7875;
+}
+
+
+@media screen  and (max-width:1600px){
+  .x_preview_img{
+    max-width: 25% !important;
+  }
+}
+@media screen  and (max-width:1440px){
+  
+}
+@media screen  and (max-width:1200px){
+  
+}
+@media screen  and (max-width:1024px){
+  
+}
+@media screen  and (max-width:992px){
+  
+}
+@media screen  and (max-width:768px){
+  
+}
+@media screen  and (max-width:576px){
+  
+}
+@media screen  and (max-width:480px){
+  
+}
+@media screen  and (max-width:375px){
+  
 }

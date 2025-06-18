@@ -172,10 +172,10 @@ function SubcategoryList() {
         <>
             <section className={`Z_product_section mx-0 mx-lg-2 my-md-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <div className="Z_table_wrapper">
-                    <div className="Z_table_header">
+                    <div className="Z_table_header flex-wrap">
                         <h4>All Subcategory List</h4>
-                        <div className="Z_table_actions">
-                            <button className="Z_add_product_btn" onClick={handleAddSubcategory}>Add Subcategory</button>
+                        <div className="Z_table_actions flex-wrap">
+                            <button className="Z_add_product_btn text-nowrap" onClick={handleAddSubcategory}>Add Subcategory</button>
                             <div className='Z_select_wrapper'>
                                 <select
                                     className="Z_time_filter"
@@ -190,7 +190,7 @@ function SubcategoryList() {
                             </div>
                             {selectedSubcategories.length > 0 && (
                                 <button
-                                    className="Z_btn Z_btn_delete"
+                                    className="Z_add_product_btn text-nowrap"
                                     onClick={handleBulkDelete}
                                     disabled={isLoading}
                                 >

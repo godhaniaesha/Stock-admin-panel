@@ -21,20 +21,20 @@ import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { fetchSalesMetrics, fetchOrdersBySeller } from '../redux/slice/sales.slice';
 import { fetchOrders } from '../redux/slice/order.slice';
 import { useNavigate } from 'react-router-dom';
-
+ 
 ChartJS.register(LineElement, BarElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend);
-
+ 
 export default function SalesReport() {
   const { isDarkMode } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const salesState = useSelector((state) => state.report.dashboardData);
   console.log(salesState);
-
+ 
   const { totalSales, totalOrders, avgOrderValue, conversionRate, ordersAndSalesOverTime = [], loading = false, error = null } = salesState || {};
   const { orders, isLoading: ordersLoading, error: ordersError } = useSelector((state) => state.order);
   const { sellerOrders = [] } = useSelector((state) => state.sales) || {};
-
+ 
   const [selectedRange, setSelectedRange] = useState('Last 7 Days');
   const [showCustomRange, setShowCustomRange] = useState(false);
   const [startDate, setStartDate] = useState('');
@@ -44,12 +44,12 @@ export default function SalesReport() {
   const [showModal, setShowModal] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState(null);
   console.log(selectedOrder);
-
-
+ 
+ 
   useEffect(() => {
     let period;
     let params = {};
-
+ 
     switch (selectedRange) {
       case 'Last 7 Days':
         period = 'last_7_days';
@@ -74,23 +74,23 @@ export default function SalesReport() {
       default:
         period = 'last_7_days';
     }
-
+ 
     dispatch(fetchSalesMetrics({ period, ...params }));
-
+ 
   }, [dispatch, selectedRange, startDate, endDate]);
-
+ 
   useEffect(() => {
     dispatch(fetchOrders());
   }, [dispatch])
-
+ 
   // Get current orders for pagination
   const indexOfLastOrder = currentPage * ordersPerPage;
   const indexOfFirstOrder = indexOfLastOrder - ordersPerPage;
   const currentOrders = orders.slice(indexOfFirstOrder, indexOfLastOrder);
-
+ 
   // Calculate total pages
   const totalPages = Math.ceil(orders.length / ordersPerPage);
-
+ 
   const handleViewOrder = (orderId) => {
     const order = orders.find(order => order._id === orderId);
     if (order && order.items && order.items.length > 0) {
@@ -102,18 +102,29 @@ export default function SalesReport() {
     setSelectedOrder(order);
     setShowModal(true);
   };
-
+ 
   const handleCloseModal = () => {
     setShowModal(false);
     setSelectedOrder(null);
   };
-
+ 
   // const handleViewOrder = (orderId) => {
   //   navigate(`/orderdetail/${orderId}`);
   // };
+ 
+  // Helper to get short day name
+  const getShortDay = (day) => {
+    if (!day) return '';
+    // Try to parse as date, fallback to first 3 letters
+    const d = new Date(day);
+    if (!isNaN(d)) {
+      return d.toLocaleDateString('en-US', { weekday: 'short' });
+    }
+    return day.slice(0, 3);
+  };
 
   const lineChartData = {
-    labels: ordersAndSalesOverTime.map(item => item.day) || [],
+    labels: ordersAndSalesOverTime.map(item => getShortDay(item.day)) || [],
     datasets: [
       {
         label: 'Sales',
@@ -126,9 +137,9 @@ export default function SalesReport() {
       },
     ],
   };
-
+ 
   const barChartData = {
-    labels: ordersAndSalesOverTime.map(item => item.day) || [],
+    labels: ordersAndSalesOverTime.map(item => getShortDay(item.day)) || [],
     datasets: [
       {
         label: 'Orders',
@@ -144,14 +155,14 @@ export default function SalesReport() {
       },
     ],
   };
-
+ 
   const summaryData = {
     totalSales: 24580,
     totalOrders: 485,
     avgOrderValue: 50.68,
     conversionRate: 3.2,
   };
-
+ 
   const lineChartOptions = {
     responsive: true,
     plugins: {
@@ -164,8 +175,6 @@ export default function SalesReport() {
         ticks: {
           color: isDarkMode ? '#ccc' : '#333',
           autoSkip: false,
-          maxRotation: 45,
-          minRotation: 45,
         },
       },
       y: {
@@ -177,7 +186,7 @@ export default function SalesReport() {
       },
     },
   };
-
+ 
   const barChartOptions = {
     responsive: true,
     // maintainAspectRatio: false, // <-- Add this line
@@ -207,7 +216,7 @@ export default function SalesReport() {
       },
     },
   };
-
+ 
   const handleRangeChange = (e) => {
     const value = e.target.value;
     setSelectedRange(value);
@@ -219,7 +228,8 @@ export default function SalesReport() {
       setEndDate('');
     }
   };
-
+ 
+ 
   return (
     <div className={`Z_product_section d_sales-report-container ${isDarkMode ? 'd_dark' : 'd_light'}`}>
       <div className="d_header-section mb-4">
@@ -255,10 +265,10 @@ export default function SalesReport() {
             <option>Last Quarter</option>
             <option>Custom Range</option>
           </select>
-
+ 
         </div>
       </div>
-
+ 
       {loading ? (
         <div className="d_loading">Loading...</div>
       ) : error ? (
@@ -283,7 +293,7 @@ export default function SalesReport() {
               <p>{conversionRate}</p>
             </div>
           </div>
-
+ 
           <div className="row d_chart-section">
             <div className="col-lg-6 col-12">
               <div className="d_chart-container">
@@ -298,7 +308,7 @@ export default function SalesReport() {
               </div>
             </div>
           </div>
-
+ 
           <section className='m-0'>
             <div className="Z_table_wrapper">
               <div className="Z_table_header">
@@ -334,18 +344,18 @@ export default function SalesReport() {
                         <tr key={order._id}>
                           <td className="Z_order_id">
                             {/* #{indexOfFirstOrder + index + 1} */}
-                            {order._id ? `${order._id}` : 'N/A'}
+                            {order._id ? `......${order._id.slice(-6)}` : 'N/A'}
                           </td>
-
+ 
                           <td>
                             {/* ${order.finalAmount.toFixed(2)} */}
                             ${Math.floor(order.finalAmount)}
                           </td>
-
+ 
                           <td className="Z_quantity">
                             {order.items ? order.items.reduce((total, item) => total + item.quantity, 0) : 0}
                           </td>
-
+ 
                           <td>
                             <div className="Z_action_buttons">
                               <button
@@ -356,7 +366,7 @@ export default function SalesReport() {
                               </button>
                             </div>
                           </td>
-
+ 
                         </tr>
                       ))
                     )}
@@ -392,7 +402,8 @@ export default function SalesReport() {
           </section>
         </>
       )}
-
+ 
+ 
       <Modal show={showModal} onHide={handleCloseModal} centered>
         <Modal.Header closeButton className='a_main_price'>
           <Modal.Title>Order Details</Modal.Title>
@@ -401,7 +412,7 @@ export default function SalesReport() {
           {selectedOrder && (
             <div className="order-details">
               <div className="mb-3">
-                <h5>Order ID: {selectedOrder._id}</h5>
+                <h5>Order ID: #{selectedOrder._id.slice(-6)}</h5>
                 <p>Total Amount: ${Math.floor(selectedOrder.finalAmount)}</p>
                 <p>Total Items: {selectedOrder.items ? selectedOrder.items.reduce((total, item) => total + item.quantity, 0) : 0}</p>
               </div>
@@ -444,7 +455,7 @@ export default function SalesReport() {
                     <tbody>
                       {sellerOrders.map((order, index) => (
                         <tr key={index}>
-                          <td className='a_main_tr'>{order._id}</td>
+                          <td className='a_main_tr'>#{order._id.slice(-6)}</td>
                           <td className='a_main_tr'>${Math.floor(order.finalAmount)}</td>
                           <td className='a_main_tr'>{order.items.reduce((total, item) => total + item.quantity, 0)}</td>
                         </tr>
@@ -460,3 +471,4 @@ export default function SalesReport() {
     </div>
   );
 }
+

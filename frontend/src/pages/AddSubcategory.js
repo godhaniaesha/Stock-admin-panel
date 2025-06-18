@@ -9,6 +9,7 @@ const AddSubcategory = () => {
     const { isDarkMode } = useOutletContext();
     const navigate = useNavigate();
     const dispatch = useDispatch();
+    const [subcategoryImage, setSubcategoryImage] = useState(null);
     const [formErrors, setFormErrors] = useState({});
     const [fileError, setFileError] = useState('');
     const { categories, isLoading: categoriesLoading } = useSelector((state) => state.category);
@@ -20,8 +21,6 @@ const AddSubcategory = () => {
         category: ''
     });
 
-    const [productImage, setProductImage] = useState(null);
-    const [error, setError] = useState('');
     const [isCategoryOpen, setIsCategoryOpen] = useState(false);
 
     useEffect(() => {
@@ -34,27 +33,28 @@ const AddSubcategory = () => {
     };
 
     const validateAndHandleFile = (file) => {
-        setError('');
+        setFileError('');
+        setFormErrors(prev => ({ ...prev, image: null }));
 
         if (!file) {
-            setError('Please select a file');
+            setFileError('Please select a file');
             return;
         }
 
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (!validTypes.includes(file.type)) {
-            setError('Invalid file type. Only PNG, JPG and JPEG are allowed');
+            setFileError('Invalid file type. Only PNG, JPG and JPEG are allowed');
             return;
         }
 
         const maxSize = 5 * 1024 * 1024; // 5MB in bytes
         if (file.size > maxSize) {
-            setError('File size exceeds 5MB limit');
+            setFileError('File size exceeds 5MB limit');
             return;
         }
 
         const imageUrl = URL.createObjectURL(file);
-        setProductImage(imageUrl);
+        setSubcategoryImage({ url: imageUrl, file });
     };
 
     const handleInputChange = (e) => {
@@ -72,40 +72,37 @@ const AddSubcategory = () => {
     };
 
     const handleSubmit = async (e) => {
-    e.preventDefault();
-    setFormErrors({});
+        e.preventDefault();
+        setFormErrors({});
 
-    if (!validateForm()) {
-        return;
-    }
-
-    try {
-        const formData = new FormData();
-        formData.append('subcategoryTitle', subcategoryData.subcategoryTitle);
-        formData.append('description', subcategoryData.description);
-        formData.append('category', subcategoryData.category);
-
-        const fileInput = document.getElementById('fileInput');
-        if (fileInput.files[0]) {
-            formData.append('image', fileInput.files[0]);
+        if (!validateForm()) {
+            return;
         }
 
-        await dispatch(createSubcategory(formData)).unwrap();
-        navigate('/subcategories');
-    } catch (error) {
-        // This will work for both fetch/axios errors
-        let errorMsg =
-            error?.response?.data?.error || // axios
-            error?.error ||                 // fetch or RTK Query
-            error?.message ||               // fallback
-            'Failed to create subcategory';
+        try {
+            const formData = new FormData();
+            formData.append('subcategoryTitle', subcategoryData.subcategoryTitle);
+            formData.append('description', subcategoryData.description);
+            formData.append('category', subcategoryData.category);
+            if (subcategoryImage && subcategoryImage.file) {
+                formData.append('image', subcategoryImage.file);
+            }
+            await dispatch(createSubcategory(formData)).unwrap();
+            navigate('/subcategories');
+        } catch (error) {
+            // This will work for both fetch/axios errors
+            let errorMsg =
+                error?.response?.data?.error || // axios
+                error?.error ||                 // fetch or RTK Query
+                error?.message ||               // fallback
+                'Failed to create subcategory';
 
-        setFormErrors(prev => ({
-            ...prev,
-            submit: errorMsg
-        }));
-    }
-};
+            setFormErrors(prev => ({
+                ...prev,
+                submit: errorMsg
+            }));
+        }
+    };
 
     const handleCancel = () => {
         navigate('/subcategories');
@@ -118,8 +115,8 @@ const AddSubcategory = () => {
         if (!subcategoryData.category) {
             errors.category = 'Category is required';
         }
-        if (!productImage) {
-            errors.image = 'Subcategory image is required';
+        if (!subcategoryImage) {
+            errors.image = 'Category image is required';
         }
         setFormErrors(errors);
         return Object.keys(errors).length === 0;
@@ -149,12 +146,25 @@ const AddSubcategory = () => {
                                 accept=".png, .jpg, .jpeg"
                             />
                             <div className="x_upload_content">
-                                {productImage ? (
-                                    <img
-                                        src={productImage}
-                                        alt="Preview"
-                                        className="x_preview_image"
-                                    />
+                                {subcategoryImage ? (
+                                    <div className="x_image_preview">
+                                        <img
+                                            src={subcategoryImage.url}
+                                            alt="Preview"
+                                            className="x_preview_image"
+                                        />
+                                        <button
+                                            className="x_remove_image"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                setSubcategoryImage(null);
+                                                setFileError('');
+                                                setFormErrors(prev => ({ ...prev, image: null }));
+                                            }}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
                                 ) : (
                                     <>
                                         <div className="x_upload_icon">
@@ -166,7 +176,7 @@ const AddSubcategory = () => {
                                         <p className="x_upload_hint">Maximum file size: 5MB. Allowed formats: PNG, JPG, JPEG</p>
                                     </>
                                 )}
-                                 {(fileError || formErrors.image) && <p className="x_error_message">{fileError || formErrors.image}</p>}
+                                {(fileError || formErrors.image) && <p className="x_error_message">{fileError || formErrors.image}</p>}
                             </div>
                         </div>
                     </div>

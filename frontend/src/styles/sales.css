@@ -8,8 +8,9 @@
 .d_sales-report-container {
   padding: 0.5rem;
 }
+
 .d_main-title {
-  font-size: 2rem;
+  font-size: 1.8rem;
   font-weight: 700;
   margin: 0;
 }
@@ -74,15 +75,21 @@
 .d_dark .x_upload_area:hover,
 .d_dark .x_size_buttons .x_size_btn,
 .d_dark .Z_order_card,
-.d_dark .Z_time_filter,.d_dark .Z_offcan_width.offcanvas {
+.d_dark .Z_time_filter,
+.d_dark .Z_offcan_width.offcanvas {
   background-color: var(--dark-card-bg) !important;
 }
+
 .d_dark.Z_offcan_width.offcanvas.offcanvas-start.show {
   background-color: var(--dark-bg) !important;
 }
+
 .d_light .d_summary-card,
-.d_light .Z_table_wrapper ,.d_light.Z_product_section .main-image,.d_light.Z_product_section .stats-card,.d_light.Z_product_section .shipping-info,.d_light.Z_product_section .info-card
-{
+.d_light .Z_table_wrapper,
+.d_light.Z_product_section .main-image,
+.d_light.Z_product_section .stats-card,
+.d_light.Z_product_section .shipping-info,
+.d_light.Z_product_section .info-card {
   background-color: var(--light-card-bg) !important;
 }
 
@@ -106,7 +113,8 @@
 .d_dark .Z_filter_option label,
 .d_dark .Z_order_card,
 .d_dark .Z_order_title,
-.d_dark .Z_time_filter,.d_dark.Z_offcan_width.offcanvas.offcanvas-start.show {
+.d_dark .Z_time_filter,
+.d_dark.Z_offcan_width.offcanvas.offcanvas-start.show {
   color: var(--light-bg) !important;
 }
 
@@ -123,9 +131,12 @@
   border: 1px solid var(--accent-color) !important;
   color: var(--accent-color) !important;
 }
-.d_light.Z_product_section .shipping-info,.d_light.Z_product_section .info-card{
+
+.d_light.Z_product_section .shipping-info,
+.d_light.Z_product_section .info-card {
   color: var(--dark-bg);
 }
+
 /* .d_dark .Z_add_to_cart_btn :hover {
   background: var(--accent-color)  !important;
   color: #fff !important;
@@ -193,20 +204,26 @@
   .d_chart-container {
     flex: 1;
   }
+
+  .d_main-title {
+    font-size: 1.5rem;
+  }
 }
 
 .d_chart-container {
-  background-color: var(
-    --card-bg-color
-  ); /* Assuming you have CSS variables for colors */
+  background-color: var(--card-bg-color);
+  /* Assuming you have CSS variables for colors */
   padding: 20px;
   border-radius: 8px;
   box-shadow: var(--shadow-small);
-  height: 400px; /* Example height, adjust as needed */
+  height: 400px;
+  /* Example height, adjust as needed */
   display: flex;
   flex-direction: column;
-  justify-content: center; /* Center content vertically */
-  align-items: center; /* Center content horizontally */
+  justify-content: center;
+  /* Center content vertically */
+  align-items: center;
+  /* Center content horizontally */
 }
 
 .d_chart-title {
@@ -228,21 +245,22 @@
 
 .d_summary-cards {
   display: grid;
-  grid-template-columns: repeat(
-    auto-fit,
-    minmax(200px, 1fr)
-  ); /* Adjusted min-width for slightly larger cards */
+  grid-template-columns: repeat(auto-fit,
+      minmax(200px, 1fr));
+  /* Adjusted min-width for slightly larger cards */
   gap: 1.5rem;
   margin-bottom: 2rem;
 }
 
 .d_summary-card {
-  background-color: var(
-    --light-card-bg
-  ); /* Use light card background by default */
-  padding: 1.5rem; /* Increased padding for more breathing room */
-  border-radius: 12px; /* Slightly more rounded corners */
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08); /* Stronger, softer shadow */
+  background-color: var(--light-card-bg);
+  /* Use light card background by default */
+  padding: 1.5rem;
+  /* Increased padding for more breathing room */
+  border-radius: 12px;
+  /* Slightly more rounded corners */
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  /* Stronger, softer shadow */
   display: flex;
   flex-direction: column;
   justify-content: space-between;
@@ -275,20 +293,19 @@
   font-size: 1.1rem;
   /* Slightly larger heading */
   font-weight: 600;
-  margin-bottom: 0.75rem; /* Space between title and value */
-  color: var(
-    --text-color-light
-  ); /* Use a slightly lighter text color for the heading */
+  margin-bottom: 0.75rem;
+  /* Space between title and value */
+  color: var(--text-color-light);
+  /* Use a slightly lighter text color for the heading */
 }
 
 .d_dark .d_summary-card h4 {
-  color: var(
-    --light-bg
-  ) !important; /* Ensure heading color is light in dark mode */
+  color: var(--light-bg) !important;
+  /* Ensure heading color is light in dark mode */
 }
 
 .d_summary-card p {
-  font-size: 2.2rem;
+  font-size: 1.5rem;
   /* Significantly larger font size for the value */
   font-weight: 700;
   color: var(--text-color);
@@ -328,29 +345,59 @@
     margin: 10px 0px;
     padding: 38px;
   }
-}
-@media (max-width: 576px) {
-  
-.d_header-section {
-  /* flex-direction: column; */
-  margin-top:6px;
-}
-.d_header-section h1{
 
-  font-size: 25px;
+  .d_summary-card p {
+    font-size: 1rem;
+  }
 }
-.d_header-section .d_subtitle{
-  font-size: 14px;
-  margin-bottom: 10px !important;
-}
-}
-@media  (max-width: 420px) {
+
+@media (max-width: 576px) {
+
   .d_header-section {
-  flex-direction: column;
-  margin-top:6px;
+    /* flex-direction: column; */
+    margin-top: 6px;
+  }
+
+  .d_header-section h1 {
+
+    font-size: 25px;
+  }
+
+  .d_header-section .d_subtitle {
+    font-size: 14px;
+    margin-bottom: 10px !important;
+  }
+
+  .d_chart-container {
+    padding: 0px;
+  }
+
+  .d_chart-container {
+    padding: 10px;
+  }
 }
+
+@media (max-width: 420px) {
+  .d_header-section {
+    flex-direction: column;
+    margin-top: 6px;
+  }
+
+  .d_chart-container canvas {
+    height: 60% !important;
+  }
   
 }
+
+@media (max-width: 375px) {
+  .d_summary-card {
+    padding: 1rem;
+    
+  }
+  .d_chart-container {
+    height: auto !important;}
+}
+
 .d_date-filter {
   position: relative;
   display: flex;

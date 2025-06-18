@@ -39,8 +39,8 @@ const AddProduct = () => {
 
     const [selectedSize, setSelectedSize] = useState([]);
     const [selectedColors, setSelectedColors] = useState([]);
-    const [productImagePreview, setProductImagePreview] = useState(null); // For UI preview
-    const [productImageFile, setProductImageFile] = useState(null); // For actual file object
+    const [productImage, setProductImage] = useState(null);
+    const [fileError, setFileError] = useState('');
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
     const [error, setError] = useState('');
@@ -53,15 +53,6 @@ const AddProduct = () => {
         dispatch(WaccessCategories());
         dispatch(WaccesssubCategories());
     }, [dispatch]);
-
-    useEffect(() => {
-        // Cleanup function to revoke object URL when component unmounts or preview changes
-        return () => {
-            if (productImagePreview) {
-                URL.revokeObjectURL(productImagePreview);
-            }
-        };
-    }, [productImagePreview]);
 
     const handleCategorySelect = (categoryId) => {
         setProductData(prev => ({ ...prev, categoryId, subcategoryId: '' }));
@@ -85,37 +76,28 @@ const AddProduct = () => {
     };
 
     const validateAndHandleFile = (file) => {
-        // Reset error state
-        setError('');
+        setFileError('');
+        setFormErrors(prev => ({ ...prev, image: null }));
 
-        // Check if file exists
         if (!file) {
-            setError('Please select a file');
-            return false;
+            setFileError('Please select a file');
+            return;
         }
 
-        // Check file type
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
         if (!validTypes.includes(file.type)) {
-            setError('Invalid file type. Only PNG, JPG and JPEG are allowed');
-            return false;
+            setFileError('Invalid file type. Only PNG, JPG and JPEG are allowed');
+            return;
         }
 
-        // Check file size (5MB)
         const maxSize = 5 * 1024 * 1024; // 5MB in bytes
         if (file.size > maxSize) {
-            setError('File size exceeds 5MB limit');
-            return false;
+            setFileError('File size exceeds 5MB limit');
+            return;
         }
 
-        // If validation passes, create preview and set file
-        const reader = new FileReader();
-        reader.onloadend = () => {
-            setProductImagePreview(reader.result);
-        };
-        reader.readAsDataURL(file);
-        setProductImageFile(file);
-        return true;
+        const imageUrl = URL.createObjectURL(file);
+        setProductImage({ url: imageUrl, file });
     };
 
     const handleTagInput = (e) => {
@@ -149,7 +131,7 @@ const AddProduct = () => {
                 }));
                 return;
             }
-            
+
             setTags([...tags, tagInput.trim()]);
             setTagInput('');
             setFormErrors(prev => ({ ...prev, tags: '' }));
@@ -215,7 +197,7 @@ const AddProduct = () => {
     // Validation function
     const validateForm = () => {
         const errors = {};
-        
+
         // Required fields validation
         if (!productData.categoryId) errors.categoryId = 'Category is required';
         if (!productData.subcategoryId) errors.subcategoryId = 'Subcategory is required';
@@ -232,7 +214,7 @@ const AddProduct = () => {
         }
         if (!productData.stock?.trim()) errors.stock = 'Stock is required';
         if (!productData.price?.trim()) errors.price = 'Price is required';
-        if (!productImageFile) errors.image = 'Product image is required';
+        if (!productImage) errors.image = 'Product image is required';
 
         // Format validation
         if (productData.price && isNaN(productData.price)) {
@@ -278,7 +260,8 @@ const AddProduct = () => {
 
     const handleSubmit = async (e) => {
         e.preventDefault();
-        
+        setFormErrors({});
+
         if (!validateForm()) {
             return;
         }
@@ -290,28 +273,28 @@ const AddProduct = () => {
             return;
         }
 
-        const actualFormData = new FormData();
-
-        // Append fields from productData state
-        for (const key in productData) {
-            if (productData.hasOwnProperty(key) && productData[key] !== '') {
-                actualFormData.append(key, productData[key]);
-            }
-        }
-
-        actualFormData.append('sellerId', sellerId);
-        actualFormData.append('tags', JSON.stringify(tags));
-        actualFormData.append('sizes', JSON.stringify(selectedSize));
-        actualFormData.append('colors', JSON.stringify(selectedColors));
-        actualFormData.append('isActive', true);
-
-        if (productImageFile) {
-            actualFormData.append('images', productImageFile);
-        }
-
         try {
+            const formData = new FormData();
+
+            // Append fields from productData state
+            for (const key in productData) {
+                if (productData.hasOwnProperty(key) && productData[key] !== '') {
+                    formData.append(key, productData[key]);
+                }
+            }
+
+            formData.append('sellerId', sellerId);
+            formData.append('tags', JSON.stringify(tags));
+            formData.append('sizes', JSON.stringify(selectedSize));
+            formData.append('colors', JSON.stringify(selectedColors));
+            formData.append('isActive', true);
+
+            if (productImage && productImage.file) {
+                formData.append('image', productImage.file);
+            }
+
             // Dispatch createProduct with the FormData object
-            const result = await dispatch(createProduct(actualFormData)).unwrap();
+            const result = await dispatch(createProduct(formData)).unwrap();
 
             if (result) {
                 // Reset form
@@ -332,8 +315,7 @@ const AddProduct = () => {
                 });
                 setSelectedSize([]);
                 setSelectedColors([]);
-                setProductImagePreview(null);
-                setProductImageFile(null);
+                setProductImage(null);
                 setTags([]);
                 setTagInput('');
                 if (document.getElementById('fileInput')) {
@@ -343,7 +325,15 @@ const AddProduct = () => {
                 navigate('/products');
             }
         } catch (error) {
-            console.error('Failed to create product:', error);
+            let errorMsg =
+                error?.response?.data?.error ||
+                error?.error ||
+                error?.message ||
+                'Failed to create product';
+            setFormErrors(prev => ({
+                ...prev,
+                submit: errorMsg
+            }));
         }
     };
 
@@ -386,44 +376,48 @@ const AddProduct = () => {
                                 onChange={(e) => validateAndHandleFile(e.target.files[0])}
                                 accept=".png, .jpg, .jpeg"
                             />
-                            {productImagePreview ? (
-                                <div className="x_image_preview">
-                                    <img src={productImagePreview} alt="Product preview" className="x_preview_img" />
-                                    <button
-                                        className="x_remove_image"
-                                        onClick={(e) => {
-                                            e.stopPropagation();
-                                            setProductImagePreview(null);
-                                            setProductImageFile(null);
-                                            if (document.getElementById('fileInput')) {
-                                                document.getElementById('fileInput').value = null;
-                                            }
-                                        }}
-                                    >
-                                        ×
-                                    </button>
-                                </div>
-                            ) : (
-                                <div className="x_upload_content">
-                                    <div className="x_upload_icon">
-                                        <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent-color)">
-                                            <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
-                                        </svg>
+                            <div className="x_upload_content">
+                                {productImage ? (
+                                    <div className="x_image_preview">
+                                        <img
+                                            src={productImage.url}
+                                            alt="Product preview"
+                                            className="x_preview_image"
+                                        />
+                                        <button
+                                            className="x_remove_image"
+                                            onClick={e => {
+                                                e.stopPropagation();
+                                                setProductImage(null);
+                                                setFileError('');
+                                                setFormErrors(prev => ({ ...prev, image: null }));
+                                            }}
+                                        >
+                                            ×
+                                        </button>
                                     </div>
-                                    <p className="x_upload_text">Drop your images here, or <span className="x_browse_text">click to browse</span></p>
-                                    <p className="x_upload_hint">Maximum file size: 5MB. Allowed formats: PNG, JPG, JPEG</p>
-                                    {error && <p className="x_error_message">{error}</p>}
-                                </div>
-                            )}
+                                ) : (
+                                    <>
+                                        <div className="x_upload_icon">
+                                            <svg width="32" height="32" viewBox="0 0 24 24" fill="var(--accent-color)">
+                                                <path d="M19.35 10.04C18.67 6.59 15.64 4 12 4 9.11 4 6.6 5.64 5.35 8.04 2.34 8.36 0 10.91 0 14c0 3.31 2.69 6 6 6h13c2.76 0 5-2.24 5-5 0-2.64-2.05-4.78-4.65-4.96zM14 13v4h-4v-4H7l5-5 5 5h-3z" />
+                                            </svg>
+                                        </div>
+                                        <p className="x_upload_text">Drop your images here, or <span className="x_browse_text">click to browse</span></p>
+                                        <p className="x_upload_hint">Maximum file size: 5MB. Allowed formats: PNG, JPG, JPEG</p>
+                                    </>
+                                )}
+                                {(fileError || formErrors.image) && <p className="x_error_message">{fileError || formErrors.image}</p>}
+                            </div>
                         </div>
                     </div>
                 </div>
- {/* Add image error message */}
- {formErrors.image && (
+                {/* Add image error message */}
+                {/* {formErrors.image && (
                     <div className="x_error_message mb-3">
                         {formErrors.image}
                     </div>
-                )}
+                )} */}
 
                 <div className="x_product_form">
                     <div className="x_product_info">
@@ -640,7 +634,7 @@ const AddProduct = () => {
                                         </button>
                                     </div> */}
                                     <div className="x_input_group">
-                                          <span  type="button"
+                                        <span type="button"
                                             className=" x_input_icon "
                                             onClick={generateSKU}>
                                             <RiAiGenerate />
@@ -654,7 +648,7 @@ const AddProduct = () => {
                                             className={`x_input ${formErrors.sku ? 'x_input_error' : ''}`}
                                             readOnly
                                         />
-                                      
+
 
                                     </div>
                                     <ErrorMessage error={formErrors.sku} />
@@ -793,7 +787,7 @@ const AddProduct = () => {
                     </div>
                 </div>
 
-               
+
 
                 <div className="x_btn_wrapper mt-3">
                     <button

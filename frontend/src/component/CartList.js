@@ -263,7 +263,7 @@ const CartList = () => {
 
             <div className="d_cart_actions">
               <button className="d_checkout_btn" onClick={handleCheckout}>Proceed to checkout</button>
-              <button className="d_continue_btn">Continue Shopping</button>
+                <button className="d_continue_btn" onClick={() => navigate('/products')}>Continue Shopping</button>
             </div>
           </div>
         </div>

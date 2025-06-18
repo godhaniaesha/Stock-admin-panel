@@ -2369,7 +2369,7 @@
   .Z_offcan_width {
     display: none !important;
   }
-  .Z_offcan_width .offcanvas-backdrop.show {
+  .offcanvas-backdrop.show {
     opacity: 0 !important;
   }
 }

@@ -51,6 +51,11 @@ const createProduct = async (req, res) => {
         console.log('Product Data:', productData);
         console.log('Uploaded Images:', images);
 
+        // Convert tax to number if it's a string
+        if (typeof productData.tax === 'string') {
+            productData.tax = parseFloat(productData.tax);
+        }
+
         // Check for duplicate SKU
         const existingSku = await Product.findOne({ sku: productData.sku });
         if (existingSku) {
@@ -242,6 +247,11 @@ const updateProduct = async (req, res) => {
         // Convert string boolean to actual boolean
         if (typeof updateData.isActive === 'string') {
             updateData.isActive = updateData.isActive === 'true';
+        }
+
+        // Convert tax to number if it's a string
+        if (typeof updateData.tax === 'string') {
+            updateData.tax = parseFloat(updateData.tax);
         }
 
         // Check for duplicate SKU (excluding current product)

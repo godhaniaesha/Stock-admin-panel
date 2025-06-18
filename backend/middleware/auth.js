@@ -4,7 +4,10 @@ const Users = require("../model/Register.model");
 const auth = (roles = []) => (req, res, next) => {
     try {
         // Get token from Authorization header
-        const authHeader = req.header('Authorization');
+        const authHeader = req.header('Authorization') || req.cookies.accessToken ;
+
+        console.log(authHeader,"authHeader");
+        
         console.log('Authorization header:', authHeader);
         if (!authHeader) {
             return res.status(401).json({
@@ -30,7 +33,7 @@ const auth = (roles = []) => (req, res, next) => {
         jwt.verify(token, process.env.ACCESS_TOKEN_KEY, async function (err, decoded) {
             console.log('JWT error:', err);
             if (err) {
-                return res.status(400).json({
+                return res.status(401).json({
                     success: false,
                     message: "Token invalid"
                 });

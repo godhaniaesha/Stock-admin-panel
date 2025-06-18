@@ -9,6 +9,7 @@ import { GiStarFormation } from 'react-icons/gi';
 import { IoMdArrowDropleft, IoMdArrowDropright } from 'react-icons/io';
 import { MdStars } from 'react-icons/md';
 import { toast } from 'react-toastify';
+import { IMG_URL } from '../utils/baseUrl';
 
 const ProductDetail = () => {
   const { id: productId } = useParams();
@@ -52,7 +53,7 @@ const ProductDetail = () => {
     }
   }, [currentProduct]);
 
-  const productImages = currentProduct?.images?.map(img => `http://localhost:2221/${img}`) || [];
+  const productImages = currentProduct?.images?.map(img => `${IMG_URL}${img}`) || [];
 
   // Auto slide effect
   useEffect(() => {
@@ -811,6 +812,17 @@ const ProductDetail = () => {
           </div>
 
           {productImages.length > 1 && (
+            // <div className="thumbnail-grid">
+            //   {productImages.map((img, index) => (
+            //     <div
+            //       key={index}
+            //       className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
+            //       onClick={() => handleImageClick(index)}
+            //     >
+            //       <img src={img} alt={`View ${index + 1} of ${currentProduct.productName}`} />
+            //     </div>
+            //   ))}
+            // </div>
             <div className="thumbnail-grid">
               {productImages.map((img, index) => (
                 <div
@@ -818,7 +830,7 @@ const ProductDetail = () => {
                   className={`thumbnail ${selectedImageIndex === index ? 'active' : ''}`}
                   onClick={() => handleImageClick(index)}
                 >
-                  <img src={img} alt={`View ${index + 1} of ${currentProduct.productName}`} />
+                  <img src={`${IMG_URL}${img}`} alt={`View ${index + 1} of ${currentProduct.productName}`} />
                 </div>
               ))}
             </div>
@@ -987,24 +999,49 @@ const ProductDetail = () => {
               ))}
             </div>
           )}
+
+          {reviews.map((review, index) => (
+            <div key={review._id || index} className="review-item">
+              <div className="reviewer-name">{review.userName || review.userId?.name || 'Anonymous'}</div>
+              <div className="d-flex align-items-center mb-1">
+                {[...Array(5)].map((_, i) => (
+                  <FaStar key={i} color={i < review.rating ? '#ffc107' : '#e0e0e0'} />
+                ))}
+              </div>
+              <div className="review-text">{review.comment}</div>
+              {review.images && review.images.length > 0 && (
+                <div className="review-images">
+                  {review.images.map((img, imgIdx) => (
+                    <img key={imgIdx} src={`${IMG_URL}${img}`} alt={`Review image ${imgIdx + 1}`} className="review-image" />
+                  ))}
+                </div>
+              )}
+              <div className="review-date">{new Date(review.createdAt).toLocaleDateString()}</div>
+            </div>
+          ))}
+
+
+
+
         </div>
       </div>
 
-      {/* Modal for zoomed image */}
-      {showZoom && (
-        <div className={`zoom-modal-overlay`} onClick={() => setShowZoom(false)}>
-          <div className="zoom-modal-content" onClick={e => e.stopPropagation()}>
-            <button className="zoom-modal-close" onClick={() => setShowZoom(false)}>×</button>
-            <img
-              src={productImages[selectedImageIndex]}
-              alt={currentProduct.productName}
-              className="zoomed-image"
-              style={{ maxWidth: '70vw', maxHeight: '70vh' }}
-            />
+      {
+        showZoom && (
+          <div className={`zoom-modal-overlay`} onClick={() => setShowZoom(false)}>
+            <div className="zoom-modal-content" onClick={e => e.stopPropagation()}>
+              <button className="zoom-modal-close" onClick={() => setShowZoom(false)}>×</button>
+              <img
+                src={productImages[selectedImageIndex]}
+                alt={currentProduct.productName}
+                className="zoomed-image"
+                style={{ maxWidth: '70vw', maxHeight: '70vh' }}
+              />
+            </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
+    </div >
   );
 };
 

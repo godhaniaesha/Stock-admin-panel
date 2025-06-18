@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchInventoryMetrics, fetchProductMovement } from '../redux/slice/sales.slice';
 import { fetchInventories, deleteInventory } from '../redux/slice/inventory.Slice';
 // import { fetchProductMovement } from '../redux/slice/sales.slice';
+import { IMG_URL } from '../utils/baseUrl';
 
 ChartJS.register(LineElement, BarElement, PointElement, LinearScale, CategoryScale, Tooltip, Legend, ArcElement);
 
@@ -392,8 +393,8 @@ export default function InventoryReport() {
                     <td>
                       <div className="Z_subcategory_details_cell">
                         <img
-                          src={`http://localhost:2221/${item.product.images[0]}`}
-                          alt={item.product?.productName || 'Product Image'}
+                          src={`${IMG_URL}/${item.productData.images[0]}`}
+                          alt={item.productData?.productName || 'Product Image'}
                           className="Z_table_subcategory_img"
                           width={60}
                           height={60}

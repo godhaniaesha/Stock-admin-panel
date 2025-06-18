@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance';
 
 const API_BASE_URL = 'http://localhost:2221/api/a1/order';
 
@@ -32,23 +33,26 @@ export const fetchOrders = createAsyncThunk(
     'order/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            console.log('Making API call to fetch orders...');
-            const { data } = await getAxios().get('/seller');
-            console.log('API response:', data);
-            return data.data;
+            // console.log('Making API call to fetch orders...');
+            // const { data } = await getAxios().get('/seller');
+            // console.log('API response:', data);
+            // return data.data;
+            const response = await axiosInstance.get('/order/seller');
+            return response.data.data;
         } catch (error) {
             console.error('Error fetching orders:', error);
             return rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 );
+
 // Fetch order by ID
 export const fetchOrderById = createAsyncThunk(
     'order/fetchById',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().get(`/get/${id}`);
-            return data.data;
+            const response = await axiosInstance.get(`/order/get/${id}`);
+            return response.data.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
@@ -60,8 +64,8 @@ export const createOrder = createAsyncThunk(
     'order/create',
     async (orderData, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().post('/add', orderData);
-            return data.data;
+            const response = await axiosInstance.post('/order/add', orderData);
+            return response.data.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
@@ -73,8 +77,8 @@ export const updateOrder = createAsyncThunk(
     'order/update',
     async ({ id, orderData }, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().put(`/update/${id}`, orderData);
-            return data.data;
+            const response = await axiosInstance.put(`/order/update/${id}`, orderData);
+            return response.data.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
@@ -86,7 +90,7 @@ export const deleteOrder = createAsyncThunk(
     'order/delete',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().delete(`/delete/${id}`);
+            await axiosInstance.delete(`/order/delete/${id}`);
             return id;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
@@ -99,8 +103,8 @@ export const fetchOrdersByUser = createAsyncThunk(
     'order/fetchByUser',
     async (userId, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().get(`/user/${userId}`);
-            return data.data;
+            const response = await axiosInstance.get(`/order/user/${userId}`);
+            return response.data.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }

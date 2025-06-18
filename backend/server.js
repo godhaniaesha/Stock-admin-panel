@@ -13,6 +13,7 @@ const session = require('express-session');
 const router = require('./router/api/a1');
 const connectDB = require('./db/mongoDB');
 
+app.use(cookieParser());
 app.use("/KAssets", express.static(path.join(__dirname, "KAssets")));
 
 // Session middleware configuration
@@ -21,16 +22,16 @@ app.use(session({
     resave: true,
     saveUninitialized: true,
 }));
-app.use(cookieParser());
+
 app.use(passport.initialize());
 app.use(passport.session());
 app.use(express.json());
 app.use(cors({
     origin: 'http://localhost:3000',
     methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
     credentials: true
 }))
-
 
 const port = process.env.PORT || 2221
 

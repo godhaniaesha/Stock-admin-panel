@@ -5,6 +5,7 @@ import { Table } from "react-bootstrap";
 import { useEffect } from "react";
 import { TbEdit, TbEye } from "react-icons/tb";
 import { RiDeleteBin6Line } from "react-icons/ri";
+import { IMG_URL } from "../utils/baseUrl";
 
 function StockAlert() {
   const { isDarkMode } = useOutletContext();
@@ -83,7 +84,7 @@ function StockAlert() {
                         <img
                           src={
                             item.product && item.product.images && item.product.images[0]
-                              ? `http://localhost:2221/${item.product.images}`
+                              ? `${IMG_URL}${item.product.images}`
                               : '/no-image.png'
                           }
                           alt={item.product?.productName || 'No Name'}

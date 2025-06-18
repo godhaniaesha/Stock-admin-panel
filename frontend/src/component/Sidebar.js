@@ -13,6 +13,7 @@ import { TbListDetails } from 'react-icons/tb';
 import { useDispatch } from 'react-redux';
 import { db_fetchUserById } from '../redux/slice/userSlice';
 import { BiDetail } from 'react-icons/bi';
+import Cookies from 'js-cookie';
 
 const Sidebar = ({ show, isDarkMode }) => {
   const location = useLocation();

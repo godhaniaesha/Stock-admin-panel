@@ -7,6 +7,7 @@ import { FaAngleLeft, FaAngleRight, FaCaretDown } from 'react-icons/fa';
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchSubcategories, deleteSubcategory } from '../redux/slice/subCategory.slice';
+import { IMG_URL } from '../utils/baseUrl';
 
 function SubcategoryList() {
     const { isDarkMode } = useOutletContext();
@@ -249,7 +250,7 @@ function SubcategoryList() {
                                         <td>
                                             <div className="Z_subcategory_details_cell">
                                                 <img
-                                                    src={`http://localhost:2221/${subcategory.image}`}
+                                                    src={`${IMG_URL}${subcategory.image}`}
                                                     alt={subcategory.subcategoryTitle}
                                                     className="Z_table_subcategory_img"
                                                     width={60}

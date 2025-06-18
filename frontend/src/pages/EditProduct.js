@@ -9,6 +9,7 @@ import { useOutletContext } from 'react-router-dom';
 import { fetchProductById, updateProduct, clearProductError, clearProductSuccess } from '../redux/slice/product.slice';
 import { fetchCategories, WaccessCategories } from '../redux/slice/category.slice';
 import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
+import { IMG_URL } from '../utils/baseUrl';
 
 const EditProduct = () => {
     const { isDarkMode } = useOutletContext();
@@ -100,7 +101,7 @@ const EditProduct = () => {
             // Set product image
             if (currentProduct.images && currentProduct.images.length > 0) {
                 setExistingImagePath(currentProduct.images[0]);
-                setProductImage(`http://localhost:2221/${currentProduct.images[0]}`);
+                setProductImage(`${IMG_URL}${currentProduct.images[0]}`);
             } else {
                 setProductImage(null);
                 setExistingImagePath(null);

@@ -18,6 +18,7 @@ import { fetchCategories, WaccessCategories } from '../redux/slice/category.slic
 import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
 import { fetchInventories } from '../redux/slice/inventory.Slice';
 // import ProductQuickView from './ProductQuickView';
+import { IMG_URL } from '../utils/baseUrl';
 
 function ProductGrid() {
     const { isDarkMode } = useOutletContext();
@@ -587,7 +588,7 @@ function ProductGrid() {
                                         <Card className="h-100 Z_product_card">
                                             <div className="Z_product_image">
                                                 <img
-                                                    src={`http://localhost:2221/${product.images?.[0]}`}
+                                                    src={`${IMG_URL}${product.images?.[0]}`}
                                                     alt={product.productName}
                                                     className={(!product.quantity || product.quantity <= 0) ? 'Z_out_of_stock_image' : ''}
                                                 />

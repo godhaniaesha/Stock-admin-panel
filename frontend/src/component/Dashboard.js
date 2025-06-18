@@ -52,6 +52,7 @@ import { BiRightArrow } from 'react-icons/bi';
 import { getAxios } from '../utils/axios';
 import { useDispatch, useSelector } from 'react-redux';
 import { Sales_Performance,getHeaderdata,getAllSellerOrder } from '../redux/slice/dashboard.slice';
+import { IMG_URL } from '../utils/baseUrl';
 
 
 const Dashboard = () => {
@@ -460,7 +461,7 @@ const Dashboard = () => {
                           <img
                             src={
                               item?.image
-                                ? `http://localhost:2221/${item?.image}`
+                                ? `${IMG_URL}${item?.image}`
                                 : "placeholder.jpg"
                             }
                             // alt={item?.name}
@@ -632,8 +633,8 @@ const Dashboard = () => {
                   style={{
                     height: "575px",
                     maxHeight: "575px",
-                    display: "flex",
-                    justifyContent: "center",
+                    // display: "flex",
+                    // justifyContent: "center",
                     alignItems: "center",
                   }}
                 >
@@ -641,7 +642,7 @@ const Dashboard = () => {
                     lowStockProducts.map((event) => (
                       <div
                         key={event._id}
-                        className="d-flex align-items-center gap-3 mb-3 p-3 rounded"
+                        className="d-flex align-items-center gap-3 mb-3 p-3 rounded w-100"
                         style={{
                           background: `var(--${
                             isDarkMode ? "dark" : "light"
@@ -667,7 +668,7 @@ const Dashboard = () => {
                           <img
                             src={
                               event?.productImage
-                                ? `http://localhost:2221/${event?.productImage[0]}`
+                                ? `${IMG_URL}${event?.productImage[0]}`
                                 : "placeholder.jpg"
                             }
                             alt={event?.productName}

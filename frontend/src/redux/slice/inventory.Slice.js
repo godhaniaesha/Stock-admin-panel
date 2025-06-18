@@ -1,5 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
+import axiosInstance from '../../utils/axiosInstance';
 
 const API_URL = 'http://localhost:2221/api/a1/inventory';
 
@@ -8,31 +9,20 @@ export const createInventory = createAsyncThunk(
     'inventory/create',
     async (inventoryData, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.post(`${API_URL}/create`, inventoryData, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await axiosInstance.post('/inventory/create', inventoryData);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to create product');
         }
     }
 );
+
 // GET ALL
 export const fetchInventories = createAsyncThunk(
     'inventory/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json'
-                }
-            });
+            const response = await axiosInstance.get('/inventory');
             console.log(response, "responseddddd");
             return response.data;
         } catch (error) {
@@ -46,7 +36,7 @@ export const fetchInventoryById = createAsyncThunk(
     'inventory/fetchOne',
     async (id, { rejectWithValue }) => {
         try {
-            const response = await axios.get(`${API_URL}/${id}`);
+            const response = await axiosInstance.get(`/inventory/${id}`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch inventory');
@@ -59,26 +49,15 @@ export const updateInventory = createAsyncThunk(
     'inventory/update',
     async ({ id, updatedData }, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
             console.log("Sending update request with:", { id, updatedData });
 
-            const response = await axios.put(`${API_URL}/${id}`, updatedData, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                    'Content-Type': 'application/json',
-                },
-            });
-
+            const response = await axiosInstance.put(`/inventory/${id}`, updatedData);
             console.log("Update response:", response.data);
 
             // After successful update, fetch the updated inventory
-            const updatedResponse = await axios.get(`${API_URL}/${id}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`,
-                },
-            });
-
+            const updatedResponse = await axiosInstance.get(`/inventory/${id}`);
             console.log("Fetched updated inventory:", updatedResponse.data);
+            
             return updatedResponse.data;
         } catch (error) {
             console.error("Update error:", error);
@@ -92,7 +71,7 @@ export const deleteInventory = createAsyncThunk(
     'inventory/delete',
     async (id, { rejectWithValue }) => {
         try {
-            await axios.delete(`${API_URL}/${id}`);
+            await axiosInstance.delete(`/inventory/${id}`);
             return id;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to delete inventory');
@@ -100,17 +79,13 @@ export const deleteInventory = createAsyncThunk(
     }
 );
 
-// ✅ Get Low Inventory Thunk
+
+// Get Low Inventory Thunk
 export const getLowInventory = createAsyncThunk(
     'inventory/getLow',
     async (_, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/getlow`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await axiosInstance.get('/inventory/getlow');
             // Filter products where quantity is less than or equal to lowStockLimit
             const lowInventory = response.data.filter(item => item.quantity <= item.lowStockLimit);
             return lowInventory;
@@ -125,12 +100,7 @@ export const getProductMovement = createAsyncThunk(
     'inventory/getProductMovement',
     async (period, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/product-movement?period=${period}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await axiosInstance.get(`/inventory/product-movement?period=${period}`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to fetch product movement data');

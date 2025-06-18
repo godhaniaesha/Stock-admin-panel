@@ -2,28 +2,15 @@
 Here's a breakdown of what the code is doing: */
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
-const API_BASE_URL = 'http://localhost:2221/api/a1/register';
-
-// Axios instance with auth header
-const getAxios = () => {
-    const token = localStorage.getItem('token');
-    return axios.create({
-        baseURL: API_BASE_URL,
-        headers: {
-            Authorization: `Bearer ${token}`,
-            'Content-Type': 'application/json'
-        }
-    });
-};
+import axiosInstance from '../../utils/axiosInstance';
 
 // Fetch all users
 export const db_fetchUsers = createAsyncThunk(
     'user/fetchAll',
     async (_, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().get('/getAllUsers');
-            return data.data;
+            const response = await axiosInstance.get('/register/getAllUsers');
+            return response.data.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
@@ -35,8 +22,8 @@ export const db_fetchUserById = createAsyncThunk(
     'user/fetchById',
     async (id, { rejectWithValue }) => {
         try {
-            const { data } = await getAxios().get(`/${id}`);
-            return data.data;
+            const response = await axiosInstance.get(`/register/${id}`);
+            return response.data.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
@@ -44,47 +31,33 @@ export const db_fetchUserById = createAsyncThunk(
 );
 
 // Create user
-// export const db_createUser = createAsyncThun k(
-//     'user/create',
-//     async (formData, { rejectWithValue }) => {
-//         try {
-//             const { data } = await getAxios().post('/createUser', formData);
-//             return data.data;
-//         } catch (error) {
-//             return rejectWithValue(error.response?.data?.message || error.message);
-//         }
-//     }
-// );
-
 export const db_createUser = createAsyncThunk(
     'user/create',
     async (formData, { rejectWithValue }) => {
         try {
-            const config = {
+            const response = await axiosInstance.post('/register/createUser', formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
-            };
-            const { data } = await getAxios().post('/createUser', formData, config);
-            return data.data;
+            });
+            return response.data.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
     }
 );
- 
+
 // Update user by ID
 export const db_updateUser = createAsyncThunk(
     'user/update',
     async ({ id, formData }, { rejectWithValue }) => {
         try {
-            const config = {
+            const response = await axiosInstance.put(`/register/updateUser/${id}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data'
                 }
-            };
-            const { data } = await getAxios().put(`/updateUser/${id}`, formData, config);
-            return data.data;
+            });
+            return response.data.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);
         }
@@ -96,7 +69,7 @@ export const db_deleteUser = createAsyncThunk(
     'user/delete',
     async (id, { rejectWithValue }) => {
         try {
-            await getAxios().delete(`/${id}`);
+            await axiosInstance.delete(`/register/${id}`);
             return id;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);

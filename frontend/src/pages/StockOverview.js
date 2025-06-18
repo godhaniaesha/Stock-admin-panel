@@ -7,6 +7,7 @@ import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchInventories, deleteInventory } from '../redux/slice/inventory.Slice';
 import { FaCaretDown } from 'react-icons/fa';
+import { IMG_URL } from '../utils/baseUrl';
 
 const StockOverview = () => {
   const { isDarkMode } = useOutletContext();
@@ -122,7 +123,7 @@ const filteredCategories = filterInventoriesByTime(inventory);
                           <img
                             src={
                               product?.images?.[0]
-                                ? `http://localhost:2221/${product.images[0]}`
+                                ? `${IMG_URL}${product.images[0]}`
                                 : 'https://via.placeholder.com/60'
                             }
                             alt={product?.productName || 'N/A'}

@@ -1,18 +1,12 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
-
-const API_URL = 'http://localhost:2221/api/a1/sales';
-const API_URL_ORDER = 'http://localhost:2221/api/a1/order';
+import axiosInstance from '../../utils/axiosInstance';
 
 export const fetchSalesMetrics = createAsyncThunk(
     'sales/fetchMetrics',
     async (params = {}, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/salesMetrics`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+            const response = await axiosInstance.get('/sales/salesMetrics', {
                 params: {
                     period: params.period || 'last_7_days',
                     startDate: params.startDate,
@@ -27,15 +21,12 @@ export const fetchSalesMetrics = createAsyncThunk(
         }
     }
 );
+
 export const fetchInventoryMetrics = createAsyncThunk(
     'sales/InventoryMetrics',
     async (params = {}, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/InventoryMetrics`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+            const response = await axiosInstance.get('/sales/InventoryMetrics', {
                 params: {
                     period: params.period || 'last_7_days',
                     startDate: params.startDate,
@@ -50,37 +41,11 @@ export const fetchInventoryMetrics = createAsyncThunk(
     }
 );
 
-// export const fetchProductMovement = createAsyncThunk(
-//     'sales/fetchProductMovement',
-//     async (params = {}, { rejectWithValue }) => {
-//         try {
-//             const token = localStorage.getItem('token');
-//             const response = await axios.get(`${API_URL}/ProductMovement`, {
-//                 headers: {
-//                     'Authorization': `Bearer ${token}`
-//                 },
-//                 params: {
-//                     startDate: params.startDate,
-//                     endDate: params.endDate
-//                 }
-//             });
-//             return response.data;
-//         } catch (error) {
-//             return rejectWithValue(error.response.data);
-//         }
-//     }
-// );
-
 export const fetchOrdersBySeller = createAsyncThunk(
     'sales/fetchOrdersBySeller',
     async (sellerId, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL_ORDER}/seller/${sellerId}`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                }
-            });
+            const response = await axiosInstance.get(`/order/seller/${sellerId}`);
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response.data);
@@ -92,11 +57,7 @@ export const fetchProductMovement = createAsyncThunk(
     'sales/fetchProductMovement',
     async (params = {}, { rejectWithValue }) => {
         try {
-            const token = localStorage.getItem('token');
-            const response = await axios.get(`${API_URL}/getProductMovement`, {
-                headers: {
-                    'Authorization': `Bearer ${token}`
-                },
+            const response = await axiosInstance.get('/sales/getProductMovement', {
                 params: {
                     startDate: params.startDate,
                     endDate: params.endDate

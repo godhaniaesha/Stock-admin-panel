@@ -3,6 +3,7 @@ import '../styles/x_app.css';
 import { useOutletContext, useLocation, useNavigate } from 'react-router-dom';
 import { useDispatch } from 'react-redux';
 import { updateCategory } from '../redux/slice/category.slice';
+import { IMG_URL } from '../utils/baseUrl';
 
 const EditCategory = () => {
     const { isDarkMode } = useOutletContext();
@@ -24,7 +25,7 @@ const EditCategory = () => {
             const { title, description, image, _id } = location.state.categoryData;
             setCategoryData({ title, description, _id });
             if (image) {
-                setCategoryImage(`http://localhost:2221/${image}`);
+                setCategoryImage(`${IMG_URL}${image}`);
             }
         }
     }, [location.state]);

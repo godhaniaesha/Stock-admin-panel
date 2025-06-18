@@ -9,6 +9,7 @@ import { getAllWishlists, getWishlist, removeFromWishlist } from '../redux/slice
 import { IoMdCart } from 'react-icons/io';
 import { addToCart, getCart } from '../redux/slice/cart.slice';
 import { FaCaretDown } from 'react-icons/fa';
+import { IMG_URL } from '../utils/baseUrl';
 
 function Wishlist() {
     const { isDarkMode } = useOutletContext();
@@ -134,7 +135,7 @@ function Wishlist() {
                                         </td>
                                         <td>
                                             <div className="Z_product_info_cell">
-                                                <img src={`http://localhost:2221/${item.productId?.images[0]}`} alt={item.productId?.productName} className="Z_table_product_img" />
+                                                <img src={`${IMG_URL}${item.productId?.images[0]}`} alt={item.productId?.productName} className="Z_table_product_img" />
                                                 <div>
                                                     <div className="Z_table_product_name">{item.productId?.productName}</div>
                                                     <div className="Z_table_product_size">Size: {item.productId?.size || 'Standard'}</div>

@@ -75,7 +75,7 @@ router.get('/callback',
         }
 
         return res.status(200)
-            .cookie("assesToken", assesToken, option)
+            .cookie("accessToken", assesToken, option)
             .cookie("refreshToken", refreshToken, option)
             .redirect('http://localhost:3000')
     });

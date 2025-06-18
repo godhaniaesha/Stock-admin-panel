@@ -5,6 +5,7 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCart, updateCartItem, removeFromCart, clearCart } from '../redux/slice/cart.slice';
 import { fetchCoupons } from '../redux/slice/coupon.slice';
+import { IMG_URL } from '../utils/baseUrl';
 
 const CartList = () => {
   const { isDarkMode } = useOutletContext();
@@ -107,7 +108,7 @@ const CartList = () => {
           {cartItems?.map(item => (
             <div key={item._id} className="d_cart_item">
               <div className="d_item_image">
-                <img src={`http://localhost:2221/${item.productId?.images?.[0]}`}
+                <img src={`${IMG_URL}${item.productId?.images?.[0]}`}
                   alt={item.productId?.productName} />
               </div>
 

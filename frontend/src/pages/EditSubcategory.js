@@ -4,6 +4,7 @@ import { useOutletContext, useNavigate, useLocation } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategories } from '../redux/slice/category.slice';
 import { updateSubcategory } from '../redux/slice/subCategory.slice';
+import { IMG_URL } from '../utils/baseUrl';
 
 const EditSubcategory = () => {
     const { isDarkMode } = useOutletContext();
@@ -35,7 +36,7 @@ const EditSubcategory = () => {
                 category: category?._id || ''
             });
             if (image) {
-                setProductImage(`http://localhost:2221/${image}`);
+                setProductImage(`${IMG_URL}${image}`);
             }
         }
     }, [dispatch, location.state]);

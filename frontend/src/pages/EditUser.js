@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { useParams, useNavigate, useOutletContext } from 'react-router-dom';
 import '../styles/x_app.css';
 import { db_fetchUserById, db_updateUser } from '../redux/slice/userSlice';
+import { IMG_URL } from '../utils/baseUrl';
 
 const EditUser = () => {
     const { id } = useParams();
@@ -61,7 +62,7 @@ const EditUser = () => {
             });
 
             if (selectedUser.profileImage) {
-                setUserImage(`http://localhost:2221/KAssets/profileImage/${selectedUser.profileImage}`);
+                setUserImage(`${IMG_URL}KAssets/profileImage/${selectedUser.profileImage}`);
             }
         }
     }, [selectedUser]);

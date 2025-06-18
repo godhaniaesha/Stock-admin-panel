@@ -15,6 +15,7 @@ import { Formik, Form, Field, ErrorMessage } from 'formik';
 import * as Yup from 'yup';
 import moment from 'moment';
 import Calendar from './Calendar';
+import { IMG_URL } from '../utils/baseUrl';
 
 const validationSchema = Yup.object().shape({
   firstName: Yup.string()
@@ -701,7 +702,7 @@ const CheckoutPage = () => {
                     {cartItems?.map(item => (
                       <div key={item._id} className="d_summary_item">
                         <img
-                          src={`http://localhost:2221/${item.productId?.images?.[0]}`}
+                          src={`${IMG_URL}${item.productId?.images?.[0]}`}
                           alt={item.productId?.productName}
                           className="d_item_thumbnail"
                         />

@@ -8,6 +8,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts, deleteProduct } from '../redux/slice/product.slice';
 import { fetchCategories } from '../redux/slice/category.slice';
 import { FaCaretDown } from 'react-icons/fa';
+import { IMG_URL } from '../utils/baseUrl';
 
 function ProductList() {
     const { isDarkMode } = useOutletContext();
@@ -188,7 +189,7 @@ function ProductList() {
                                             <td>
                                                 <div className="Z_product_info_cell">
                                                     <img
-                                                        src={product.images && product.images[0] ? `http://localhost:2221/${product.images[0]}` : 'placeholder.jpg'}
+                                                        src={product.images && product.images[0] ? `${IMG_URL}${product.images[0]}` : 'placeholder.jpg'}
                                                         alt={product.productName}
                                                         className="Z_table_product_img"
                                                     />

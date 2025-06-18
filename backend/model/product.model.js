@@ -61,6 +61,10 @@ const productSchema = new Schema({
     required: true,
     min: 0
   },
+  tax: {
+    type: Number,
+    min: 0
+  },
   images: {
     type: [String],
     default: []

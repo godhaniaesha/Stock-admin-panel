@@ -63,10 +63,10 @@ function ProductGrid() {
     };
 
     const productsWithInventory = products.map(product => {
-        const inventoryItem = inventory.find(inv => inv.product?._id === product._id);
+        const inventoryItem = inventory?.find(inv => inv?.product?._id === product._id);
         return {
             ...product,
-            quantity: inventoryItem ? inventoryItem.quantity : 0
+            quantity: inventoryItem?.quantity || 0
         };
     });
 

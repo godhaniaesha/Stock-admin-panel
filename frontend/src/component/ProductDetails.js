@@ -167,7 +167,6 @@ const ProductDetail = () => {
           background: var(--dark-card-bg);
           padding: 1rem;
           border-radius: 12px;
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2); /* Subtle shadow */
         }
 
         .main-image {
@@ -210,7 +209,6 @@ const ProductDetail = () => {
           padding: 1rem;
           background: var(--dark-card-bg);
           border-radius: 12px;
-          box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); /* Consistent prominent shadow */
         }
 
         .product-title {
@@ -242,7 +240,6 @@ const ProductDetail = () => {
           padding: 1rem; /* Increased padding */
           margin-bottom: 1.5rem; /* More spacing */
           border: 1px solid var(--dark-border);
-          box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
         }
 
         .stats-grid {
@@ -257,7 +254,6 @@ const ProductDetail = () => {
           background: var(--dark-card-bg);
           border-radius: 8px; /* Softer rounded corners */
           transition: transform 0.3s ease, box-shadow 0.3s ease;
-          box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Subtle shadow for stat items */
         }
 
         .stat-item:hover {
@@ -677,15 +673,34 @@ const ProductDetail = () => {
             text-align: right;
         }
 
-        @media (max-width: 768px) {
-          .product-container {
+        @media (max-width: 1024px) {
+         .product-container {
             grid-template-columns: 1fr;
             gap: 0.8rem;
             padding: 0.8rem;
+            margin: 0.5rem;
           }
+             .image-section{
+            position:inherit; 
+            }
+        }
+
+        @media (max-width: 768px) {
+         
           
           .product-title {
-            font-size: 1.8rem;
+            font-size: 1.5rem;
+            margin-bottom: 0.3rem;
+          }
+
+          .product-id {
+            font-size: 0.7rem;
+            margin-bottom: 0.8rem;
+          }
+
+          .product-description {
+            font-size: 0.9rem;
+            margin-bottom: 1rem;
           }
 
           .stats-grid {
@@ -702,6 +717,7 @@ const ProductDetail = () => {
           .shipping-info,
           .info-card {
             padding: 0.8rem;
+            margin-bottom: 0.8rem;
           }
 
           .product-badge {
@@ -710,66 +726,177 @@ const ProductDetail = () => {
           }
 
           .stat-value {
-            font-size: 1.3rem;
+            font-size: 1.2rem;
           }
 
           .stat-label {
             font-size: 0.65rem;
           }
 
+          .action-buttons {
+            flex-direction: column;
+            gap: 0.8rem;
+          }
+
           .primary-btn,
           .secondary-btn {
-            font-size: 0.8rem;
-            padding: 0.7rem 1rem;
+            width: 100%;
+            font-size: 0.9rem;
+            padding: 0.8rem;
+          }
+
+          .quantity-selector {
+            width: 100%;
+            justify-content: space-between;
           }
 
           .quantity-selector .option-label {
-            font-size: 0.8rem;
+            font-size: 0.9rem;
           }
 
           .quantity-selector .quantity-btn {
-            font-size: 0.85rem;
-            padding: 0.25rem 0.5rem;
+            font-size: 1rem;
+            padding: 0.4rem 0.8rem;
           }
 
           .quantity-selector .quantity-input {
-            width: 28px;
-            font-size: 0.7rem;
+            width: 40px;
+            font-size: 0.9rem;
           }
-            .zoom-modal-overlay {
-  position: fixed;
-  top: 0; left: 0; right: 0; bottom: 0;
-  background: rgba(0,0,0,0.7);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 9999;
-}
-.zoom-modal-content {
-  position: relative;
-  background: #222;
-  padding: 1rem;
-  border-radius: 8px;
-  max-width: 95vw;
-  max-height: 95vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-}
-.zoom-modal-close {
-  position: absolute;
-  top: 8px; right: 12px;
-  background: transparent;
-  border: none;
-  color: #fff;
-  font-size: 2rem;
-  cursor: pointer;
-}
-.zoomed-image {
-  max-width: 90vw;
-  max-height: 80vh;
-  border-radius: 8px;
-}
+
+          .shipping-row {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.3rem;
+            padding: 0.8rem;
+          }
+
+          .info-table td {
+            display: block;
+            width: 100%;
+            padding: 0.5rem 0;
+          }
+
+          .info-table td:first-child {
+            font-weight: 600;
+            border-bottom: none;
+            padding-bottom: 0.2rem;
+          }
+
+          .feature-tags {
+            justify-content: center;
+            gap: 0.4rem;
+          }
+
+          .feature-tag {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.6rem;
+          }
+
+          .rating-header {
+            flex-direction: column;
+            text-align: center;
+            gap: 0.5rem;
+          }
+
+          .rating-score {
+            font-size: 2rem;
+          }
+
+          .review-item {
+            padding: 0.8rem;
+          }
+
+          .reviewer-name {
+            font-size: 0.9rem;
+          }
+
+          .review-text {
+            font-size: 0.85rem;
+          }
+
+          .review-images {
+            justify-content: center;
+          }
+
+          .review-image {
+            width: 60px;
+            height: 60px;
+          }
+
+          .zoom-modal-content {
+            padding: 0.5rem;
+          }
+
+          .zoomed-image {
+            max-width: 95vw;
+            max-height: 70vh;
+          }
+           
+        }
+
+        @media (max-width: 480px) {
+          .product-container {
+            padding: 0.5rem;
+            margin: 0.3rem;
+          }
+
+          .product-title {
+            font-size: 1.3rem;
+          }
+
+          .stats-grid {
+            grid-template-columns: 1fr;
+            gap: 0.6rem;
+          }
+
+          .stat-item {
+            padding: 0.6rem;
+          }
+
+          .stat-value {
+            font-size: 1.1rem;
+          }
+
+          .action-buttons {
+            gap: 0.6rem;
+          }
+
+          .primary-btn,
+          .secondary-btn {
+            font-size: 0.85rem;
+            padding: 0.7rem;
+          }
+
+          .shipping-info {
+            padding: 0.6rem;
+          }
+
+          .shipping-row {
+            padding: 0.6rem;
+          }
+
+          .info-card {
+            padding: 0.6rem;
+          }
+
+          .info-title {
+            font-size: 1rem;
+          }
+
+          .feature-tag {
+            font-size: 0.7rem;
+            padding: 0.2rem 0.5rem;
+          }
+
+          .review-item {
+            padding: 0.6rem;
+          }
+
+          .review-image {
+            width: 50px;
+            height: 50px;
+          }
         }
       `}</style>
 
@@ -870,13 +997,13 @@ const ProductDetail = () => {
 
 
           {/* Feature Tags */}
-          {currentProduct.tags && currentProduct.tags.length > 0 && (
+          {/* {currentProduct.tags && currentProduct.tags.length > 0 && (
             <div className="feature-tags">
               {currentProduct.tags.map(tag => (
                 <span className="feature-tag" key={tag}><GiStarFormation /> {tag}</span>
               ))}
             </div>
-          )}
+          )} */}
 
           {/* Action Buttons */}
           <div className="action-buttons">
@@ -931,7 +1058,7 @@ const ProductDetail = () => {
             </div>
           </div>
 
-          <div className="info-card">
+          {/* <div className="info-card">
             <h3 className="info-title">Product Details</h3>
             <table className="info-table">
               <tbody>
@@ -950,7 +1077,7 @@ const ProductDetail = () => {
                 ))}
               </tbody>
             </table>
-          </div>
+          </div> */}
 
           {(currentProduct.averageRating || reviews.length > 0) && (
             <div className="info-card">

@@ -7,7 +7,7 @@ import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchProducts, deleteProduct } from '../redux/slice/product.slice';
 import { fetchCategories } from '../redux/slice/category.slice';
-import { FaCaretDown } from 'react-icons/fa';
+import { FaCaretDown, FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { IMG_URL } from '../utils/baseUrl';
 
 function ProductList() {
@@ -26,6 +26,8 @@ function ProductList() {
     const [selectedProducts, setSelectedProducts] = useState([]);
     const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
     const [timeFilter, setTimeFilter] = useState('thisMonth');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [productsPerPage] = useState(10);
 
     useEffect(() => {
         dispatch(fetchProducts());
@@ -99,6 +101,12 @@ function ProductList() {
 
     const filteredProducts = filterProductsByTime(products);
 
+    // Add pagination logic
+    const indexOfLastProduct = currentPage * productsPerPage;
+    const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
+    const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
+    const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
     if (productsLoading || categoriesLoading) {
         return <div>Loading products and categories...</div>;
     }
@@ -161,7 +169,7 @@ function ProductList() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredProducts.map((product) => {
+                                {currentProducts.map((product) => {
                                     const categoryIdToMatch = product.categoryId ? product.categoryId._id : null;
                                     const productCategory = categories.find(category => category._id === categoryIdToMatch);
                                     const categoryTitle = productCategory ? productCategory.title : 'N/A';
@@ -228,6 +236,31 @@ function ProductList() {
                                 })}
                             </tbody>
                         </Table>
+                    </div>
+                    <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
+                        <button
+                            className="Z_page_btn"
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                        >
+                            <FaAngleLeft />
+                        </button>
+                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                            <button
+                                key={number}
+                                className={`Z_page_btn ${currentPage === number ? 'active' : ''}`}
+                                onClick={() => setCurrentPage(number)}
+                            >
+                                {number}
+                            </button>
+                        ))}
+                        <button
+                            className="Z_page_btn"
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                        >
+                            <FaAngleRight />
+                        </button>
                     </div>
                 </div>
             </section>

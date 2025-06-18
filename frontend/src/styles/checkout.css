@@ -379,7 +379,7 @@
 
 .d_checkout_btn {
   width: 100%;
-  padding: 1rem;
+  padding: 11px 12px;
   background: var(--accent-color);
   color: white;
   border: none;
@@ -653,11 +653,11 @@
 
 .d_continue_btn {
   /* background-color: gray; */
-  color: white;
+  color: #6a9c89;
   border: none;
-  padding: 12px 24px;
+  padding: 11px 12px;
   border-radius: 6px;
-  border: 1px solid white;
+  border: 1px solid #6a9c89;
   font-size: 1rem;
   cursor: pointer;
   transition: all 0.3s ease;

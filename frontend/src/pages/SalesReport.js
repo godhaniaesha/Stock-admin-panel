@@ -334,7 +334,7 @@ export default function SalesReport() {
                         <tr key={order._id}>
                           <td className="Z_order_id">
                             {/* #{indexOfFirstOrder + index + 1} */}
-                            {order._id ? `${order._id}` : 'N/A'}
+                            {order._id ? `......${order._id.slice(-6)}` : 'N/A'}
                           </td>
 
                           <td>
@@ -401,7 +401,7 @@ export default function SalesReport() {
           {selectedOrder && (
             <div className="order-details">
               <div className="mb-3">
-                <h5>Order ID: {selectedOrder._id}</h5>
+                <h5>Order ID: #{selectedOrder._id.slice(-6)}</h5>
                 <p>Total Amount: ${Math.floor(selectedOrder.finalAmount)}</p>
                 <p>Total Items: {selectedOrder.items ? selectedOrder.items.reduce((total, item) => total + item.quantity, 0) : 0}</p>
               </div>
@@ -444,7 +444,7 @@ export default function SalesReport() {
                     <tbody>
                       {sellerOrders.map((order, index) => (
                         <tr key={index}>
-                          <td className='a_main_tr'>{order._id}</td>
+                          <td className='a_main_tr'>#{order._id.slice(-6)}</td>
                           <td className='a_main_tr'>${Math.floor(order.finalAmount)}</td>
                           <td className='a_main_tr'>{order.items.reduce((total, item) => total + item.quantity, 0)}</td>
                         </tr>

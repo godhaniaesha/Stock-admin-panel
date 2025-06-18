@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchCategories, WaccessCategories } from '../redux/slice/category.slice';
 import { fetchSubcategories, WaccesssubCategories } from '../redux/slice/subCategory.slice';
 import { createProduct } from '../redux/slice/product.slice';
+import { createInventory } from '../redux/slice/inventory.Slice';
 import { useNavigate } from 'react-router-dom';
 import { RiAiGenerate } from 'react-icons/ri';
 
@@ -312,8 +313,27 @@ const AddProduct = () => {
         try {
             // Dispatch createProduct with the FormData object
             const result = await dispatch(createProduct(actualFormData)).unwrap();
-
+            console.log(result,"result");
             if (result) {
+                // Create inventory for the new product
+                const inventoryData = {
+                    category: productData.categoryId,
+                    subcategory: productData.subcategoryId,
+                    product: result.data._id,
+                    quantity: parseInt(productData.stock),
+                    lowStockLimit: 10, // Default low stock limit
+                    sellerId: sellerId
+                };
+                console.log(inventoryData,"inventoryData");
+                
+
+                try {
+                    await dispatch(createInventory(inventoryData)).unwrap();
+                } catch (error) {
+                    console.error('Failed to create inventory:', error);
+                    setError('Product created but failed to create inventory. Please try updating inventory manually.');
+                }
+
                 // Reset form
                 setProductData({
                     categoryId: '',

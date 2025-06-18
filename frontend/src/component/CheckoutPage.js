@@ -143,11 +143,22 @@ const CheckoutPage = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [showExpiryCalendar]);
 
+  const formatAmount = (amount) => {
+    return Math.round(amount).toLocaleString();
+  };
+
   // Calculate totals
-  const subtotal = cartItems?.reduce((total, item) => total + (item.productId?.price * item.quantity), 0) || 0;
+  const subtotal = cartItems?.reduce((total, item) => {
+    const itemTotal = item.productId?.price * item.quantity;
+    return total + itemTotal;
+  }, 0) || 0;
+
   const discount = selectedCoupon ? (subtotal * selectedCoupon.discountPercentage / 100) : 0;
-  const deliveryCharge = 50;
-  const tax = subtotal * 0.155; // 15.5% tax
+  const deliveryCharge = 0;
+  const tax = cartItems?.reduce((total, item) => {
+    const itemTax = item.productId?.price * item.quantity * (item.productId?.tax / 100);
+    return total + itemTax;
+  }, 0) || 0; // 15.5% tax
   const finalTotal = subtotal + tax + deliveryCharge - discount;
 
   const handleCouponChange = (e) => {
@@ -693,7 +704,7 @@ const CheckoutPage = () => {
                     {selectedCoupon && (
                       <div className="d_coupon_info" style={{ marginTop: '10px' }}>
                         <p>Applied: {selectedCoupon.title} - {selectedCoupon.discountPercentage}% off</p>
-                        <p>Discount Amount: ${discount.toFixed(2)}</p>
+                        <p>Discount Amount: ${formatAmount(discount)}</p>
                       </div>
                     )}
                   </div>
@@ -724,23 +735,23 @@ const CheckoutPage = () => {
                   <div className="d_summary_calculations">
                     <div className="d_calc_row">
                       <span>Subtotal</span>
-                      <span>${subtotal.toFixed(2)}</span>
+                      <span>${formatAmount(subtotal)}</span>
                     </div>
                     <div className="d_calc_row">
                       <span>Discount</span>
-                      <span className="d_discount">-${discount.toFixed(2)}</span>
+                      <span>- ${formatAmount(discount)}</span>
                     </div>
                     <div className="d_calc_row">
                       <span>Shipping</span>
-                      <span>${deliveryCharge.toFixed(2)}</span>
+                      <span>${formatAmount(deliveryCharge)}</span>
                     </div>
                     <div className="d_calc_row">
-                      <span>Tax (15.5%)</span>
-                      <span>${tax.toFixed(2)}</span>
+                      <span>Tax</span>
+                      <span>${formatAmount(tax)}</span>
                     </div>
                     <div className="d_calc_row d_total">
                       <span>Total</span>
-                      <span>${finalTotal.toFixed(2)}</span>
+                      <span>${formatAmount(finalTotal)}</span>
                     </div>
                   </div>
 
@@ -750,7 +761,7 @@ const CheckoutPage = () => {
                     disabled={isSubmitting || loading || !cartItems?.length}
                     style={{
                       width: '100%',
-                      padding: '15px',
+                      padding: '11px 12px',
                       fontSize: '1.1rem',
                       fontWeight: '600',
                       backgroundColor: 'var(--accent-color)',
@@ -788,6 +799,7 @@ const CheckoutPage = () => {
             <button
               className="d_continue_btn"
               onClick={handleContinueShopping}
+              style={{ cursor: 'pointer' }}
             >
               Continue Shopping
             </button>

@@ -6,12 +6,13 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getCart, updateCartItem, removeFromCart, clearCart } from '../redux/slice/cart.slice';
 import { fetchCoupons } from '../redux/slice/coupon.slice';
 import { IMG_URL } from '../utils/baseUrl';
+import { toast } from 'react-toastify';
 
 const CartList = () => {
   const { isDarkMode } = useOutletContext();
   const dispatch = useDispatch();
   const navigate = useNavigate();
-  const { items: cartItems, loading, error } = useSelector((state) => state.cart);
+  const { items: cartItems, isLoading } = useSelector((state) => state.cart);
   const { coupons, isLoading: couponsLoading } = useSelector((state) => state.coupon);
   const userId = localStorage.getItem('user');
   const [selectedCoupon, setSelectedCoupon] = useState(null);
@@ -52,8 +53,18 @@ const CartList = () => {
     }
   };
 
-  const handleRemoveItem = (itemId) => {
-    dispatch(removeFromCart(itemId));
+  const handleRemoveItem = async (itemId) => {
+    try {
+      await dispatch(removeFromCart(itemId)).unwrap();
+      // Refresh cart after removal
+      if (userId) {
+        await dispatch(getCart(userId));
+        toast.success('Item removed from cart successfully!');
+      }
+    } catch (error) {
+      console.error('Failed to remove item from cart:', error);
+      toast.error('Failed to remove item from cart. Please try again.');
+    }
   };
 
   const handleClearCart = () => {
@@ -79,20 +90,28 @@ const CartList = () => {
     setIsOpen(false);
   };
 
-  // if (loading) {
-  //   return <div className="text-center p-5">Loading...</div>;
-  // }
-
-  // if (error) {
-  //   return <div className="text-center p-5 text-danger">Error: {error}</div>;
-  // }
+  // Function to format amount (remove decimal places)
+  const formatAmount = (amount) => {
+    return Math.round(amount).toLocaleString();
+  };
 
   // Calculate totals
-  const subtotal = cartItems?.reduce((total, item) => total + (item.productId?.price * item.quantity), 0) || 0;
+  const subtotal = cartItems?.reduce((total, item) => {
+    const itemTotal = item.productId?.price * item.quantity;
+    return total + itemTotal;
+  }, 0) || 0;
+
   const discount = selectedCoupon ? (subtotal * selectedCoupon.discountPercentage / 100) : 0;
   const deliveryCharge = 0;
-  const tax = subtotal * 0.155; // 15.5% tax
+  const tax = cartItems?.reduce((total, item) => {
+    const itemTax = item.productId?.price * item.quantity * (item.productId?.tax / 100);
+    return total + itemTax;
+  }, 0) || 0;
   const finalTotal = subtotal + tax + deliveryCharge - discount;
+
+  if (isLoading) {
+    return <div className="text-center p-5">Loading...</div>;
+  }
 
   return (
     <div className="d_cart_container w-100" data-theme={isDarkMode ? 'dark' : 'light'}>
@@ -106,6 +125,8 @@ const CartList = () => {
       <div className="d_cart_content">
         <div className="d_cart_items">
           {cartItems?.map(item => (
+            // console.log(item,"item")
+            
             <div key={item._id} className="d_cart_item">
               <div className="d_item_image">
                 <img src={`${IMG_URL}${item.productId?.images?.[0]}`}
@@ -135,19 +156,19 @@ const CartList = () => {
                   <div className="d_price_info">
                     <span>Items Price</span>
                     <div>
-                      <span>${item.productId?.price?.toFixed(2)}</span>
-                      <span className="d_tax">/ ${(item.productId?.price * 0.155).toFixed(2)} Tax</span>
+                      <span>${formatAmount(item.productId?.price)}</span>
+                      <span className="d_tax">/ ${formatAmount(item.productId?.price * (item.productId?.tax / 100))} Tax</span>
                     </div>
                   </div>
                 </div>
 
                 <div className="d_item_footer d-flex justify-content-between align-items-center">
-                  <button className="d_remove_btn" onClick={() => handleRemoveItem(item._id)}>
+                  <button className="d_remove_btn" onClick={() => handleRemoveItem(item._id)} disabled={isLoading}>
                     <Trash2 size={18} />
-                    Remove
+                    {isLoading ? 'Removing...' : 'Remove'}
                   </button>
                   <p className='mb-0'>
-                    Total: <span>${((item.productId?.price * item.quantity) + (item.productId?.price * 0.155)).toFixed(2)}</span>
+                    Total: <span>${formatAmount((item.productId?.price * item.quantity) + (item.productId?.price * 0.155))}</span>
                   </p>
                 </div>
               </div>
@@ -228,10 +249,10 @@ const CartList = () => {
               )}
             </div>
             {selectedCoupon && (
-              <div className="d_coupon_info" style={{ marginTop: '10px', color: isDarkMode ? 'var(--dark-text)' : 'white' }}>
+              <div className="d_applied_coupon">
                 <p>Applied: {selectedCoupon.title} - {selectedCoupon.discountPercentage}% off</p>
                 {/* <p>Valid till: {new Date(selectedCoupon.endDate).toLocaleDateString()}</p> */}
-                <p>Discount Amount: ${discount.toFixed(2)}</p>
+                <p>Discount Amount: ${formatAmount(discount)}</p>
               </div>
             )}
           </div>
@@ -241,23 +262,23 @@ const CartList = () => {
             <div className="d_summary_details">
               <div className="d_summary_row">
                 <span>Sub Total :</span>
-                <span>${subtotal.toFixed(2)}</span>
+                <span>${formatAmount(subtotal)}</span>
               </div>
               <div className="d_summary_row">
                 <span>Discount :</span>
-                <span>${discount.toFixed(2)}</span>
+                <span>- ${formatAmount(discount)}</span>
               </div>
               <div className="d_summary_row">
                 <span>Delivery Charge :</span>
-                <span>${deliveryCharge.toFixed(2)}</span>
+                <span>${formatAmount(deliveryCharge)}</span>
               </div>
               <div className="d_summary_row">
-                <span>Estimated Tax (15.5%) :</span>
-                <span>${tax.toFixed(2)}</span>
+                <span>Estimated Tax :</span>
+                <span>${formatAmount(tax)}</span>
               </div>
               <div className="d_summary_total">
                 <span>Total Amount</span>
-                <span>${finalTotal.toFixed(2)}</span>
+                <span>${formatAmount(finalTotal)}</span>
               </div>
             </div>
 

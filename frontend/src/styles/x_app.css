@@ -874,7 +874,7 @@
   }
 
   .x_custom_dropdown {
-    display: flex;
+    /* display: flex; */
     justify-content: center;
   }
 
@@ -905,6 +905,20 @@
   .x_add_product_container.Z_product_section {
     padding: 3px !important;
   }
+  .x_add_product_container .x_btn_wrapper .x_btn{
+    width: 100% !important;
+    padding: 0.5rem 0.5rem !important;
+  }
+  .x_add_product_container {
+        padding: 3px !important;
+    }
+   .d_order_summary {
+    margin-top: 0;
+   }
+   .d_checkout_section {
+    margin-bottom: 0;
+   }
+
 }
 
 .x_preview_image {

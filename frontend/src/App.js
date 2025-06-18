@@ -27,7 +27,7 @@ function App() {
             <Route path="/*" element={<UserRoutes />} />
           </Routes>
           {/* <Footer /> */}
-          <ToastContainer position="top-right" autoClose={3000} />
+          <ToastContainer position="top-right" autoClose={3000} style={{ zIndex: 111111 }} />
         </div>
       </Router>
     </Provider>

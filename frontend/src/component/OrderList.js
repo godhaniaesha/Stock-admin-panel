@@ -56,7 +56,7 @@ function OrderList() {
   return (
     <section className={`Z_product_section mx-0 mx-lg-5 my-md-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
       <div className="Z_order_header d-flex justify-content-between align-items-center mb-4">
-        <h4 className="Z_order_title mb-0">ORDER LIST</h4>
+        <h4 className="Z_order_title mb-0 mt-3 ms-1">ORDER LIST</h4>
       </div>
 
       <Row>
@@ -116,7 +116,7 @@ function OrderList() {
 
       <div className="Z_table_wrapper">
         <div className="Z_order_header d-flex justify-content-between align-items-center mb-4">
-          <h5 className="Z_order_title mb-0">All Order List</h5>
+          <h5 className="Z_order_title mb-0 ">All Order List</h5>
           {/* <Dropdown className="Z_time_filter">
             <Dropdown.Toggle variant="light" className="Z_filter_toggle">
               This Month

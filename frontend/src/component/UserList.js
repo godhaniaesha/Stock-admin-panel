@@ -124,6 +124,8 @@ function UserList() {
 
     // Handle delete user
     const handleDeleteUser = (user) => {
+        console.log('Deleting user:', user);
+        
         setUserToDelete(user);
         setShowDeleteModal(true);
     };
@@ -226,7 +228,7 @@ function UserList() {
     }
 
     return (
-        <section className={`Z_product_section ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-2 my-md-3`}>
+        <section className={`Z_product_section z_user_list ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-2 my-md-3`}>
             {/* Error Alert */}
             {error && (
                 <Alert variant="danger" dismissible onClose={() => dispatch(db_resetUserState())}>
@@ -305,7 +307,7 @@ function UserList() {
                     <h4>All Users List ({filteredUsers.length})</h4>
                     <div className="Z_table_actions d-flex gap-2 align-items-center flex-wrap">
                         {/* Search Input */}
-                        <InputGroup style={{ width: '250px' }}>
+                        <InputGroup style={{ width: '200px' }}>
                             <InputGroup.Text>
                                 <TbSearch />
                             </InputGroup.Text>
@@ -348,6 +350,7 @@ function UserList() {
                                 size="sm"
                                 onClick={handleBulkDelete}
                                 disabled={isLoading}
+                                className='Z_add_product_btn'
                             >
                                 Delete Selected ({selectedUsers.length})
                             </Button>
@@ -457,15 +460,19 @@ function UserList() {
             </div>
 
             {/* Delete Confirmation Modal */}
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}
+                centered
+                className={`z_delete_modal ${isDarkMode ? 'd_dark' : 'd_light'}`}>
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Delete</Modal.Title>
                 </Modal.Header>
                 <Modal.Body>
-                    Are you sure you want to delete user "{userToDelete?.name || userToDelete?.username}"? This action cannot be undone.
+                    Are you sure you want to delete user "{userToDelete?.firstName || userToDelete?.username}"? This action cannot be undone.
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                      <button className="Z_btn Z_btn_cancel" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                    <button className="Z_btn Z_btn_delete"  onClick={confirmDelete}>Delete</button>
+                    {/* <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                         Cancel
                     </Button>
                     <Button
@@ -481,10 +488,13 @@ function UserList() {
                         ) : (
                             'Delete'
                         )}
-                    </Button>
+                    </Button> */}
                 </Modal.Footer>
             </Modal>
-            <Modal show={showBulkDeleteModal} onHide={() => setShowBulkDeleteModal(false)}>
+            <Modal show={showBulkDeleteModal} onHide={() => setShowBulkDeleteModal(false)}
+                  centered
+                className={`z_delete_modal ${isDarkMode ? 'd_dark' : 'd_light'}`}
+                >
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Bulk Delete</Modal.Title>
                 </Modal.Header>
@@ -492,7 +502,14 @@ function UserList() {
                     Are you sure you want to delete <strong>{selectedUsers.length}</strong> selected user(s)? This action cannot be undone.
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowBulkDeleteModal(false)}>
+                     <button className="Z_btn Z_btn_cancel" onClick={() => setShowBulkDeleteModal(false)}>Cancel</button>
+                                        <button
+                                            className="Z_btn Z_btn_delete"
+                                           onClick={confirmBulkDelete}
+                                        >
+                                            Delete
+                                        </button>
+                    {/* <Button variant="secondary" onClick={() => setShowBulkDeleteModal(false)}>
                         Cancel
                     </Button>
                     <Button variant="danger" onClick={confirmBulkDelete} disabled={isLoading}>
@@ -504,7 +521,7 @@ function UserList() {
                         ) : (
                             'Confirm Delete'
                         )}
-                    </Button>
+                    </Button> */}
                 </Modal.Footer>
             </Modal>
 

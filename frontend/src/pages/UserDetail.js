@@ -124,7 +124,8 @@ function UserDetail() {
   const { id } = useParams();
   const dispatch = useDispatch();
 
-  const { selectedUser, loading, error } = useSelector(state => state.user);
+  const { users, isLoading: loading, error } = useSelector(state => state.user);
+  const selectedUser = users.find(user => user._id === id);
 
   useEffect(() => {
     const link = document.createElement("link");
@@ -186,8 +187,8 @@ function UserDetail() {
           <Card className="d_user-card shadow-lg">
             <Card.Header className="d_card-header text-center py-4">
               <Image
-               src={`http://localhost:2221/KAssets/profileImage/${selectedUser.profileImage}`}
-               
+                src={`http://localhost:2221/KAssets/profileImage/${selectedUser.profileImage}`}
+
                 roundedCircle
                 className="d_profile-image mb-3"
                 alt={`${selectedUser.firstName || ''} ${selectedUser.lastName || ''}`}
@@ -196,7 +197,7 @@ function UserDetail() {
                   e.target.src = "https://placehold.co/150x150/CCCCCC/000000?text=Error";
                 }}
               />
-              
+
               <Card.Title className="d_user-name mb-1">
                 {selectedUser.firstName} {selectedUser.lastName}
               </Card.Title>

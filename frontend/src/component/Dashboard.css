@@ -71,7 +71,7 @@
 }
 
 .d_card::before {
-  content: '';
+  /* content: ''; */
   position: absolute;
   top: 0;
   left: 0;
@@ -530,4 +530,33 @@
 .d_btn-ghost:hover {
   background: rgba(255, 255, 255, 0.05);
   border-color: var(--accent-green);
+}
+.d_card {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.category-wise-products-list {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-color) transparent;
+  max-height: 250px;
+}
+
+.category-wise-products-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.category-wise-products-list::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.category-wise-products-list::-webkit-scrollbar-thumb {
+  background-color: var(--accent-color);
+  border-radius: 3px;
+}
+
+.category-wise-products-list::-webkit-scrollbar-thumb:hover {
+  background-color: var(--accent-color-dark);
 }

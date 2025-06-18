@@ -24,7 +24,7 @@ const AddUser = () => {
         role: '',
         password: '',
         confirmPassword: '',
-        profileImage:''
+        profileImage: ''
     };
 
     const [userData, setUserData] = useState(initialUserData);
@@ -65,13 +65,13 @@ const AddUser = () => {
         setShowConfirmPassword(false);
         setIsGenderOpen(false);
         setIsRoleOpen(false);
-        
+
         // Clear file input
         const fileInput = document.getElementById('fileInput');
         if (fileInput) {
             fileInput.value = '';
         }
-        
+
         // Clean up preview image URL to prevent memory leaks
         if (previewImage) {
             URL.revokeObjectURL(previewImage);
@@ -81,7 +81,7 @@ const AddUser = () => {
     const handleInputChange = (e) => {
         const { name, value } = e.target;
         setUserData((prev) => ({ ...prev, [name]: value }));
-        
+
         // Clear error when user starts typing
         if (error) {
             setError('');
@@ -114,7 +114,7 @@ const AddUser = () => {
 
         // Store the file object directly
         setUserImage(file);
-        
+
         // Create preview URL for display
         const previewUrl = URL.createObjectURL(file);
         setPreviewImage(previewUrl);
@@ -122,7 +122,7 @@ const AddUser = () => {
 
     const validateForm = () => {
         const requiredFields = ['firstName', 'lastName', 'email', 'phone', 'password', 'confirmPassword'];
-        
+
         for (let field of requiredFields) {
             if (!userData[field].trim()) {
                 setError(`${field.replace(/([A-Z])/g, ' $1').replace(/^./, str => str.toUpperCase())} is required`);
@@ -145,7 +145,11 @@ const AddUser = () => {
             setError("Please enter a valid email address");
             return false;
         }
-
+        const phoneRegex = /^[0-9]{10}$/;
+        if (!phoneRegex.test(userData.phone)) {
+            setError("Please enter a valid 10-digit phone number");
+            return false;
+        }
         return true;
     };
 
@@ -155,7 +159,7 @@ const AddUser = () => {
 
         try {
             const formData = new FormData();
-            
+
             // Add all user data to formData
             Object.keys(userData).forEach(key => {
                 formData.append(key, userData[key]);
@@ -223,9 +227,9 @@ const AddUser = () => {
                             </div>
                         </div>
                         {previewImage && (
-                            <button 
-                                type="button" 
-                                className="x_btn x_btn_secondary mt-2" 
+                            <button
+                                type="button"
+                                className="x_btn x_btn_secondary mt-2"
                                 onClick={() => {
                                     URL.revokeObjectURL(previewImage);
                                     setPreviewImage(null);
@@ -249,10 +253,10 @@ const AddUser = () => {
                                 <div className="x_form_row">
                                     <div className="x_form_group">
                                         <label>First Name <span className="text-danger">*</span></label>
-                                        <input 
-                                            name="firstName" 
-                                            value={userData.firstName} 
-                                            onChange={handleInputChange} 
+                                        <input
+                                            name="firstName"
+                                            value={userData.firstName}
+                                            onChange={handleInputChange}
                                             className="x_input"
                                             placeholder="Enter first name"
                                             required
@@ -260,10 +264,10 @@ const AddUser = () => {
                                     </div>
                                     <div className="x_form_group">
                                         <label>Last Name <span className="text-danger">*</span></label>
-                                        <input 
-                                            name="lastName" 
-                                            value={userData.lastName} 
-                                            onChange={handleInputChange} 
+                                        <input
+                                            name="lastName"
+                                            value={userData.lastName}
+                                            onChange={handleInputChange}
                                             className="x_input"
                                             placeholder="Enter last name"
                                             required
@@ -274,11 +278,11 @@ const AddUser = () => {
                                 <div className="x_form_row">
                                     <div className="x_form_group">
                                         <label>Email <span className="text-danger">*</span></label>
-                                        <input 
-                                            name="email" 
-                                            type="email" 
-                                            value={userData.email} 
-                                            onChange={handleInputChange} 
+                                        <input
+                                            name="email"
+                                            type="email"
+                                            value={userData.email}
+                                            onChange={handleInputChange}
                                             className="x_input"
                                             placeholder="Enter email address"
                                             required
@@ -286,13 +290,15 @@ const AddUser = () => {
                                     </div>
                                     <div className="x_form_group">
                                         <label>Phone <span className="text-danger">*</span></label>
-                                        <input 
-                                            name="phone" 
-                                            type="tel" 
-                                            value={userData.phone} 
-                                            onChange={handleInputChange} 
+
+                                        <input
+                                            name="phone"
+                                            type="tel"
+                                            value={userData.phone}
+                                            onChange={handleInputChange}
                                             className="x_input"
-                                            placeholder="Enter phone number"
+                                            placeholder="Enter 10-digit phone number"
+                                            maxLength="10"
                                             required
                                         />
                                     </div>
@@ -301,11 +307,11 @@ const AddUser = () => {
                                 <div className="x_form_row">
                                     <div className="x_form_group">
                                         <label>Birthdate</label>
-                                        <input 
-                                            name="birthdate" 
-                                            type="date" 
-                                            value={userData.birthdate} 
-                                            onChange={handleInputChange} 
+                                        <input
+                                            name="birthdate"
+                                            type="date"
+                                            value={userData.birthdate}
+                                            onChange={handleInputChange}
                                             className="x_input"
                                         />
                                     </div>
@@ -331,10 +337,10 @@ const AddUser = () => {
                                 <div className="x_form_row">
                                     <div className="x_form_group x_full_width">
                                         <label>Address</label>
-                                        <textarea 
-                                            name="address" 
-                                            value={userData.address} 
-                                            onChange={handleInputChange} 
+                                        <textarea
+                                            name="address"
+                                            value={userData.address}
+                                            onChange={handleInputChange}
                                             className="x_textarea"
                                             placeholder="Enter full address"
                                         />
@@ -344,20 +350,20 @@ const AddUser = () => {
                                 <div className="x_form_row">
                                     <div className="x_form_group">
                                         <label>City</label>
-                                        <input 
-                                            name="city" 
-                                            value={userData.city} 
-                                            onChange={handleInputChange} 
+                                        <input
+                                            name="city"
+                                            value={userData.city}
+                                            onChange={handleInputChange}
                                             className="x_input"
                                             placeholder="Enter city"
                                         />
                                     </div>
                                     <div className="x_form_group">
                                         <label>State</label>
-                                        <input 
-                                            name="state" 
-                                            value={userData.state} 
-                                            onChange={handleInputChange} 
+                                        <input
+                                            name="state"
+                                            value={userData.state}
+                                            onChange={handleInputChange}
                                             className="x_input"
                                             placeholder="Enter state"
                                         />
@@ -367,10 +373,10 @@ const AddUser = () => {
                                 <div className="x_form_row">
                                     <div className="x_form_group">
                                         <label>Country</label>
-                                        <input 
-                                            name="country" 
-                                            value={userData.country} 
-                                            onChange={handleInputChange} 
+                                        <input
+                                            name="country"
+                                            value={userData.country}
+                                            onChange={handleInputChange}
                                             className="x_input"
                                             placeholder="Enter country"
                                         />
@@ -419,7 +425,7 @@ const AddUser = () => {
                                                 name="confirmPassword"
                                                 value={userData.confirmPassword}
                                                 onChange={handleInputChange}
-                                                placeholder='Enter confirm password'                                       
+                                                placeholder='Enter confirm password'
                                                 className="x_input"
                                                 required
                                             />
@@ -436,24 +442,24 @@ const AddUser = () => {
 
                 {/* Buttons */}
                 <div className="x_btn_wrapper mt-3">
-                    <button 
-                        className="x_btn x_btn_create" 
-                        onClick={handleSubmit} 
+                    <button
+                        className="x_btn x_btn_create"
+                        onClick={handleSubmit}
                         disabled={isLoading}
                     >
                         {isLoading ? "Creating..." : "Create User"}
                     </button>
-                    <button 
-                        type="button" 
-                        className="x_btn x_btn_secondary mr-2" 
+                    <button
+                        type="button"
+                        className="x_btn x_btn_secondary mr-2"
                         onClick={handleReset}
                         disabled={isLoading}
                     >
                         Reset Form
                     </button>
-                    <button 
-                        type="button" 
-                        className="x_btn x_btn_cancel" 
+                    <button
+                        type="button"
+                        className="x_btn x_btn_cancel"
                         onClick={handleCancel}
                         disabled={isLoading}
                     >

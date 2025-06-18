@@ -1,37 +1,18 @@
 import React, { useState, useEffect } from 'react';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, LineChart, Line, PieChart, Pie, Cell, AreaChart, Area } from 'recharts';
 import {
-    Bell,
-    Search,
+  
     TrendingUp,
     Users,
     DollarSign,
     ShoppingCart,
-    Calendar,
-    Activity,
+   
     ArrowUp,
-    ArrowDown,
-    MoreVertical,
-    Plus,
-    Filter,
-    Settings,
-    Download,
-    Star,
-    MessageSquare,
-    Globe,
-    Zap,
-    Target,
-    Award,
+    
     Eye,
-    Heart,
-    Share2,
-    RefreshCw,
-    BarChart3,
+   
     PieChart as PieChartIcon,
-    TrendingDown,
-    Mail,
-    Phone,
-    MapPin,
+  
     Clock,
     CheckCircle,
     AlertCircle,
@@ -397,7 +378,7 @@ const Dashboard = () => {
             </div>
 
             <div className="col-lg-4">
-              <div className="d_card" style={{ height: "100%" }}>
+              <div className="d_card d-flex flex-column" style={{ height: "100%" }}>
                 <div className="d-flex justify-content-between align-items-center mb-4">
                   <div>
                     <h5 className="fw-bold mb-0">Category Wise Products</h5>
@@ -443,7 +424,7 @@ const Dashboard = () => {
                   </ResponsiveContainer>
                 </div>
                 <div
-                  className="mt-3 overflow-y-scroll"
+                  className="category-wise-products-list mt-3 flex-grow-1"
                   style={{
                     height: "250px",
                     maxHeight: "250px",

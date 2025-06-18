@@ -144,7 +144,7 @@
   background-color: var(--light-bg) !important;
 }
 
-.d_dark .Z_order_table tbody tr {
+.d_dark .Z_order_table tbody tr  {
   --bs-table-bg: var(--dark-bg) !important;
   background: var(--dark-bg) !important;
   box-shadow: 0 2px 4px rgba(187, 216, 205, 0.21) !important;
@@ -343,6 +343,9 @@
   font-size: 14px;
   margin-bottom: 10px !important;
 }
+.d_success_modal {
+  padding: 1rem;
+}
 }
 @media  (max-width: 420px) {
   .d_header-section {
@@ -385,4 +388,14 @@
 
 .d_dark .d_date-separator {
   color: #999;
+}
+
+.Z_product_section  thead th{
+  color: var(--light-bg) !important;
+}
+
+.Z_product_section  thead tr{
+  background-color: var(--accent-color);
+  color:var(--dark-bg) !important;
+  
 }

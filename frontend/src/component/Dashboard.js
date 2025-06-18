@@ -113,7 +113,7 @@ const Dashboard = () => {
     return (
       <div
         className={`d_dashboard w-100 ${
-          isDarkMode ? "d_theme-dark" : "d_theme-light"
+          isDarkMode ? "" : "d_theme-light"
         }`}
       >
         <div className="container-fluid px-md-4  py-md-4 p-1">
@@ -444,10 +444,7 @@ const Dashboard = () => {
                 </div>
                 <div
                   className="mt-3 overflow-y-scroll"
-                  style={{
-                    height: "250px",
-                    maxHeight: "250px",
-                  }}
+                  style={{maxHeight: "250px"}}
                 >
                   {categoryWiseProducts.map((item, index) => (
                     <div

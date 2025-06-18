@@ -58,11 +58,13 @@
                 <Profile isDarkMode={isDarkMode} />
               ) : (
                 <div 
-                  className="rounded d-flex justify-content-center shadow-sm p-md-4 p-1"
+                  className="rounded d-flex justify-content-center shadow-sm px-md-4 mt-5"
                   style={{
                     backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`,
                     color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
-                    borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`
+                    borderColor: `var(${isDarkMode ? '--dark-border' : '--light-border'})`,
+                     height: "calc(100vh - 100px)",
+                    overflowY: "scroll"
                   }}
                 >
                   {/* <Dashboard isDarkMode={isDarkMode} /> */}

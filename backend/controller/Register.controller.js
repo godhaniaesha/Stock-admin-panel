@@ -85,7 +85,7 @@ const RegisterUser = async (req, res) => {
         const data = await Register.findOne({ email: req.body.email }).select("-password");
 
         return res.status(200)
-            .cookie("accessToken", assesToken, { httpOnly: true, secure: true, maxAge:60*1000, sameSite:"None" })
+            .cookie("accessToken", assesToken, { httpOnly: true, secure: true, maxAge:15*60*1000, sameSite:"None" })
             .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, maxAge:15*24*60*60*1000, sameSite:"None" })
             .json({
                 accessToken: assesToken,
@@ -122,7 +122,7 @@ const login = async (req, res) => {
         console.log("userDetails", userDetails);
 
         return res.status(200)
-        .cookie("accessToken", assesToken, { httpOnly: true, secure: true, maxAge: 60*1000, sameSite:"None" })
+        .cookie("accessToken", assesToken, { httpOnly: true, secure: true, maxAge: 15*60*1000, sameSite:"None" })
         .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, maxAge:15*24*60*60*1000, sameSite:"None" })
             .json({ success: true, finduser: finduser, data: userDetails, accessToken: assesToken,refreshToken:refreshToken,  message: "Login successful" }); // Added accessToken to the response body
 
@@ -183,7 +183,7 @@ const generateNewToken = async (req, res) => {
             }
 
             return res.status(200)
-            .cookie("accessToken", assesToken, { httpOnly: true, secure: true, maxAge: 60*1000, sameSite:"None" })
+            .cookie("accessToken", assesToken, { httpOnly: true, secure: true, maxAge: 15*60*1000, sameSite:"None" })
             .cookie("refreshToken", refreshToken, { httpOnly: true, secure: true, maxAge:15*24*60*60*1000, sameSite:"None" })
             .json({ success: true, finduser: userDetails, data: userDetails, accessToken: assesToken,refreshToken:refreshToken });
 
@@ -477,7 +477,7 @@ const createUser = async (req, res) => {
         if (tokens) {
             response.accessToken = tokens.assesToken;
             return res.status(201)
-                .cookie("accessToken", tokens.assesToken, { httpOnly: true, secure: true , maxAge: 60*1000, sameSite:"None" })
+                .cookie("accessToken", tokens.assesToken, { httpOnly: true, secure: true , maxAge: 15*60*1000, sameSite:"None" })
                 .cookie("refreshToken", tokens.refreshToken, { httpOnly: true, secure: true,maxAge:15*24*60*60*1000, sameSite:"None" })
                 .json(response);
         }

@@ -1,6 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { MinusIcon, Plus, Trash2, Heart, Code, ChevronDown } from 'lucide-react';
 import '../styles/cart.css';
+import '../styles/Z_styles.css';
+
 import { useOutletContext, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { getCart, updateCartItem, removeFromCart, clearCart } from '../redux/slice/cart.slice';
@@ -43,9 +45,9 @@ const CartList = () => {
     const newQty = currentQty + change;
     const item = cartItems.find(item => item._id === itemId);
     if (newQty > 0) {
-      
+
       // if (newQty > item.quantity) {
-        
+
       //   alert(`Stock limit reached! Only ${item.quantity} items available.`);
       //   return;
       // }
@@ -122,64 +124,77 @@ const CartList = () => {
         </div>
       </div>
 
-      <div className="d_cart_content">
+      <div className="d_cart_content ">
         <div className="d_cart_items">
-          {cartItems?.map(item => (
-            // console.log(item,"item")
-            
-            <div key={item._id} className="d_cart_item">
-              <div className="d_item_image">
-                <img src={`${IMG_URL}${item.productId?.images?.[0]}`}
-                  alt={item.productId?.productName} />
-              </div>
-
-              <div className="d_item_details">
-                <div className="d_item_header">
-                  <h3>{item.productId?.productName}</h3>
-                  <div className="d_item_meta">
-                    <span>Color : {item.productId?.color || 'Default'}</span>
-                    <span>Size : {item.productId?.size || 'Standard'}</span>
-                  </div>
+          {cartItems && cartItems.length > 0 ? (
+            cartItems.map(item => (
+              <div key={item._id} className="d_cart_item">
+                <div className="d_item_image">
+                  <img
+                    src={`${IMG_URL}${item.productId?.images?.[0]}`}
+                    alt={item.productId?.productName}
+                  />
                 </div>
 
-                <div className="d_item_actions">
-                  <div className="d_quantity_control">
-                    <button onClick={() => handleQuantityChange(item._id, item.quantity, -1)}>
-                      <MinusIcon size={16} />
-                    </button>
-                    <span>{item.quantity}</span>
-                    <button onClick={() => handleQuantityChange(item._id, item.quantity, 1)}>
-                      <Plus size={16} />
-                    </button>
-                  </div>
-
-                  <div className="d_price_info">
-                    <span>Items Price</span>
-                    <div>
-                      <span>${formatAmount(item.productId?.price)}</span>
-                      <span className="d_tax">/ ${formatAmount(item.productId?.price * (item.productId?.tax / 100))} Tax</span>
+                <div className="d_item_details">
+                  <div className="d_item_header">
+                    <h3>{item.productId?.productName}</h3>
+                    <div className="d_item_meta">
+                      <span>Color : {item.productId?.color || 'Default'}</span>
+                      <span>Size : {item.productId?.size || 'Standard'}</span>
                     </div>
                   </div>
-                </div>
 
-                <div className="d_item_footer d-flex justify-content-between align-items-center">
-                  <button className="d_remove_btn" onClick={() => handleRemoveItem(item._id)} disabled={isLoading}>
-                    <Trash2 size={18} />
-                    {isLoading ? 'Removing...' : 'Remove'}
-                  </button>
-                  <p className='mb-0'>
-                    Total: <span>${formatAmount((item.productId?.price * item.quantity) + (item.productId?.price * 0.155))}</span>
-                  </p>
+                  <div className="d_item_actions">
+                    <div className="d_quantity_control">
+                      <button onClick={() => handleQuantityChange(item._id, item.quantity, -1)}>
+                        <MinusIcon size={16} />
+                      </button>
+                      <span>{item.quantity}</span>
+                      <button onClick={() => handleQuantityChange(item._id, item.quantity, 1)}>
+                        <Plus size={16} />
+                      </button>
+                    </div>
+
+                    <div className="d_price_info">
+                      <span>Items Price</span>
+                      <div>
+                        <span>${item.productId?.price?.toFixed(2)}</span>
+                        <span className="d_tax">/ ${(item.productId?.price * 0.155).toFixed(2)} Tax</span>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="d_item_footer d-flex justify-content-between align-items-center">
+                    <button className="d_remove_btn" onClick={() => handleRemoveItem(item._id)}>
+                      <Trash2 size={18} />
+                      Remove
+                    </button>
+                    <p className='mb-0'>
+                      Total: <span>${((item.productId?.price * item.quantity) + (item.productId?.price * 0.155)).toFixed(2)}</span>
+                    </p>
+                  </div>
                 </div>
               </div>
+            ))
+          ) : (
+            <div className="Z_no_data_wrapper">
+              <img
+                src="https://cdni.iconscout.com/illustration/premium/thumb/no-data-found-3678255-3098784.png"
+                alt="No Products Found"
+                className="Z_no_data_image"
+              />
+              <h3 className="Z_no_data_title">No Products Found</h3>
+              <p className="Z_no_data_text">Try adjusting your search or filter to find what you're looking for.</p>
             </div>
-          ))}
+          )}
+
         </div>
 
         <div className="d_cart_sidebar">
-          <div className="d_promo_section" style={{ 
-            backgroundColor: isDarkMode ? 'var(--dark-card-bg)' : 'var(--accent-color)', 
-            borderRadius: '8px', 
+          <div className="d_promo_section" style={{
+            backgroundColor: isDarkMode ? 'var(--dark-card-bg)' : 'var(--accent-color)',
+            borderRadius: '8px',
             padding: '20px',
             minHeight: isOpen ? '300px' : 'auto',
             transition: 'min-height 0.3s ease'

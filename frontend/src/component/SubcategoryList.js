@@ -204,7 +204,7 @@ function SubcategoryList() {
                         <Table className="Z_product_table p-1">
                             <thead>
                                 <tr>
-                                    <th>
+                                    {/* <th>
                                         <div className="Z_custom_checkbox">
                                             <input
                                                 type="checkbox"
@@ -215,18 +215,18 @@ function SubcategoryList() {
                                             />
                                             <label htmlFor="selectAll" className="Z_checkbox_label"></label>
                                         </div>
-                                    </th>
+                                    </th> */}
                                     {/* <th>Subcategory ID</th> */}
                                     <th>Category Name</th>
                                     <th>Subcategory Details</th>
                                     <th>Description</th>
-                                    <th>Action</th>
+                                    {/* <th>Action</th> */}
                                 </tr>
                             </thead>
                             <tbody>
                                 {currentSubcategories.map((subcategory) => (
                                     <tr key={subcategory._id}>
-                                        <td>
+                                        {/* <td>
                                             <div className="Z_custom_checkbox">
                                                 <input
                                                     type="checkbox"
@@ -240,7 +240,7 @@ function SubcategoryList() {
                                                     className="Z_checkbox_label"
                                                 ></label>
                                             </div>
-                                        </td>
+                                        </td> */}
                                         {/* <td>#{subcategory._id}</td> */}
                                         <td>
                                             <div className="Z_category_name_cell">
@@ -264,11 +264,9 @@ function SubcategoryList() {
                                                 <div className="Z_table_product_description">{subcategory.description || 'No description'}</div>
                                             </div>
                                         </td>
-                                        <td>
+                                        {/* <td>
                                             <div className="Z_action_buttons">
-                                                {/* <button className="Z_action_btn Z_view_btn">
-                                                    <TbEye size={22} />
-                                                </button> */}
+                                          
                                                 <button
                                                     className="Z_action_btn Z_edit_btn"
                                                     onClick={() => handleEdit(subcategory)}
@@ -282,7 +280,7 @@ function SubcategoryList() {
                                                     <RiDeleteBin6Line size={22} />
                                                 </button>
                                             </div>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 ))}
                             </tbody>
@@ -317,7 +315,10 @@ function SubcategoryList() {
             </section>
 
             {/* Single Delete Modal */}
-            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+            <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}
+                centered
+                className={`z_delete_modal ${isDarkMode ? 'd_dark' : 'd_light'}`}
+            >
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Delete</Modal.Title>
                 </Modal.Header>
@@ -325,7 +326,9 @@ function SubcategoryList() {
                     Are you sure you want to delete subcategory "{subcategoryToDelete?.subcategoryTitle}"? This action cannot be undone.
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
+                    <button className="Z_btn Z_btn_cancel" onClick={() => setShowDeleteModal(false)}>Cancel</button>
+                    <button className="Z_btn Z_btn_delete" onClick={handleDeleteConfirm}>Delete</button>
+                    {/* <Button variant="secondary" onClick={() => setShowDeleteModal(false)}>
                         Cancel
                     </Button>
                     <Button
@@ -341,12 +344,15 @@ function SubcategoryList() {
                         ) : (
                             'Delete'
                         )}
-                    </Button>
+                    </Button> */}
                 </Modal.Footer>
             </Modal>
 
             {/* Bulk Delete Modal */}
-            <Modal show={showBulkDeleteModal} onHide={() => setShowBulkDeleteModal(false)}>
+            <Modal show={showBulkDeleteModal} onHide={() => setShowBulkDeleteModal(false)}
+                centered
+                className={`z_delete_modal ${isDarkMode ? 'd_dark' : 'd_light'}`}
+            >
                 <Modal.Header closeButton>
                     <Modal.Title>Confirm Bulk Delete</Modal.Title>
                 </Modal.Header>
@@ -354,7 +360,14 @@ function SubcategoryList() {
                     Are you sure you want to delete <strong>{selectedSubcategories.length}</strong> selected subcategory(s)? This action cannot be undone.
                 </Modal.Body>
                 <Modal.Footer>
-                    <Button variant="secondary" onClick={() => setShowBulkDeleteModal(false)}>
+                    <button className="Z_btn Z_btn_cancel" onClick={() => setShowBulkDeleteModal(false)}>Cancel</button>
+                                        <button
+                                            className="Z_btn Z_btn_delete"a
+                                           onClick={confirmBulkDelete}
+                                        >
+                                            Delete
+                                        </button>
+                    {/* <Button variant="secondary" onClick={() => setShowBulkDeleteModal(false)}>
                         Cancel
                     </Button>
                     <Button variant="danger" onClick={confirmBulkDelete} disabled={isLoading}>
@@ -366,7 +379,7 @@ function SubcategoryList() {
                         ) : (
                             'Confirm Delete'
                         )}
-                    </Button>
+                    </Button> */}
                 </Modal.Footer>
             </Modal>
         </>

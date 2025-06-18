@@ -58,7 +58,7 @@ const ForgotPassword = () => {
           </button>
         </form>
 
-          <p>Remember your password? <Link to="/login">Back to Login</Link></p>
+          <p className='text-center mt-2 text-light text-decoration-dashed text-opacity-75 small'>Remember Your password? <Link to="/login" className='fs-6 ' style={{color:'var(--accent-color)'}}>Back to Login</Link></p>
         </div>
       </div>
   );

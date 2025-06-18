@@ -230,6 +230,7 @@ const Sidebar = ({ show, isDarkMode }) => {
       onMouseEnter={() => !show && setIsExpanded(true)} // Only expand on hover if not in offcanvas mode
       onMouseLeave={() => !show && setIsExpanded(false)} // Only collapse on leave if not in offcanvas mode
       style={{ 
+        zIndex: '11111',
         backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`,
         color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
         borderRight: `1px solid var(${isDarkMode ? '--dark-border' : '--light-border'})`,

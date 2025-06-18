@@ -125,6 +125,7 @@
     width: 100%;
     justify-content: flex-end;
   }
+  
 }
 
 @media (max-width: 576px) {
@@ -135,6 +136,9 @@
   }
   .Z_offcan_width {
     width: 60% !important;
+  }
+  .z_user_list .form-select,.z_user_list .input-group{
+    width: 100% !important;
   }
 }
 
@@ -1451,7 +1455,7 @@
   font-weight: 500;
   padding: 12px;
   border: none;
-  text-align: center;
+  /* text-align: center; */
 }
 
 .Z_order_table tbody tr {
@@ -2224,7 +2228,7 @@
 
 /* Dark mode styles for modal */
 .d_dark .modal-content {
-  background-color: #1a1a1a;
+  background-color: var(--dark-bg);
   color: #fff;
 }
 
@@ -2270,7 +2274,7 @@
 }
 
 .d_dark .Z_btn_cancel {
-  background-color: #333;
+  background-color: var(--accent-color);
   color: #fff;
 }
 
@@ -2340,12 +2344,12 @@
 }
 
 /* Dark mode styles */
-.d_dark .Z_no_data_title {
-  color: #fff;
+.d_dark .Z_no_data_title,[data-theme='dark'] .Z_no_data_title {
+  color: #fff !important;
 }
 
-.d_dark .Z_no_data_text {
-  color: #ccc;
+.d_dark .Z_no_data_text,[data-theme='dark'] .Z_no_data_text {
+  color: #ccc !important;
 }
 
 @media (max-width: 576px) {
@@ -2463,3 +2467,5 @@
 .Z_select_caret svg{
   color: #666 !important;
 }
+
+

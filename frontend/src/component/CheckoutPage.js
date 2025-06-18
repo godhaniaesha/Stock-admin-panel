@@ -504,7 +504,7 @@ const CheckoutPage = () => {
                               type="text"
                               name="cardNumber"
                               className={`d_input ${touched.cardNumber && errors.cardNumber ? 'is-invalid' : ''}`}
-                              placeholder="1234 5678 9012 3456"
+                              placeholder="1234567890123456"
                               maxLength="16"
                             />
                             <ErrorMessage name="cardNumber" component="div" className="error-message" />

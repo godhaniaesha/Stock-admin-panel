@@ -163,7 +163,7 @@ const CategoryList = () => {
                         <Table className="Z_product_table p-1">
                             <thead>
                                 <tr>
-                                    <th>
+                                    {/* <th>
                                         <div className="Z_custom_checkbox">
                                             <input
                                                 type="checkbox"
@@ -174,18 +174,18 @@ const CategoryList = () => {
                                             />
                                             <label htmlFor="selectAll" className="Z_checkbox_label"></label>
                                         </div>
-                                    </th>
+                                    </th> */}
                                     <th>Category Image</th>
                                     <th>Category Name</th>
                                     <th>Description</th>
                                     <th>Created At</th>
-                                    <th>Action</th>
+                                    {/* <th>Action</th> */}
                                 </tr>
                             </thead>
                             <tbody>
                                 {filteredCategories.map((category) => (
                                     <tr key={category._id}>
-                                        <td>
+                                        {/* <td>
                                             <div className="Z_custom_checkbox">
                                                 <input
                                                     type="checkbox"
@@ -199,7 +199,7 @@ const CategoryList = () => {
                                                     className="Z_checkbox_label"
                                                 ></label>
                                             </div>
-                                        </td>
+                                        </td> */}
                                         <td>
                                             <div className="Z_category_img_cell">
                                                 <img
@@ -224,11 +224,11 @@ const CategoryList = () => {
                                                 {new Date(category.createdAt).toLocaleDateString()}
                                             </div>
                                         </td>
-                                        <td>
+                                        {/* <td>
                                             <div className="Z_action_buttons">
-                                                {/* <button className="Z_action_btn Z_view_btn">
+                                                <button className="Z_action_btn Z_view_btn">
                                                         <TbEye size={22} />
-                                                    </button> */}
+                                                    </button>
                                                 <button
                                                     className="Z_action_btn Z_edit_btn"
                                                     onClick={() => handleEdit(category)}
@@ -242,7 +242,7 @@ const CategoryList = () => {
                                                     <RiDeleteBin6Line size={22} />
                                                 </button>
                                             </div>
-                                        </td>
+                                        </td> */}
                                     </tr>
                                 ))}
                             </tbody>

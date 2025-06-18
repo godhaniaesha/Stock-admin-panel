@@ -50,6 +50,7 @@ const TopNavbar = ({ toggleSidebar, isDarkMode, toggleDarkMode, setShowProfile }
   return (
     <Navbar 
       style={{
+         zIndex: '11111',
         backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`,
         color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
         padding: '16px 0',

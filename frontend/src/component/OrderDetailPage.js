@@ -85,7 +85,8 @@ const OrderDetailPage = () => {
 
         .d_order-detail-container {
           min-height: 100vh;
-          padding: 2rem 0;
+          padding-top: 2rem;
+          padding-bottom: 0.5rem;
           transition: all 0.3s ease;
           font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
         }
@@ -169,7 +170,9 @@ const OrderDetailPage = () => {
           border-radius: 50%;
           transform: rotate(45deg);
         }
-
+        .d_order-detail-container .d_card{
+          height:auto !important;
+        }
         .d_order-id {
           font-size: 1.8rem;
           font-weight: 700;
@@ -180,6 +183,7 @@ const OrderDetailPage = () => {
         .d_order-date {
           opacity: 0.9;
           font-size: 1rem;
+          margin-bottom: 0.5rem;
         }
 
         .d_badge {
@@ -392,9 +396,11 @@ const OrderDetailPage = () => {
 
         @media (max-width: 768px) {
           .d_order-detail-container {
-            padding: 1rem;
+            padding-top: 1.5rem;
           }
-          
+          .d_order-detail-container .d_card{ 
+            padding: 8px;
+          }
           .d_order-header {
             padding: 1.5rem;
           }
@@ -417,6 +423,7 @@ const OrderDetailPage = () => {
             flex-direction: row;
             flex-wrap: wrap;
             gap: 1rem;
+            padding: 10px;
           }
 
           .d_product-info {
@@ -466,13 +473,7 @@ const OrderDetailPage = () => {
             font-size: 1.2rem;
           }
         }
-           @media (max-width: 768px) {
-          .d_order-detail-container {
-            padding: 0rem;
-          }
-            .d_card .d_product-item{
-               padding: 10px;
-            }
+          
       `}</style>
       <div className="p-3">
         {/* Order Header */}
@@ -499,26 +500,35 @@ const OrderDetailPage = () => {
               </div>
               <div className="card-body p-0">
                 {selectedOrder.items.map((item, index) => (
-                  <>
                   <div key={index} className="d_product-item justify-content-between ">
                     <div className="d-flex gap-3">
                       <div className="d_product-image">
-                      <img src={`${IMG_URL}${item.productId.images[0]}`} alt={item.productId.productName} className="img-fluid" />
-                    </div>
-                    <div className="d_product-info">
-                      <h6 className="d_product-name">{item.productId.productName}</h6>
-                      <p className="d_product-description">{item.productId.description}</p>
-                      <small className="d_product-sku">SKU: {item.productId.sku}</small>
-                    </div>
-                      
+                        {/* Defensive check for item.productId and item.productId.images */}
+                        {item.productId && item.productId.images && item.productId.images.length > 0 ? (
+                          <img
+                            src={`${IMG_URL}${item.productId.images[0]}`}
+                            alt={item.productId.productName || 'Product Image'} // Fallback alt text
+                            className="img-fluid"
+                          />
+                        ) : (
+                          // Fallback if product data or image is missing
+                          <div className="d_product-image d-flex align-items-center justify-content-center">
+                            <FaBox style={{ fontSize: '2rem', color: '#ccc' }} /> {/* Placeholder icon */}
+                          </div>
+                        )}
                       </div>
-                   
-                   <div className="d_product-price-qty">
-                      <div className="price">₹{item.productId.price}</div>
+                      <div className="d_product-info">
+                        <h6 className="d_product-name">{item.productId ? item.productId.productName : 'Unknown Product'}</h6>
+                        <p className="d_product-description">{item.productId ? item.productId.description : 'N/A'}</p>
+                        <small className="d_product-sku">SKU: {item.productId ? item.productId.sku : 'N/A'}</small>
+                      </div>
+                    </div>
+
+                    <div className="d_product-price-qty">
+                      <div className="price">₹{item.productId ? item.productId.price : '0.00'}</div>
                       <div className="qty">Qty: {item.quantity}</div>
                     </div>
                   </div>
-                    </>
                 ))}
               </div>
             </div>
@@ -572,10 +582,10 @@ const OrderDetailPage = () => {
                   <span className="d_info-label">Tax:</span>
                   <span className="d_info-value">₹{selectedOrder.tax}</span>
                 </div>
-                <div className="d_info-row d_total-row">
-                  <span className="d_info-label">Total Amount:</span>
-                  <span className="d_info-value">₹{selectedOrder.finalAmount}</span>
-                </div>
+               <div className="d_info-row d_total-row">
+  <span className="d_info-label">Total Amount:</span>
+  <span className="d_info-value">₹{selectedOrder.finalAmount.toFixed(2)}</span>
+</div>
               </div>
             </div>
 

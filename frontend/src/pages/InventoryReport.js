@@ -393,38 +393,28 @@ export default function InventoryReport() {
                     <td>
                       <div className="Z_subcategory_details_cell">
                         <img
-                          src={`${IMG_URL}/${item.productData.images[0]}`}
-                          alt={item.productData?.productName || 'Product Image'}
+                          src={item.product && item.product.images && item.product.images.length > 0 ? `${IMG_URL}${item.product.images[0]}` : 'https://via.placeholder.com/60'}
+                          alt={item.productData?.productName || item.product?.productName || 'Product Image'}
                           className="Z_table_subcategory_img"
                           width={60}
                           height={60}
-                          onError={(e) => {
-                            e.target.onerror = null;
-                            // e.target.src = 'https://via.placeholder.com/60';
-                          }}
                           style={{
                             objectFit: 'cover',
                             borderRadius: '4px',
                             border: '1px solid #e0e0e0'
                           }}
                         />
-                        <div className="Z_table_subcategory_name">{item.product?.productName || 'N/A'}</div>
+                        <div className="Z_table_subcategory_name">
+                          {item.productData?.productName || item.product?.productName || 'N/A'}
+                        </div>
                       </div>
                     </td>
-                    {/* <td>
-                      <div className="Z_category_name_cell">
-                        <div className="Z_table_product_name">{item.categoryData?.name}</div>
-                      </div>
-                    </td> */}
                     <td>{item.quantity}</td>
-                    <td>${item.product?.price?.toFixed(2) || '0.00'}</td>
-                    <td>{item.product?.sku || 'N/A'}</td>
+                    <td>${item.productData?.price?.toFixed(2) || item.product?.price?.toFixed(2) || '0.00'}</td>
+                    <td>{item.productData?.sku || item.product?.sku || 'N/A'}</td>
                     <td>
                       <div className="Z_action_buttons">
-                        {/* <button className="Z_action_btn Z_view_btn">
-                          <TbEye size={22} />
-                        </button> */}
-                        <button className="Z_action_btn Z_edit_btn" onClick={() => navigate(`/stock/edit/${item._id}`)} >
+                        <button className="Z_action_btn Z_edit_btn" onClick={() => navigate(`/stock/edit/${item._id}`)}>
                           <TbEdit size={22} />
                         </button>
                         <button className="Z_action_btn Z_delete_btn" onClick={() => handleDelete(item._id)}>

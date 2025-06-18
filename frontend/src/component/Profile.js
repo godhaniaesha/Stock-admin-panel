@@ -41,10 +41,10 @@ const Profile = () => {
   // Set form data only when user changes
   useEffect(() => {
     const userId = localStorage.getItem('user');
-    
+
     if (userId && allUsers.length > 0) {
       const user = allUsers.find(u => u._id === userId);
-      console.log(user,"user");
+      console.log(user, "user");
       if (user) {
         setCurrentUser(user);
         setFormData({
@@ -52,7 +52,7 @@ const Profile = () => {
           email: user.email || '',
           role: user.role || '',
           phone: user.phone || '',
-          company: user.company || '',
+          company: user.sellerInfo.businessName || '',
           address: user.address || '',
           password: '',
           confirmPassword: ''
@@ -88,48 +88,48 @@ const Profile = () => {
 
   const validateForm = () => {
     const newErrors = {};
-  
+
     // Full Name - only alphabets
     if (!formData.firstName.trim()) {
       newErrors.firstName = 'first name is required';
     } else if (!/^[A-Za-z\s]+$/.test(formData.firstName)) {
       newErrors.firstName = 'first name must contain only letters';
     }
-  
+
     // Email
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required';
     } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.email)) {
       newErrors.email = 'Invalid email format';
     }
-  
+
     // Phone - 10 digit number
     if (!formData.phone.trim()) {
       newErrors.phone = 'Phone number is required';
     } else if (!/^\d{10}$/.test(formData.phone)) {
       newErrors.phone = 'Phone number must be 10 digits';
     }
-  
+
     // Company
     if (!formData.company.trim()) newErrors.company = 'Company is required';
-  
+
     // Address
     if (!formData.address.trim()) newErrors.address = 'Address is required';
-  
+
     // Password
     if (formData.password && formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters';
     }
-  
+
     // Confirm Password
     if (formData.password !== formData.confirmPassword) {
       newErrors.confirmPassword = 'Passwords do not match';
     }
-  
+
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
-  
+
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -160,7 +160,12 @@ const Profile = () => {
 
     Object.keys(formData).forEach(key => {
       if (formData[key]) {
-        formDataToSend.append(key, formData[key]);
+        if (key === 'company') {
+          // Send the company name as part of sellerInfo
+          formDataToSend.append('sellerInfo[businessName]', formData[key]);
+        } else {
+          formDataToSend.append(key, formData[key]);
+        }
       }
     });
 

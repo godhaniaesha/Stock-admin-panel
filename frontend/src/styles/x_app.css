@@ -857,7 +857,9 @@
 }
 
 
-
+.x_product_page_container{
+  margin: 20px 0px;
+}
 @media (max-width: 375px) {
   .x_product_page_container .x_add_product_container {
     padding: 0;

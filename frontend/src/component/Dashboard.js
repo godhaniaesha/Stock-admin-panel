@@ -93,7 +93,7 @@ const Dashboard = () => {
 
     return (
       <div
-        className={`d_dashboard w-100 ${
+        className={`d_dashboard my-5 w-100 ${
           isDarkMode ? "" : "d_theme-light"
         }`}
       >

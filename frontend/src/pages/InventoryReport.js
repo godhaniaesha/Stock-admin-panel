@@ -81,7 +81,18 @@ export default function InventoryReport() {
     dispatch(fetchProductMovement());
   }, [dispatch]);
 
-
+useEffect(() => {
+  setTimeout(() => {
+    window.dispatchEvent(new Event('resize'));
+  }, 500);
+}, []);
+useEffect(() => {
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      window.dispatchEvent(new Event('resize'));
+    }, 300);
+  });
+}, []);
   const handleRangeChange = (e) => {
     const value = e.target.value;
     setSelectedRange(value);
@@ -292,7 +303,7 @@ export default function InventoryReport() {
   };
 
   return (
-    <div className={`Z_product_section d_sales-report-container ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+    <div className={`Z_product_section my-4 d_sales-report-container ${isDarkMode ? 'd_dark' : 'd_light'}`}>
       <div className="d_header-section">
         <div>
           <h1 className="d_main-title">Inventory Report</h1>

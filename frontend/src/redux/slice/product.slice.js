@@ -3,6 +3,21 @@ import axios from 'axios';
 import axiosInstance from '../../utils/axiosInstance';
 
 // Create product
+// export const createProduct = createAsyncThunk(
+//     'product/create',
+//     async (productData, { rejectWithValue }) => {
+//         try {
+//             const response = await axiosInstance.post('/product/addProduct', productData, {
+//                 headers: {
+//                     'Content-Type': 'multipart/form-data'
+//                 }
+//             });
+//             return response.data;
+//         } catch (error) {
+//             return rejectWithValue(error.response?.data?.message || 'Failed to create product');
+//         }
+//     }
+// );
 export const createProduct = createAsyncThunk(
     'product/create',
     async (productData, { rejectWithValue }) => {
@@ -14,11 +29,17 @@ export const createProduct = createAsyncThunk(
             });
             return response.data;
         } catch (error) {
-            return rejectWithValue(error.response?.data?.message || 'Failed to create product');
+            // Better error handling
+            const errorMessage = error.response?.data?.message || 
+                               error.response?.data?.error || 
+                               error.message || 
+                               'Failed to create product';
+            
+            console.error('Create product error:', error.response?.data || error.message);
+            return rejectWithValue(errorMessage);
         }
     }
 );
-
 export const getallwAccess = createAsyncThunk(
     'product/getallwAccess',
     async (_, { rejectWithValue }) => {

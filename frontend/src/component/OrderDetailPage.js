@@ -63,7 +63,7 @@ const OrderDetailPage = () => {
   }
 
   return (
-    <div className={`d_order-detail-container w-100 ${isDarkMode ? 'd_dark-theme' : 'd_light-theme'}`}>
+    <div className={`d_order-detail-container my-3 w-100 ${isDarkMode ? 'd_dark-theme' : 'd_light-theme'}`}>
       <style>{`
         :root {
           /* Dark theme colors */
@@ -84,7 +84,7 @@ const OrderDetailPage = () => {
         }
 
         .d_order-detail-container {
-          min-height: 100vh;
+          height: fit-content;
           padding-top: 2rem;
           padding-bottom: 0.5rem;
           transition: all 0.3s ease;

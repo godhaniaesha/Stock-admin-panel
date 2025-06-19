@@ -40,7 +40,7 @@ const AddProduct = () => {
 
     const [selectedSize, setSelectedSize] = useState([]);
     const [selectedColors, setSelectedColors] = useState([]);
-    const [productImage, setProductImage] = useState(null);
+    const [productImages, setProductImages] = useState([]);
     const [fileError, setFileError] = useState('');
     const [tags, setTags] = useState([]);
     const [tagInput, setTagInput] = useState('');
@@ -75,31 +75,31 @@ const AddProduct = () => {
         setProductData(prev => ({ ...prev, gender: value }));
         setIsGenderOpen(false);
     };
-
-    const validateAndHandleFile = (file) => {
+    const validateAndHandleMultipleFiles = (files) => {
         setFileError('');
-        setFormErrors(prev => ({ ...prev, image: null }));
-
-        if (!file) {
-            setFileError('Please select a file');
-            return;
-        }
-
         const validTypes = ['image/png', 'image/jpeg', 'image/jpg'];
-        if (!validTypes.includes(file.type)) {
-            setFileError('Invalid file type. Only PNG, JPG and JPEG are allowed');
-            return;
-        }
+        const maxSize = 5 * 1024 * 1024;
+        const validFiles = [];
 
-        const maxSize = 5 * 1024 * 1024; // 5MB in bytes
-        if (file.size > maxSize) {
-            setFileError('File size exceeds 5MB limit');
-            return;
-        }
+        Array.from(files).forEach((file) => {
+            if (!validTypes.includes(file.type)) {
+                setFileError('Only PNG, JPG, JPEG files allowed');
+                return;
+            }
+            if (file.size > maxSize) {
+                setFileError('File size must be under 5MB');
+                return;
+            }
 
-        const imageUrl = URL.createObjectURL(file);
-        setProductImage({ url: imageUrl, file });
+            validFiles.push({
+                url: URL.createObjectURL(file),
+                file,
+            });
+        });
+
+        setProductImages(validFiles);
     };
+
 
     const handleTagInput = (e) => {
         if (e.key === 'Enter' && tagInput.trim()) {
@@ -215,7 +215,7 @@ const AddProduct = () => {
         }
         if (!productData.stock?.trim()) errors.stock = 'Stock is required';
         if (!productData.price?.trim()) errors.price = 'Price is required';
-        if (!productImage) errors.image = 'Product image is required';
+        if (!productImages) errors.image = 'Product image is required';
 
         // Format validation
         if (productData.price && isNaN(productData.price)) {
@@ -290,15 +290,14 @@ const AddProduct = () => {
             formData.append('colors', JSON.stringify(selectedColors));
             formData.append('isActive', true);
 
-            if (productImage && productImage.file) {
-                formData.append('image', productImage.file);
-            }
-
+            productImages.forEach(({ file }) => {
+                formData.append('images', file); // match backend field name
+            });
             // Dispatch createProduct with the FormData object
             const result = await dispatch(createProduct(formData)).unwrap();
 
             // const result = await dispatch(createProduct(actualFormData)).unwrap();
-            console.log(result,"result");
+            console.log(result, "result");
             if (result) {
                 // Create inventory for the new product
                 const inventoryData = {
@@ -309,8 +308,8 @@ const AddProduct = () => {
                     lowStockLimit: 10, // Default low stock limit
                     sellerId: sellerId
                 };
-                console.log(inventoryData,"inventoryData");
-                
+                console.log(inventoryData, "inventoryData");
+
 
                 try {
                     await dispatch(createInventory(inventoryData)).unwrap();
@@ -337,7 +336,7 @@ const AddProduct = () => {
                 });
                 setSelectedSize([]);
                 setSelectedColors([]);
-                setProductImage(null);
+                setProductImages([]);
                 setTags([]);
                 setTagInput('');
                 if (document.getElementById('fileInput')) {
@@ -386,7 +385,7 @@ const AddProduct = () => {
                             onDrop={(e) => {
                                 e.preventDefault();
                                 const file = e.dataTransfer.files[0];
-                                validateAndHandleFile(file);
+                                validateAndHandleMultipleFiles(e.target.files);
                             }}
                             onDragOver={(e) => e.preventDefault()}
                             onClick={() => document.getElementById('fileInput').click()}
@@ -395,14 +394,15 @@ const AddProduct = () => {
                                 type="file"
                                 id="fileInput"
                                 className="x_hidden_input"
-                                onChange={(e) => validateAndHandleFile(e.target.files[0])}
+                                multiple
+                                onChange={(e) => validateAndHandleMultipleFiles(e.target.files)}
                                 accept=".png, .jpg, .jpeg"
                             />
                             <div className="x_upload_content">
-                                {productImage ? (
+                                {productImages.length > 0 ? (
                                     <div className="x_image_preview">
                                         <img
-                                            src={productImage.url}
+                                            src={productImages.url}
                                             alt="Product preview"
                                             className="x_preview_image"
                                         />
@@ -410,7 +410,7 @@ const AddProduct = () => {
                                             className="x_remove_image"
                                             onClick={e => {
                                                 e.stopPropagation();
-                                                setProductImage(null);
+                                               setProductImages([]);
                                                 setFileError('');
                                                 setFormErrors(prev => ({ ...prev, image: null }));
                                             }}

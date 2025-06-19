@@ -140,9 +140,15 @@
 .d_checkbox_wrapper input[type="checkbox"] {
   width: 16px;
   height: 16px;
-  border: 1px solid var(--dark-border);
+  border: 1.5px solid #6a9c89;
   border-radius: 4px;
   cursor: pointer;
+  accent-color: #6a9c89;
+}
+
+.d_checkbox_wrapper input[type="checkbox"]:checked {
+  background-color: #6a9c89;
+  border-color: #6a9c89;
 }
 
 .d_checkbox_label {

@@ -11,7 +11,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { getAllWishlists, getWishlist, removeFromWishlist } from '../redux/slice/wishlist.slice';
 import { IoMdCart } from 'react-icons/io';
 import { addToCart, getCart } from '../redux/slice/cart.slice';
-import { FaCaretDown } from 'react-icons/fa';
+import { FaCaretDown, FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { IMG_URL } from '../utils/baseUrl';
 import { toast } from 'react-toastify';
 
@@ -23,6 +23,9 @@ function Wishlist() {
     const [toastMessage, setToastMessage] = useState('');
 
     const [timeFilter, setTimeFilter] = useState('thisMonth');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(6);
+
     const handleTimeFilterChange = (e) => setTimeFilter(e.target.value);
 
     const filterWishlistByTime = (items) => {
@@ -53,6 +56,12 @@ function Wishlist() {
     };
 
     const filteredWishlist = filterWishlistByTime(wishlistItems);
+    
+    // Add pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentWishlistItems = filteredWishlist.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(filteredWishlist.length / itemsPerPage);
 
     console.log(wishlistItems, " wishlistItems");
     useEffect(() => {
@@ -117,6 +126,39 @@ function Wishlist() {
         }
     };
 
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        const maxVisiblePages = 1;
+
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            if (currentPage <= 2) {
+                for (let i = 1; i <= maxVisiblePages; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            } else if (currentPage >= totalPages - 1) {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    pageNumbers.push(i);
+                }
+            } else {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+        return pageNumbers;
+    };
 
     return (
         <>
@@ -158,7 +200,7 @@ function Wishlist() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {filteredWishlist?.map((item) => (
+                                {currentWishlistItems?.map((item) => (
                                     // console.log(item.productId?.categoryId, "item")
                                     <tr key={item._id}>
                                         <td>
@@ -212,6 +254,32 @@ function Wishlist() {
                                 ))}
                             </tbody>
                         </Table>
+                    </div>
+                    <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
+                        <button
+                            className="Z_page_btn"
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                        >
+                            <FaAngleLeft />
+                        </button>
+                        {getPageNumbers().map((number, index) => (
+                            <button
+                                key={index}
+                                className={`Z_page_btn ${currentPage === number ? 'active' : ''} ${typeof number !== 'number' ? 'disabled' : ''}`}
+                                onClick={() => typeof number === 'number' ? setCurrentPage(number) : null}
+                                disabled={typeof number !== 'number'}
+                            >
+                                {number}
+                            </button>
+                        ))}
+                        <button
+                            className="Z_page_btn"
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                        >
+                            <FaAngleRight />
+                        </button>
                     </div>
                 </div>
             </section>

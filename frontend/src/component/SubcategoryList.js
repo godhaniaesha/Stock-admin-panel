@@ -20,7 +20,7 @@ function SubcategoryList() {
     const [currentPage, setCurrentPage] = useState(1);
     const [selectedSubcategories, setSelectedSubcategories] = useState([]);
     const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
-    const itemsPerPage = 9;
+    const itemsPerPage = 5;
 
     useEffect(() => {
         dispatch(fetchSubcategories());
@@ -100,7 +100,7 @@ function SubcategoryList() {
 
     const getPageNumbers = () => {
         const pageNumbers = [];
-        const maxVisiblePages = 3;
+        const maxVisiblePages = 1;
 
         if (totalPages <= maxVisiblePages) {
             for (let i = 1; i <= totalPages; i++) {
@@ -111,14 +111,22 @@ function SubcategoryList() {
                 for (let i = 1; i <= maxVisiblePages; i++) {
                     pageNumbers.push(i);
                 }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
             } else if (currentPage >= totalPages - 1) {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
                 for (let i = totalPages - 2; i <= totalPages; i++) {
                     pageNumbers.push(i);
                 }
             } else {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
                 for (let i = currentPage - 1; i <= currentPage + 1; i++) {
                     pageNumbers.push(i);
                 }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
             }
         }
         return pageNumbers;
@@ -294,11 +302,12 @@ function SubcategoryList() {
                         >
                             <FaAngleLeft />
                         </button>
-                        {getPageNumbers().map((pageNum) => (
+                        {getPageNumbers().map((pageNum, index) => (
                             <button
-                                key={pageNum}
-                                className={`Z_page_btn ${currentPage === pageNum ? 'active' : ''}`}
-                                onClick={() => handlePageChange(pageNum)}
+                                key={index}
+                                className={`Z_page_btn ${currentPage === pageNum ? 'active' : ''} ${typeof pageNum !== 'number' ? 'disabled' : ''}`}
+                                onClick={() => typeof pageNum === 'number' ? handlePageChange(pageNum) : null}
+                                disabled={typeof pageNum !== 'number'}
                             >
                                 {pageNum}
                             </button>
@@ -361,12 +370,12 @@ function SubcategoryList() {
                 </Modal.Body>
                 <Modal.Footer>
                     <button className="Z_btn Z_btn_cancel" onClick={() => setShowBulkDeleteModal(false)}>Cancel</button>
-                                        <button
-                                            className="Z_btn Z_btn_delete"a
-                                           onClick={confirmBulkDelete}
-                                        >
-                                            Delete
-                                        </button>
+                    <button
+                        className="Z_btn Z_btn_delete" a
+                        onClick={confirmBulkDelete}
+                    >
+                        Delete
+                    </button>
                     {/* <Button variant="secondary" onClick={() => setShowBulkDeleteModal(false)}>
                         Cancel
                     </Button>

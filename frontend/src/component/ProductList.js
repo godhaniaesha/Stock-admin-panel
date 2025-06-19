@@ -27,7 +27,7 @@ function ProductList() {
     const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
     const [timeFilter, setTimeFilter] = useState('thisMonth');
     const [currentPage, setCurrentPage] = useState(1);
-    const [productsPerPage] = useState(10);
+    const [productsPerPage] = useState(6);
 
     useEffect(() => {
         dispatch(fetchProducts());
@@ -106,6 +106,40 @@ function ProductList() {
     const indexOfFirstProduct = indexOfLastProduct - productsPerPage;
     const currentProducts = filteredProducts.slice(indexOfFirstProduct, indexOfLastProduct);
     const totalPages = Math.ceil(filteredProducts.length / productsPerPage);
+
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        const maxVisiblePages = 1;
+
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            if (currentPage <= 2) {
+                for (let i = 1; i <= maxVisiblePages; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            } else if (currentPage >= totalPages - 1) {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    pageNumbers.push(i);
+                }
+            } else {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+        return pageNumbers;
+    };
 
     if (productsLoading || categoriesLoading) {
         return <div>Loading products and categories...</div>;
@@ -245,11 +279,12 @@ function ProductList() {
                         >
                             <FaAngleLeft />
                         </button>
-                        {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                        {getPageNumbers().map((number, index) => (
                             <button
-                                key={number}
-                                className={`Z_page_btn ${currentPage === number ? 'active' : ''}`}
-                                onClick={() => setCurrentPage(number)}
+                                key={index}
+                                className={`Z_page_btn ${currentPage === number ? 'active' : ''} ${typeof number !== 'number' ? 'disabled' : ''}`}
+                                onClick={() => typeof number === 'number' ? setCurrentPage(number) : null}
+                                disabled={typeof number !== 'number'}
                             >
                                 {number}
                             </button>

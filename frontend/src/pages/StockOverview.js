@@ -6,7 +6,7 @@ import '../styles/Z_styles.css';
 import { useNavigate, useOutletContext } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchInventories, deleteInventory } from '../redux/slice/inventory.Slice';
-import { FaCaretDown } from 'react-icons/fa';
+import { FaCaretDown, FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 import { IMG_URL } from '../utils/baseUrl';
 
 const StockOverview = () => {
@@ -16,6 +16,8 @@ const StockOverview = () => {
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [productToDelete, setProductToDelete] = useState(null);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
 
   const { inventory, isLoading, error } = useSelector((state) => state.inventory);
   console.log(inventory, "inventory");
@@ -55,6 +57,13 @@ const StockOverview = () => {
         setTimeFilter(e.target.value);
     };
 const filteredCategories = filterInventoriesByTime(inventory);
+
+  // Add pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = filteredCategories.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(filteredCategories.length / itemsPerPage);
+
   const handleDeleteClick = (product) => {
     setProductToDelete(product);
     setShowDeleteModal(true);
@@ -70,6 +79,40 @@ const filteredCategories = filterInventoriesByTime(inventory);
         console.error('Failed to delete inventory:', error);
       }
     }
+  };
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 1;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 2) {
+        for (let i = 1; i <= maxVisiblePages; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 1) {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = totalPages - 2; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      }
+    }
+    return pageNumbers;
   };
 
   return (
@@ -114,7 +157,7 @@ const filteredCategories = filterInventoriesByTime(inventory);
                 </tr>
               </thead>
               <tbody>
-                {filteredCategories.map((item) => {
+                {currentItems.map((item) => {
                   const product = item?.product;
 
                   return (
@@ -165,6 +208,32 @@ const filteredCategories = filterInventoriesByTime(inventory);
                 })}
               </tbody>
             </Table>
+            <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
+              <button
+                className="Z_page_btn"
+                disabled={currentPage === 1}
+                onClick={() => setCurrentPage(currentPage - 1)}
+              >
+                <FaAngleLeft />
+              </button>
+              {getPageNumbers().map((number, index) => (
+                <button
+                  key={index}
+                  className={`Z_page_btn ${currentPage === number ? 'active' : ''} ${typeof number !== 'number' ? 'disabled' : ''}`}
+                  onClick={() => typeof number === 'number' ? setCurrentPage(number) : null}
+                  disabled={typeof number !== 'number'}
+                >
+                  {number}
+                </button>
+              ))}
+              <button
+                className="Z_page_btn"
+                disabled={currentPage === totalPages}
+                onClick={() => setCurrentPage(currentPage + 1)}
+              >
+                <FaAngleRight />
+              </button>
+            </div>
           </div>
         )}
       </div>

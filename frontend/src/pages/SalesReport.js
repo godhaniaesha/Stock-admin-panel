@@ -90,6 +90,26 @@ export default function SalesReport() {
  
   // Calculate total pages
   const totalPages = Math.ceil(orders.length / ordersPerPage);
+
+  // Pagination page numbers logic
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 1;
+    if (totalPages <= maxVisiblePages + 1) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      pageNumbers.push(1);
+      if (totalPages > 2) {
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      } else if (totalPages === 2) {
+        pageNumbers.push(2);
+      }
+    }
+    return pageNumbers;
+  };
  
   const handleViewOrder = (orderId) => {
     const order = orders.find(order => order._id === orderId);
@@ -381,11 +401,12 @@ export default function SalesReport() {
                 >
                   <FaAngleLeft />
                 </button>
-                {Array.from({ length: totalPages }, (_, i) => i + 1).map((number) => (
+                {getPageNumbers().map((number, index) => (
                   <button
-                    key={number}
-                    className={`Z_page_btn ${currentPage === number ? 'active' : ''}`}
-                    onClick={() => setCurrentPage(number)}
+                    key={index}
+                    className={`Z_page_btn ${currentPage === number ? 'active' : ''} ${typeof number !== 'number' ? 'disabled' : ''}`}
+                    onClick={() => typeof number === 'number' ? setCurrentPage(number) : null}
+                    disabled={typeof number !== 'number'}
                   >
                     {number}
                   </button>

@@ -24,7 +24,7 @@ function OrderList() {
 
   // Pagination state
   const [currentPage, setCurrentPage] = useState(1);
-  const [ordersPerPage] = useState(10); // You can adjust this number
+  const [ordersPerPage] = useState(5); // Changed from 10 to 6
 
   useEffect(() => {
     dispatch(fetchOrders());
@@ -46,10 +46,40 @@ function OrderList() {
   // Calculate total pages
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
-  const pageNumbers = [];
-  for (let i = 1; i <= totalPages; i++) {
-    pageNumbers.push(i);
-  }
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 1;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 2) {
+        for (let i = 1; i <= maxVisiblePages; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 1) {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = totalPages - 2; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      }
+    }
+    return pageNumbers;
+  };
+
   const handleViewOrder = (orderId) => {
     navigate(`/orderdetail/${orderId}`);
   };
@@ -208,11 +238,12 @@ function OrderList() {
 
         <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
           <button className="Z_page_btn" onClick={() => paginate(currentPage - 1)} disabled={currentPage === 1}><FaAngleLeft /></button>
-          {pageNumbers.map(number => (
+          {getPageNumbers().map((number, index) => (
             <button
-              key={number}
-              onClick={() => paginate(number)}
-              className={`Z_page_btn ${currentPage === number ? 'active' : ''}`}
+              key={index}
+              onClick={() => typeof number === 'number' ? paginate(number) : null}
+              className={`Z_page_btn ${currentPage === number ? 'active' : ''} ${typeof number !== 'number' ? 'disabled' : ''}`}
+              disabled={typeof number !== 'number'}
             >
               {number}
             </button>

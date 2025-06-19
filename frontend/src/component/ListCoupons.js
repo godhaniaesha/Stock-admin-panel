@@ -10,7 +10,7 @@ import { useDispatch, useSelector } from 'react-redux';
 import { fetchCoupons, deleteCoupon } from '../redux/slice/coupon.slice';
 import { useNavigate } from 'react-router-dom';
 import { toast } from 'react-toastify';
-import { FaCaretDown } from 'react-icons/fa';
+import { FaCaretDown, FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 
 function ListCoupons() {
     const { isDarkMode } = useOutletContext();
@@ -27,6 +27,8 @@ function ListCoupons() {
 
     const [selectedTimeFilter, setSelectedTimeFilter] = useState('All');
     const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
+    const [currentPage, setCurrentPage] = useState(1);
+    const [itemsPerPage] = useState(6);
 
     useEffect(() => {
         dispatch(fetchCoupons());
@@ -129,6 +131,46 @@ function ListCoupons() {
     };
 
     const displayedCoupons = getFilteredCoupons();
+    
+    // Add pagination logic
+    const indexOfLastItem = currentPage * itemsPerPage;
+    const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+    const currentCoupons = displayedCoupons.slice(indexOfFirstItem, indexOfLastItem);
+    const totalPages = Math.ceil(displayedCoupons.length / itemsPerPage);
+
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        const maxVisiblePages = 1;
+
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            if (currentPage <= 2) {
+                for (let i = 1; i <= maxVisiblePages; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            } else if (currentPage >= totalPages - 1) {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    pageNumbers.push(i);
+                }
+            } else {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+        return pageNumbers;
+    };
 
     return (
         <section className={`Z_product_section mx-0 mx-lg-2 my-md-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
@@ -180,7 +222,7 @@ function ListCoupons() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {displayedCoupons.map((coupon) => (
+                                {currentCoupons.map((coupon) => (
                                     <tr key={coupon._id}>
                                         <td>
                                             <div className="Z_custom_checkbox">
@@ -229,6 +271,32 @@ function ListCoupons() {
                             </tbody>
                         </Table>
                     )}
+                </div>
+                <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
+                    <button
+                        className="Z_page_btn"
+                        disabled={currentPage === 1}
+                        onClick={() => setCurrentPage(currentPage - 1)}
+                    >
+                        <FaAngleLeft />
+                    </button>
+                    {getPageNumbers().map((number, index) => (
+                        <button
+                            key={index}
+                            className={`Z_page_btn ${currentPage === number ? 'active' : ''} ${typeof number !== 'number' ? 'disabled' : ''}`}
+                            onClick={() => typeof number === 'number' ? setCurrentPage(number) : null}
+                            disabled={typeof number !== 'number'}
+                        >
+                            {number}
+                        </button>
+                    ))}
+                    <button
+                        className="Z_page_btn"
+                        disabled={currentPage === totalPages}
+                        onClick={() => setCurrentPage(currentPage + 1)}
+                    >
+                        <FaAngleRight />
+                    </button>
                 </div>
             </div>
 

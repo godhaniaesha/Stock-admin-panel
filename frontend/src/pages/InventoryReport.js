@@ -45,6 +45,33 @@ export default function InventoryReport() {
   const [startDate, setStartDate] = useState('');
   const [endDate, setEndDate] = useState('');
 
+  // Pagination logic for inventory table
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 10;
+  const totalPages = Math.ceil((inventory?.length || 0) / itemsPerPage);
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentInventory = (inventory || []).slice(indexOfFirstItem, indexOfLastItem);
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 1;
+    if (totalPages <= maxVisiblePages + 1) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      pageNumbers.push(1);
+      if (totalPages > 2) {
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      } else if (totalPages === 2) {
+        pageNumbers.push(2);
+      }
+    }
+    return pageNumbers;
+  };
+
   useEffect(() => {
     let period;
     let params = {};
@@ -387,7 +414,7 @@ export default function InventoryReport() {
                 </tr>
               </thead>
               <tbody>
-                {inventory && inventory.map((item) => (
+                {currentInventory.map((item) => (
                   <tr key={item._id}>
                     <td>{item._id}</td>
                     <td>
@@ -428,13 +455,20 @@ export default function InventoryReport() {
             </Table>
           </div>
           <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
-            <button className="Z_page_btn" disabled>
+            <button className="Z_page_btn" disabled={currentPage === 1} onClick={() => setCurrentPage(currentPage - 1)}>
               <FaAngleLeft />
             </button>
-            <button className="Z_page_btn active">1</button>
-            <button className="Z_page_btn">2</button>
-            <button className="Z_page_btn">3</button>
-            <button className="Z_page_btn">
+            {getPageNumbers().map((number, index) => (
+              <button
+                key={index}
+                className={`Z_page_btn ${currentPage === number ? 'active' : ''} ${typeof number !== 'number' ? 'disabled' : ''}`}
+                onClick={() => typeof number === 'number' ? setCurrentPage(number) : null}
+                disabled={typeof number !== 'number'}
+              >
+                {number}
+              </button>
+            ))}
+            <button className="Z_page_btn" disabled={currentPage === totalPages} onClick={() => setCurrentPage(currentPage + 1)}>
               <FaAngleRight />
             </button>
           </div>

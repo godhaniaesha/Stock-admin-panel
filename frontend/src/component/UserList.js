@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
 import { Row, Col, Card, Button, Form, InputGroup, Spinner, Alert, Modal } from 'react-bootstrap';
-import { FaUsersViewfinder } from 'react-icons/fa6';
+import { FaUsersViewfinder, FaAngleLeft, FaAngleRight } from 'react-icons/fa6';
 import { LuClipboardList } from 'react-icons/lu';
 import { RiCustomerServiceLine, RiDeleteBin6Line } from 'react-icons/ri';
 import { TbEdit, TbEye, TbFileInvoice, TbSearch } from 'react-icons/tb';
@@ -49,6 +49,14 @@ function UserList() {
     const [userToDelete, setUserToDelete] = useState(null);
     const [filteredUsers, setFilteredUsers] = useState([]);
     const [showBulkDeleteModal, setShowBulkDeleteModal] = useState(false);
+    const [currentPage, setCurrentPage] = useState(1);
+    const itemsPerPage = 4;
+
+    // Add pagination logic
+    const indexOfLastUser = currentPage * itemsPerPage;
+    const indexOfFirstUser = indexOfLastUser - itemsPerPage;
+    const currentUsers = filteredUsers.slice(indexOfFirstUser, indexOfLastUser);
+    const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
 
     // Check if Redux store is properly configured
     useEffect(() => {
@@ -227,6 +235,40 @@ function UserList() {
         );
     }
 
+    const getPageNumbers = () => {
+        const pageNumbers = [];
+        const maxVisiblePages = 1;
+
+        if (totalPages <= maxVisiblePages) {
+            for (let i = 1; i <= totalPages; i++) {
+                pageNumbers.push(i);
+            }
+        } else {
+            if (currentPage <= 2) {
+                for (let i = 1; i <= maxVisiblePages; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            } else if (currentPage >= totalPages - 1) {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = totalPages - 2; i <= totalPages; i++) {
+                    pageNumbers.push(i);
+                }
+            } else {
+                pageNumbers.push(1);
+                pageNumbers.push('...');
+                for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+                    pageNumbers.push(i);
+                }
+                pageNumbers.push('...');
+                pageNumbers.push(totalPages);
+            }
+        }
+        return pageNumbers;
+    };
+
     return (
         <section className={`Z_product_section z_user_list ${isDarkMode ? 'd_dark' : 'd_light'} mx-0 mx-lg-2 my-md-3`}>
             {/* Error Alert */}
@@ -380,7 +422,7 @@ function UserList() {
                             </tr>
                         </thead>
                         <tbody>
-                            {filteredUsers.length === 0 ? (
+                            {currentUsers.length === 0 ? (
                                 <tr>
                                     <td colSpan="7" className="text-center py-4">
                                         {isLoading ? (
@@ -394,7 +436,7 @@ function UserList() {
                                     </td>
                                 </tr>
                             ) : (
-                                filteredUsers.map(user => (
+                                currentUsers.map(user => (
                                     // console.log("Users",user)
                                     <tr key={user._id || user.id}>
                                         <td>
@@ -456,6 +498,32 @@ function UserList() {
                             )}
                         </tbody>
                     </table>
+                    <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
+                        <button
+                            className="Z_page_btn"
+                            disabled={currentPage === 1}
+                            onClick={() => setCurrentPage(currentPage - 1)}
+                        >
+                            <FaAngleLeft />
+                        </button>
+                        {getPageNumbers().map((number, index) => (
+                            <button
+                                key={index}
+                                className={`Z_page_btn ${currentPage === number ? 'active' : ''} ${typeof number !== 'number' ? 'disabled' : ''}`}
+                                onClick={() => typeof number === 'number' ? setCurrentPage(number) : null}
+                                disabled={typeof number !== 'number'}
+                            >
+                                {number}
+                            </button>
+                        ))}
+                        <button
+                            className="Z_page_btn"
+                            disabled={currentPage === totalPages}
+                            onClick={() => setCurrentPage(currentPage + 1)}
+                        >
+                            <FaAngleRight />
+                        </button>
+                    </div>
                 </div>
             </div>
 

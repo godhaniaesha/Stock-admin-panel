@@ -2,10 +2,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { useOutletContext, useNavigate } from "react-router-dom";
 import { getLowInventory, deleteInventory } from "../redux/slice/inventory.Slice";
 import { Table } from "react-bootstrap";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { TbEdit, TbEye } from "react-icons/tb";
 import { RiDeleteBin6Line } from "react-icons/ri";
 import { IMG_URL } from "../utils/baseUrl";
+import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
 
 function StockAlert() {
   const { isDarkMode } = useOutletContext();
@@ -13,6 +14,14 @@ function StockAlert() {
   const navigate = useNavigate();
 
   const { lowInventory, isLoading, error } = useSelector(state => state.inventory);
+  const [currentPage, setCurrentPage] = useState(1);
+  const itemsPerPage = 6;
+
+  // Add pagination logic
+  const indexOfLastItem = currentPage * itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
+  const currentItems = lowInventory.slice(indexOfFirstItem, indexOfLastItem);
+  const totalPages = Math.ceil(lowInventory.length / itemsPerPage);
 
   useEffect(() => {
     dispatch(getLowInventory());
@@ -38,6 +47,40 @@ function StockAlert() {
         console.error('Failed to delete inventory:', error);
       }
     }
+  };
+
+  const getPageNumbers = () => {
+    const pageNumbers = [];
+    const maxVisiblePages = 1;
+
+    if (totalPages <= maxVisiblePages) {
+      for (let i = 1; i <= totalPages; i++) {
+        pageNumbers.push(i);
+      }
+    } else {
+      if (currentPage <= 2) {
+        for (let i = 1; i <= maxVisiblePages; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      } else if (currentPage >= totalPages - 1) {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = totalPages - 2; i <= totalPages; i++) {
+          pageNumbers.push(i);
+        }
+      } else {
+        pageNumbers.push(1);
+        pageNumbers.push('...');
+        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
+          pageNumbers.push(i);
+        }
+        pageNumbers.push('...');
+        pageNumbers.push(totalPages);
+      }
+    }
+    return pageNumbers;
   };
 
   return (
@@ -66,7 +109,7 @@ function StockAlert() {
                 </tr>
               </thead>
               <tbody>
-                {lowInventory.map((item, index) => (
+                {currentItems.map((item, index) => (
                   <tr key={item._id || index}>
                    
                     <td>
@@ -121,6 +164,32 @@ function StockAlert() {
               </tbody>
             </Table>
           )}
+        </div>
+        <div className="Z_pagination d-flex justify-content-end align-items-center mt-4">
+          <button
+            className="Z_page_btn"
+            disabled={currentPage === 1}
+            onClick={() => setCurrentPage(currentPage - 1)}
+          >
+            <FaAngleLeft />
+          </button>
+          {getPageNumbers().map((number, index) => (
+            <button
+              key={index}
+              className={`Z_page_btn ${currentPage === number ? 'active' : ''} ${typeof number !== 'number' ? 'disabled' : ''}`}
+              onClick={() => typeof number === 'number' ? setCurrentPage(number) : null}
+              disabled={typeof number !== 'number'}
+            >
+              {number}
+            </button>
+          ))}
+          <button
+            className="Z_page_btn"
+            disabled={currentPage === totalPages}
+            onClick={() => setCurrentPage(currentPage + 1)}
+          >
+            <FaAngleRight />
+          </button>
         </div>
       </div>
     </section>

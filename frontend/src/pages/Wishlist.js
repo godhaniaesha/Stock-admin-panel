@@ -200,58 +200,71 @@ function Wishlist() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {currentWishlistItems?.map((item) => (
-                                    // console.log(item.productId?.categoryId, "item")
-                                    <tr key={item._id}>
-                                        <td>
-                                            <div className="Z_custom_checkbox">
-                                                <input
-                                                    type="checkbox"
-                                                    id={`checkbox-${item._id}`}
-                                                    className="Z_checkbox_input"
-                                                />
-                                                <label
-                                                    htmlFor={`checkbox-${item._id}`}
-                                                    className="Z_checkbox_label"
-                                                ></label>
-                                            </div>
-                                        </td>
-                                        <td>
-                                            <div className="Z_product_info_cell">
-                                                <img src={`${IMG_URL}${item.productId?.images[0]}`} alt={item.productId?.productName} className="Z_table_product_img" />
-                                                <div>
-                                                    <div className="Z_table_product_name">{item.productId?.productName}</div>
-                                                    <div className="Z_table_product_size">Size: {item.productId?.size || 'Standard'}</div>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>${item.productId?.price}</td>
-                                        <td>
-                                            <div className="Z_stock_info">
-                                                <div>{item.productId?.stock || 0} Items Left</div>
-                                                <div className="Z_stock_sold">{item.productId?.sold || 0} Sold</div>
-                                            </div>
-                                        </td>
-                                        <td>{item.productId?.categoryId?.title || 'No Category'}</td>
-
-                                        <td>
-                                            <div className="Z_action_buttons">
-                                                <button className="Z_action_btn Z_view_btn" onClick={() => handleMoveToCart(item)}>
-                                                    <IoMdCart size={22} />
-                                                </button>
-                                                {/* <button className="Z_action_btn Z_edit_btn">
-                                                    <TbEdit size={22}/>
-                                                </button> */}
-                                                <button
-                                                    className="Z_action_btn Z_delete_btn"
-                                                    onClick={() => handleDelete(item._id)}
-                                                >
-                                                    <RiDeleteBin6Line size={22} />
-                                                </button>
-                                            </div>
+                                {currentWishlistItems.length === 0 ? (
+                                    <tr>
+                                        <td colSpan={6} style={{ textAlign: 'center', padding: '40px 0' }}>
+                                            <img
+                                                src="https://cdni.iconscout.com/illustration/premium/thumb/no-data-found-3678255-3098784.png"
+                                                alt="No Wishlist"
+                                                className='Z_no_data_image'
+                                                style={{  opacity: 0.7 }}
+                                            />
+                                            <div style={{ fontSize: 18, color: '#888' }}>No wishlist product</div>
                                         </td>
                                     </tr>
-                                ))}
+                                ) : (
+                                    currentWishlistItems.map((item) => (
+                                        <tr key={item._id}>
+                                            <td>
+                                                <div className="Z_custom_checkbox">
+                                                    <input
+                                                        type="checkbox"
+                                                        id={`checkbox-${item._id}`}
+                                                        className="Z_checkbox_input"
+                                                    />
+                                                    <label
+                                                        htmlFor={`checkbox-${item._id}`}
+                                                        className="Z_checkbox_label"
+                                                    ></label>
+                                                </div>
+                                            </td>
+                                            <td>
+                                                <div className="Z_product_info_cell">
+                                                    <img src={`${IMG_URL}${item.productId?.images[0]}`} alt={item.productId?.productName} className="Z_table_product_img" />
+                                                    <div>
+                                                        <div className="Z_table_product_name">{item.productId?.productName}</div>
+                                                        <div className="Z_table_product_size">Size: {item.productId?.size || 'Standard'}</div>
+                                                    </div>
+                                                </div>
+                                            </td>
+                                            <td>${item.productId?.price}</td>
+                                            <td>
+                                                <div className="Z_stock_info">
+                                                    <div>{item.productId?.stock || 0} Items Left</div>
+                                                    <div className="Z_stock_sold">{item.productId?.sold || 0} Sold</div>
+                                                </div>
+                                            </td>
+                                            <td>{item.productId?.categoryId?.title || 'No Category'}</td>
+
+                                            <td>
+                                                <div className="Z_action_buttons">
+                                                    <button className="Z_action_btn Z_view_btn" onClick={() => handleMoveToCart(item)}>
+                                                        <IoMdCart size={22} />
+                                                    </button>
+                                                    {/* <button className="Z_action_btn Z_edit_btn">
+                                                        <TbEdit size={22}/>
+                                                    </button> */}
+                                                    <button
+                                                        className="Z_action_btn Z_delete_btn"
+                                                        onClick={() => handleDelete(item._id)}
+                                                    >
+                                                        <RiDeleteBin6Line size={22} />
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
                             </tbody>
                         </Table>
                     </div>

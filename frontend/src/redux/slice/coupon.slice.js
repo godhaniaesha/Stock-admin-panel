@@ -61,7 +61,7 @@ export const deleteCoupon = createAsyncThunk(
     'coupon/delete',
     async (id, { rejectWithValue }) => {
         try {
-            await axiosInstance.delete(`/delete/${id}`);
+            await axiosInstance.delete(`coupon/delete/${id}`);
             return id;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || error.message);

@@ -1001,5 +1001,7 @@
   
 }
 @media screen  and (max-width:375px){
-  
+  .x_btn_wrapper {
+    flex-direction: column;
+  }
 }

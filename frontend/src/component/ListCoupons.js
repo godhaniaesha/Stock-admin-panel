@@ -131,7 +131,7 @@ function ListCoupons() {
     };
 
     const displayedCoupons = getFilteredCoupons();
-    
+
     // Add pagination logic
     const indexOfLastItem = currentPage * itemsPerPage;
     const indexOfFirstItem = indexOfLastItem - itemsPerPage;
@@ -321,10 +321,12 @@ function ListCoupons() {
                     )}
                 </Modal.Body>
                 <Modal.Footer className={isDarkMode ? 'dark-modal-footer' : ''}>
-                    <button className="Z_btn Z_btn_cancel" onClick={handleDeleteCancel} disabled={isLoading}>Cancel</button>
-                    <button className="Z_btn Z_btn_delete" onClick={handleDeleteConfirm} disabled={isLoading}>
-                        {isLoading ? 'Deleting...' : 'Delete'}
-                    </button>
+                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-center' }}>
+                        <button className="Z_btn Z_btn_cancel" onClick={handleDeleteCancel} disabled={isLoading}>Cancel</button>
+                        <button className="Z_btn Z_btn_delete" onClick={handleDeleteConfirm} disabled={isLoading}>
+                            {isLoading ? 'Deleting...' : 'Delete'}
+                        </button>
+                    </div>
                 </Modal.Footer>
             </Modal>
         </section>

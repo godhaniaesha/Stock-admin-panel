@@ -400,13 +400,12 @@ function ProductGrid() {
                     {/* Offcanvas for smaller screens */}
                     <Offcanvas
                         show={filters.showOffcanvas}
-
                         onHide={() => handleFilterChange('showOffcanvas', false)}
-                        placement="start"
+                        placement="end"
                         className={`Z_offcan_width ${isDarkMode ? 'd_dark' : 'd_light'}`}
                     >
                         <Offcanvas.Header closeButton>
-                            <Offcanvas.Title>Filters</Offcanvas.Title>
+                            <Offcanvas.Title className='text-light'>Filters</Offcanvas.Title>
                         </Offcanvas.Header>
                         <Offcanvas.Body>
                             <div className='Z_input_grp mb-4'>

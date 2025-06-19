@@ -687,3 +687,35 @@
 [data-theme="dark"] .d_order_details {
   background: #2d2d2d;
 }
+
+@media (max-width: 576px) {
+  .d_success_modal {
+    padding: 1rem;
+  }
+  .d_success_modal h2 {
+    font-size: 1.1rem;
+  }
+  .d_success_modal p {
+    font-size: 0.95rem;
+  }
+  .d_order_details {
+    font-size: 0.95rem;
+  }
+  .d_continue_btn {
+    font-size: 0.95rem;
+    padding: 9px 10px;
+  }
+}
+@media (max-width: 420px) {
+  .d_success_modal h2 {
+    font-size: 1rem;
+  }
+  .d_success_modal p,
+  .d_order_details {
+    font-size: 0.85rem;
+  }
+  .d_continue_btn {
+    font-size: 0.85rem;
+    padding: 8px 8px;
+  }
+}

@@ -689,3 +689,42 @@
   color:var(--dark-bg) !important;
   
 }
+
+/* @media (max-width: 576px) {
+  .d_chart-section {
+    flex-direction: column !important;
+    gap: 12px;
+  }
+  .d_chart-container {
+    min-height: 220px !important;
+    height: auto !important;
+    padding: 8px !important;
+    margin-bottom: 10px;
+  }
+  .d_chart-title {
+    font-size: 1rem;
+    margin-bottom: 0.5rem;
+  }
+  .d_chart-container canvas {
+    height: 180px !important;
+    max-width: 100% !important;
+  }
+}
+@media (max-width: 375px) {
+  .d_chart-section {
+    flex-direction: column !important;
+    gap: 8px;
+  }
+  .d_chart-container {
+    min-height: 160px !important;
+    height: auto !important;
+    padding: 4px !important;
+  }
+  .d_chart-title {
+    font-size: 0.95rem;
+  }
+  .d_chart-container canvas {
+    height: 120px !important;
+    max-width: 100% !important;
+  }
+} */

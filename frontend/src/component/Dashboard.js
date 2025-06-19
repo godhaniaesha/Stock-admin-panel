@@ -101,7 +101,7 @@ const Dashboard = () => {
           {/* Time & Welcome Section */}
           <div className="row mb-md-4 mb-2">
             <div className="col-12">
-              <div className="d_card d_gradient-bg ">
+              <div className="d_card d_gradient-bg mt-md-0 mt-4">
                 <div className="row align-items-center">
                   <div className="col-md-8">
                     <h2 className="fw-bold mb-2">
@@ -141,7 +141,7 @@ const Dashboard = () => {
           </div>
 
           {/* Enhanced Stats Cards */}
-          <div className="row g-4 mb-md-4 mb-2">
+          <div className="row g-4 mb-md-4 mb-2 mt-md-0 mt-3">
             <div className="col-xl-3 col-md-6">
               <div className="d_stat-card">
                 <div className="d-flex justify-content-between align-items-start mb-mb-3 mb-2">

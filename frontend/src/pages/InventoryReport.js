@@ -18,7 +18,7 @@ import { Line, Pie } from 'react-chartjs-2';
 import { Table } from 'react-bootstrap';
 import { TbEdit, TbEye } from 'react-icons/tb';
 import { RiDeleteBin6Line } from 'react-icons/ri';
-import { FaAngleLeft, FaAngleRight } from 'react-icons/fa';
+import { FaAngleLeft, FaAngleRight, FaCaretDown } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { fetchInventoryMetrics, fetchProductMovement } from '../redux/slice/sales.slice';
 import { fetchInventories, deleteInventory } from '../redux/slice/inventory.Slice';
@@ -31,7 +31,7 @@ export default function InventoryReport() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const { inventory, isLoading, error } = useSelector((state) => state.inventory);
-  const {productMovement} = useSelector((state) => state.report.productMovement);
+  const { productMovement } = useSelector((state) => state.report.productMovement);
   const linechart = useSelector((state) => state);
   console.log('Inventory Data:', inventory);
 
@@ -393,11 +393,14 @@ export default function InventoryReport() {
             <h4>All Product Inventory</h4>
             <div className="Z_table_actions">
               <button className="Z_add_product_btn" onClick={() => navigate('/stock')}>Add Product</button>
-              <select className="Z_time_filter">
-                <option>This Month</option>
-                <option>Last Month</option>
-                <option>Last 3 Months</option>
-              </select>
+              <div className='Z_select_wrapper'>
+                <select className="Z_time_filter">
+                  <option>This Month</option>
+                  <option>Last Month</option>
+                  <option>Last 3 Months</option>
+                </select>
+                <div className="Z_select_caret"><FaCaretDown size={20} color='white' /></div>
+              </div>
             </div>
           </div>
           <div className="Z_table_scroll_container">

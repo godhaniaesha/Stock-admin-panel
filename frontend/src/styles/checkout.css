@@ -2,7 +2,10 @@
   padding: 2rem;
   background: var(--dark-bg);
   color: var(--text-color);
-  min-height: 100vh;
+  /* min-height: 100vh;
+  heig */
+  margin: 20px 0px;
+  height: fit-content;
 }
 
 .d_checkout_header {

@@ -1732,7 +1732,9 @@
 }
 
 /* ... existing code ... */
-
+ .Z_product_section {
+  height: fit-content;
+ }
 @media screen and (min-width: 768px) {
   .Z_product_section {
     width: 75vw;

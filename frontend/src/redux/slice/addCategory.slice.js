@@ -37,8 +37,6 @@ export const addCategory = createAsyncThunk(
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${token}`,
-          // Don't set Content-Type header when using FormData
-          // The browser will set it automatically with the correct boundary
         },
         body: formData
       });

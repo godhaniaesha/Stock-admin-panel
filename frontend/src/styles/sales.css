@@ -155,7 +155,7 @@
   background-color: var(--light-bg) !important;
 }
 
-.d_dark .Z_order_table tbody tr  {
+.d_dark .Z_order_table tbody tr {
   --bs-table-bg: var(--dark-bg) !important;
   background: var(--dark-bg) !important;
   box-shadow: 0 2px 4px rgba(187, 216, 205, 0.21) !important;
@@ -176,9 +176,14 @@
   /* <-- Add this line */
 }
 
-.d_chart-container canvas {
+.x_d_sales .d_chart-container canvas {
   width: 100% !important;
   height: 100% !important;
+}
+
+.d_chart-container canvas {
+  width: 100% !important;
+  height: 93% !important;
 }
 
 .d_dark .d_chart-container {
@@ -343,7 +348,7 @@
 
   .d_chart-container {
     margin: 10px 0px;
-    padding: 38px;
+    padding: 10px;
   }
 
   .d_summary-card p {
@@ -353,15 +358,17 @@
 
 @media (max-width: 576px) {
 
-.d_header-section .d_subtitle{
-  font-size: 14px;
-  margin-bottom: 10px !important;
+  .d_header-section .d_subtitle {
+    font-size: 14px;
+    margin-bottom: 10px !important;
+  }
+
+  .d_success_modal {
+    padding: 1rem;
+  }
 }
-.d_success_modal {
-  padding: 1rem;
-}
-}
-@media  (max-width: 420px) {
+
+@media (max-width: 420px) {
   .d_header-section {
     /* flex-direction: column; */
     margin-top: 6px;
@@ -392,19 +399,29 @@
     margin-top: 6px;
   }
 
-  .d_chart-container canvas {
+  .x_d_sales .d_chart-container canvas {
     height: 60% !important;
   }
-  
+
+  .d_chart-container canvas {
+    height: 86% !important;
+  }
+
 }
 
 @media (max-width: 375px) {
   .d_summary-card {
     padding: 1rem;
-    
+
   }
+
   .d_chart-container {
-    height: auto !important;}
+    height: 300px !important;
+  }
+
+  .x_d_sales .d_chart-container {
+    height: auto !important;
+  }
 }
 
 .d_date-filter {
@@ -448,15 +465,15 @@
   .d_main-title {
     font-size: 1.8rem;
   }
-  
+
   .d_subtitle {
     font-size: 0.95rem;
   }
-  
+
   .d_summary-card h4 {
     font-size: 1rem;
   }
-  
+
   .d_summary-card p {
     font-size: 18px;
   }
@@ -466,23 +483,23 @@
   .d_main-title {
     font-size: 1.6rem;
   }
-  
+
   .d_subtitle {
     font-size: 0.9rem;
   }
-  
+
   .d_summary-card {
     padding: 1.2rem;
   }
-  
+
   .d_summary-card h4 {
     font-size: 0.95rem;
   }
-  
+
   .d_summary-card p {
     font-size: 16px;
   }
-  
+
   .d_chart-title {
     font-size: 1.1rem;
   }
@@ -492,37 +509,37 @@
   .d_main-title {
     font-size: 1.4rem;
   }
-  
+
   .d_subtitle {
     font-size: 0.85rem;
   }
-  
+
   .d_summary-cards {
     grid-template-columns: repeat(2, 1fr);
     gap: 1rem;
   }
-  
+
   .d_summary-card {
     padding: 1rem;
   }
-  
+
   .d_summary-card h4 {
     font-size: 0.9rem;
   }
-  
+
   .d_summary-card p {
     font-size: 15px;
   }
-  
+
   .d_chart-title {
     font-size: 1rem;
   }
-  
+
   .d_filter-select {
     padding: 0.4rem 0.8rem;
     font-size: 0.9rem;
   }
-  
+
   .d_date-input {
     padding: 6px 10px;
     font-size: 0.9rem;
@@ -533,42 +550,42 @@
   .d_main-title {
     font-size: 1.2rem;
   }
-  
+
   .d_subtitle {
     font-size: 0.8rem;
   }
-  
+
   .d_summary-cards {
     grid-template-columns: 1fr;
     gap: 0.8rem;
   }
-  
+
   .d_summary-card {
     padding: 0.8rem;
   }
-  
+
   .d_summary-card h4 {
     font-size: 0.85rem;
   }
-  
+
   .d_summary-card p {
     font-size: 14px;
   }
-  
+
   .d_chart-title {
     font-size: 0.95rem;
   }
-  
+
   .d_filter-select {
     padding: 0.3rem 0.6rem;
     font-size: 0.85rem;
   }
-  
+
   .d_date-input {
     padding: 5px 8px;
     font-size: 0.85rem;
   }
-  
+
   .d_header-section {
     flex-direction: column;
     align-items: flex-start;
@@ -580,33 +597,33 @@
   .d_main-title {
     font-size: 1.1rem;
   }
-  
+
   .d_subtitle {
     font-size: 0.75rem;
   }
-  
+
   .d_summary-card h4 {
     font-size: 0.8rem;
   }
-  
+
   .d_summary-card p {
     font-size: 13px;
   }
-  
+
   .d_chart-title {
     font-size: 0.9rem;
   }
-  
+
   .d_filter-select {
     padding: 0.25rem 0.5rem;
     font-size: 0.8rem;
   }
-  
+
   .d_date-input {
     padding: 4px 6px;
     font-size: 0.8rem;
   }
-  
+
   .d_custom-range-picker {
     flex-direction: column;
     align-items: flex-start;
@@ -619,19 +636,19 @@
   .a_main_price .modal-title {
     font-size: 1.1rem;
   }
-  
+
   .a_modal_body h5 {
     font-size: 1rem;
   }
-  
+
   .a_modal_body h6 {
     font-size: 0.9rem;
   }
-  
+
   .a_modal_body p {
     font-size: 0.9rem;
   }
-  
+
   .a_main_tr {
     font-size: 0.85rem;
   }
@@ -641,19 +658,19 @@
   .a_main_price .modal-title {
     font-size: 1rem;
   }
-  
+
   .a_modal_body h5 {
     font-size: 0.95rem;
   }
-  
+
   .a_modal_body h6 {
     font-size: 0.85rem;
   }
-  
+
   .a_modal_body p {
     font-size: 0.85rem;
   }
-  
+
   .a_main_tr {
     font-size: 0.8rem;
   }
@@ -663,29 +680,30 @@
   .a_main_price .modal-title {
     font-size: 0.95rem;
   }
-  
+
   .a_modal_body h5 {
     font-size: 0.9rem;
   }
-  
+
   .a_modal_body h6 {
     font-size: 0.8rem;
   }
-  
+
   .a_modal_body p {
     font-size: 0.8rem;
   }
-  
+
   .a_main_tr {
     font-size: 0.75rem;
   }
 }
-.Z_product_section  thead th{
+
+.Z_product_section thead th {
   color: var(--light-bg) !important;
 }
 
-.Z_product_section  thead tr{
+.Z_product_section thead tr {
   background-color: var(--accent-color);
-  color:var(--dark-bg) !important;
-  
+  color: var(--dark-bg) !important;
+
 }

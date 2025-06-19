@@ -373,13 +373,13 @@ export default function InventoryReport() {
       </div>
 
       <div className="row d_chart-section">
-        <div className="col-lg-6 col-12">
+        <div className="col-xl-6 col-12" >
           <div className="d_chart-container">
             <h3 className="d_chart-title">Product Movement</h3>
             <Line data={productMovementData} options={productMovementOptions} />
           </div>
         </div>
-        <div className="col-lg-6 col-12">
+        <div className="col-xl-6 col-12 mt-xl-0 mt-3">
           <div className="d_chart-container">
             <h3 className="d_chart-title">Stock by Category</h3>
             <Pie data={stockByCategoryData} options={stockByCategoryOptions} />

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Nav, Form, InputGroup, Badge } from 'react-bootstrap';
-import { 
-  FaTachometerAlt, FaBoxes, FaUsers, FaChartLine, FaCog, FaSearch, FaAngleDown, 
+import {
+  FaTachometerAlt, FaBoxes, FaUsers, FaChartLine, FaCog, FaSearch, FaAngleDown,
   FaClipboardList, FaShoppingCart, FaFileInvoice, FaUserPlus, FaChartBar, FaChartPie,
   FaBell, FaStar, FaPlus, FaHeart, FaShoppingBag, FaBars, FaTags, FaLayerGroup, FaList, FaEdit, FaEye
 } from 'react-icons/fa';
@@ -89,17 +89,17 @@ const Sidebar = ({ show, isDarkMode }) => {
       submenu: [
         { title: 'Category List', path: '/categories', icon: <FaList size={14} /> },
         { title: 'Add Category', path: '/categories/add', icon: <FaPlus size={14} /> },
-        { title: 'Edit Category', path: '/categories/edit', icon: <FaEdit size={14} /> , hidden: true },
-      
+        { title: 'Edit Category', path: '/categories/edit', icon: <FaEdit size={14} />, hidden: true },
+
       ]
     },
-    { 
+    {
       title: 'Subcategories',
       icon: <FaLayerGroup size={16} />,
       submenu: [
         { title: 'Subcategory List', path: '/subcategories', icon: <FaList size={14} /> },
         { title: 'Add Subcategory', path: '/subcategories/add', icon: <FaPlus size={14} /> },
-        { title: 'Edit Subcategory', path: '/subcategories/edit', icon: <FaEdit size={14} /> , hidden: true  }
+        { title: 'Edit Subcategory', path: '/subcategories/edit', icon: <FaEdit size={14} />, hidden: true }
       ]
     },
     {
@@ -108,9 +108,9 @@ const Sidebar = ({ show, isDarkMode }) => {
       submenu: [
         { title: 'Product Grid', path: '/products', icon: <BsFillGrid1X2Fill size={16} />, notifications: 5 },
         { title: 'Add Product', path: '/products/add', icon: <FaPlus size={16} /> },
-        { title: 'Product Details', path: '/products/details/:id', icon: <TbListDetails size={16} />,hidden: true  },
-        { title: 'Edit Product', path: '/products/edit', icon: <FaEdit size={16} /> , hidden: true },
-        { title: 'View Product', path: '/products/view', icon: <FaEye size={16} />  }
+        { title: 'Product Details', path: '/products/details/:id', icon: <TbListDetails size={16} />, hidden: true },
+        { title: 'Edit Product', path: '/products/edit', icon: <FaEdit size={16} />, hidden: true },
+        { title: 'View Product', path: '/products/view', icon: <FaEye size={16} /> }
       ]
     },
     {
@@ -129,6 +129,8 @@ const Sidebar = ({ show, isDarkMode }) => {
       icon: <FaShoppingCart size={18} />,
       submenu: [
         { title: 'Order List', path: '/orders', icon: <FaClipboardList size={16} />, notifications: 2 },
+        { title: 'Order detail', path: '/orderdetail/', icon: <FaClipboardList size={16} />, hidden: true },
+
         { title: 'Shopping Cart', path: '/cart', icon: <FaShoppingBag size={16} /> },
         { title: 'Wishlist', path: '/wishlist', icon: <FaHeart size={16} /> },
         { title: 'Checkout', path: '/checkout', icon: <FaFileInvoice size={16} /> }
@@ -142,10 +144,10 @@ const Sidebar = ({ show, isDarkMode }) => {
         { title: 'User List', path: '/users', icon: <FaUsers size={16} /> },
         // { title: 'User Roles', path: '/user-roles', icon: <FaUserCog size={16} /> },
         { title: 'Add User', path: '/add-user', icon: <FaUserPlus size={16} /> },
-        { title: 'User Detail', path: 'userdetail/:id', icon: <BiDetail size={16} />, hidden: true  }
+        { title: 'User Detail', path: 'userdetail/:id', icon: <BiDetail size={16} />, hidden: true }
       ]
     },
- 
+
     {
       title: 'Reports',
       icon: <FaChartLine size={18} />,
@@ -225,11 +227,11 @@ const Sidebar = ({ show, isDarkMode }) => {
   const filteredMenuItems = menuItems.filter(item => item.title.toLowerCase().includes(searchTerm.toLowerCase()));
 
   return (
-    <div 
+    <div
       className={`sidebar overflow-hidden ${show ? 'show' : ''} ${isExpanded ? 'expanded' : 'collapsed'} ${!isDarkMode ? 'light-mode' : ''}`}
       onMouseEnter={() => !show && setIsExpanded(true)} // Only expand on hover if not in offcanvas mode
       onMouseLeave={() => !show && setIsExpanded(false)} // Only collapse on leave if not in offcanvas mode
-      style={{ 
+      style={{
         zIndex: '11111',
         backgroundColor: `var(${isDarkMode ? '--dark-card-bg' : '--light-card-bg'})`,
         color: `var(${isDarkMode ? '--dark-text' : '--light-text'})`,
@@ -266,7 +268,16 @@ const Sidebar = ({ show, isDarkMode }) => {
           </InputGroup>
         )}
       </div>
-      <Nav className="flex-column py-2">
+      <Nav className="flex-column py-2"
+        style={
+          {
+            maxHeight: '79vh',
+            overflow: 'scroll',
+            flexDirection: 'column',
+            flexWrap: 'nowrap',
+          }
+        }
+      >
         {filteredMenuItems.map(item => (
           item.show !== false && (
             <div
@@ -282,7 +293,7 @@ const Sidebar = ({ show, isDarkMode }) => {
           )
         ))}
       </Nav>
-    </div>
+    </div >
   );
 };
 

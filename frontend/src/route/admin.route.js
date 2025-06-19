@@ -61,6 +61,7 @@ function UserRoutes() {
             <Route path="/change-password" element={<ChangePassword />} />
             <Route path="/SellerGST" element={<Seller />} />
             <Route path="/sellerGST-verify" element={<SellergstVerify />} />
+            
 
             {/* Protected Routes */}
             <Route element={<PrivateRoute />}>

@@ -369,6 +369,17 @@
 }
 
 @media (max-width: 420px) {
+.d_success_modal {
+  padding: 1rem;
+}
+}
+@media (max-width: 420px) {
+  .d_chart-container {
+    min-height: 280px;
+    max-height: 300px;
+  }
+}
+@media  (max-width: 420px) {
   .d_header-section {
     /* flex-direction: column; */
     margin-top: 6px;

@@ -329,6 +329,8 @@ useEffect(() => {
     },
   };
 
+  const outOfStockCount = (inventory || []).filter(item => item.quantity === 0).length;
+
   return (
     <div className={`Z_product_section my-4 d_sales-report-container ${isDarkMode ? 'd_dark' : 'd_light'}`}>
       <div className="d_header-section">
@@ -371,7 +373,7 @@ useEffect(() => {
         </div>
         <div className="d_summary-card">
           <h4>Out of Stock</h4>
-          <p>{inventoryData?.TotalOutStock || 0}</p>
+          <p>{outOfStockCount}</p>
         </div>
         <div className="d_summary-card">
           <h4>Low Stock</h4>

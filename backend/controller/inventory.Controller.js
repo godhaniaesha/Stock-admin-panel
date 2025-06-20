@@ -107,6 +107,8 @@ const getInventories = async (req, res) => {
 };
 
 
+ 
+
 // Get Single Inventory
 const getInventory = async (req, res) => {
     try {
@@ -208,6 +210,7 @@ const getLowInventory = async (req, res) => {
         res.status(500).json({ error: err.message });
     }
 };
+
 
 
 module.exports = {

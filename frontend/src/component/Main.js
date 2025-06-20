@@ -52,6 +52,9 @@
               isDarkMode={isDarkMode} 
               toggleDarkMode={toggleDarkMode} 
               setShowProfile={setShowProfile}
+              style={{ 
+                zIndex: 1111,
+              }}
             />
             <div className="content w-100">
               {showProfile ? (

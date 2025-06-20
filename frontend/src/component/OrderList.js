@@ -18,7 +18,7 @@ function OrderList() {
   const dispatch = useDispatch();
   const navigate = useNavigate();
   //  const [selectedTimeFilter, setSelectedTimeFilter] = useState('All');
-      const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
+  const [selectedStatusFilter, setSelectedStatusFilter] = useState('All');
 
   const { orders, isLoading, error } = useSelector((state) => state.order);
 
@@ -46,7 +46,7 @@ function OrderList() {
   // Calculate total pages
   const totalPages = Math.ceil(filteredOrders.length / ordersPerPage);
 
- const getPageNumbers = () => {
+  const getPageNumbers = () => {
     const pageNumbers = [];
     const maxVisiblePages = 1;
     if (totalPages <= maxVisiblePages + 1) {
@@ -70,11 +70,11 @@ function OrderList() {
   };
   return (
     <section className={`Z_product_section mx-0 mx-lg-5 my-md-3 ${isDarkMode ? 'd_dark' : 'd_light'}`}>
-      <div className="Z_order_header d-flex justify-content-between align-items-center mb-4">
+      {/* <div className="Z_order_header d-flex justify-content-between align-items-center mb-4">
         <h4 className="Z_order_title mb-0 mt-3 ms-1">ORDER LIST</h4>
-      </div>
+      </div> */}
 
-      <Row>
+      {/* <Row>
         <Col xl={3} lg={6} md={6} sm={12} className="mb-3">
           <Card className="Z_order_card">
             <Card.Body className="d-flex justify-content-between align-items-center">
@@ -127,7 +127,7 @@ function OrderList() {
             </Card.Body>
           </Card>
         </Col>
-      </Row>
+      </Row> */}
 
       <div className="Z_table_wrapper">
         <div className="Z_order_header d-flex justify-content-between align-items-center mb-4">
@@ -160,7 +160,7 @@ function OrderList() {
 
         <Table className="Z_order_table">
           <thead>
-            <tr style={{textWrap :"nowrap"}}>
+            <tr style={{ textWrap: "nowrap" }}>
               <th>Order ID</th>
               <th>Customer</th>
               <th>Created at</th>
@@ -173,9 +173,33 @@ function OrderList() {
             {isLoading ? (
               <tr><td colSpan="6">Loading...</td></tr>
             ) : error ? (
-              <tr><td colSpan="6">Error: {error}</td></tr>
+              <>
+                <tr>
+                  <td colSpan="6" className="text-center text-danger">  
+                    <img
+                      src="https://cdni.iconscout.com/illustration/premium/thumb/no-data-found-3678255-3098784.png"
+                      alt="No Products Found"
+                      className="Z_no_data_image"
+                    />
+                    <p>{error}</p>
+                  </td>     
+                </tr>
+              </>
+            
             ) : currentOrders.length === 0 ? (
-              <tr><td colSpan="6">No Orders Found</td></tr>
+              <>
+                <Col xs={12} className="text-center py-5">
+                  <div className="Z_no_data_wrapper">
+                    <img
+                      src="https://cdni.iconscout.com/illustration/premium/thumb/no-data-found-3678255-3098784.png"
+                      alt="No Products Found"
+                      className="Z_no_data_image"
+                    />
+                    <h3 className="Z_no_data_title">No Products Found</h3>
+                    <p className="Z_no_data_text">Try adjusting your search or filter to find what you're looking for.</p>
+                  </div>
+                </Col>
+              </>
             ) : (
               currentOrders.map((order, index) => (
                 <tr key={order._id || index}>

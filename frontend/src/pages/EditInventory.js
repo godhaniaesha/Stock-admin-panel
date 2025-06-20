@@ -114,7 +114,7 @@ const EditInventory = () => {
 
     // Filter subcategories based on selected category
     const filteredSubcategories = subcategories.filter(
-        sub =>  sub.category._id === inventoryData.category
+        sub => sub.category._id === inventoryData.category
     );
 
     // Filter products based on selected subcategory
@@ -358,10 +358,14 @@ const EditInventory = () => {
             </div>
 
             {/* Success Modal */}
-            <Modal show={showSuccessModal} onHide={() => {
-                setShowSuccessModal(false);
-                navigate('/stock-overview');
-            }}>
+            <Modal show={showSuccessModal}
+                centered
+                className={`z_delete_modal ${isDarkMode ? 'd_dark' : 'd_light'}`}
+                onHide={() => {
+                    setShowSuccessModal(false);
+                    navigate('/stock-overview');
+
+                }}>
                 <Modal.Header closeButton>
                     <Modal.Title>Success</Modal.Title>
                 </Modal.Header>

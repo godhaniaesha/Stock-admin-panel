@@ -11,7 +11,7 @@ import { IMG_URL } from '../utils/baseUrl';
 
 const StockOverview = () => {
   const { isDarkMode } = useOutletContext();
-      const [timeFilter, setTimeFilter] = useState('thisMonth');
+  const [timeFilter, setTimeFilter] = useState('thisMonth');
   const dispatch = useDispatch();
   const navigate = useNavigate();
   const [showDeleteModal, setShowDeleteModal] = useState(false);
@@ -19,6 +19,8 @@ const StockOverview = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 6;
 
+  // console.log('StockOverview component rendered', productToDelete.product.productName);
+  // console.log('StockOverview component rendered', productToDelete);                              
   const { inventory, isLoading, error } = useSelector((state) => state.inventory);
   console.log(inventory, "inventory");
 
@@ -27,36 +29,36 @@ const StockOverview = () => {
   }, [dispatch]);
 
   const filterInventoriesByTime = (Inventories) => {
-        const now = new Date();
-        const currentMonth = now.getMonth();
-        const currentYear = now.getFullYear();
+    const now = new Date();
+    const currentMonth = now.getMonth();
+    const currentYear = now.getFullYear();
 
-        return (Inventories || []).filter(inventory => {
-            if (!inventory || !inventory.createdAt) return false;
-            const inventoryDate = new Date(inventory.createdAt);
-            const inventoryMonth = inventoryDate.getMonth();
-            const inventoryYear = inventoryDate.getFullYear();
+    return (Inventories || []).filter(inventory => {
+      if (!inventory || !inventory.createdAt) return false;
+      const inventoryDate = new Date(inventory.createdAt);
+      const inventoryMonth = inventoryDate.getMonth();
+      const inventoryYear = inventoryDate.getFullYear();
 
-            switch (timeFilter) {
-                case 'thisMonth':
-                    return inventoryMonth === currentMonth && inventoryYear === currentYear;
-                case 'lastMonth':
-                    const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
-                    const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
-                    return inventoryMonth === lastMonth && inventoryYear === lastMonthYear;
-                case 'last3Months':
-                    const threeMonthsAgo = new Date(now);
-                    threeMonthsAgo.setMonth(now.getMonth() - 3);
-                    return inventoryDate >= threeMonthsAgo;
-                default:
-                    return true;
-            }
-        });
-    };
-      const handleTimeFilterChange = (e) => {
-        setTimeFilter(e.target.value);
-    };
-const filteredCategories = filterInventoriesByTime(inventory);
+      switch (timeFilter) {
+        case 'thisMonth':
+          return inventoryMonth === currentMonth && inventoryYear === currentYear;
+        case 'lastMonth':
+          const lastMonth = currentMonth === 0 ? 11 : currentMonth - 1;
+          const lastMonthYear = currentMonth === 0 ? currentYear - 1 : currentYear;
+          return inventoryMonth === lastMonth && inventoryYear === lastMonthYear;
+        case 'last3Months':
+          const threeMonthsAgo = new Date(now);
+          threeMonthsAgo.setMonth(now.getMonth() - 3);
+          return inventoryDate >= threeMonthsAgo;
+        default:
+          return true;
+      }
+    });
+  };
+  const handleTimeFilterChange = (e) => {
+    setTimeFilter(e.target.value);
+  };
+  const filteredCategories = filterInventoriesByTime(inventory);
 
   // Add pagination logic
   const indexOfLastItem = currentPage * itemsPerPage;
@@ -79,6 +81,23 @@ const filteredCategories = filterInventoriesByTime(inventory);
         console.error('Failed to delete inventory:', error);
       }
     }
+  };
+
+  // const handleDeleteConfirm = async () => {
+  //         if (productToDelete) {
+  //             try {
+  //                 await dispatch(deleteProduct(productToDelete._id)).unwrap();
+  //                 setShowDeleteModal(false);
+  //                 setProductToDelete(null);
+  //             } catch (error) {
+  //                 console.error('Failed to delete product:', error);
+  //             }
+  //         }
+  //     };
+
+  const handleDeleteCancel = () => {
+    setShowDeleteModal(false);
+    setProductToDelete(null);
   };
 
   const getPageNumbers = () => {
@@ -195,12 +214,12 @@ const filteredCategories = filterInventoriesByTime(inventory);
                           >
                             <TbEdit size={22} />
                           </button>
-                          <button 
-                          className="Z_action_btn Z_delete_btn"
-                          onClick={() => handleDeleteClick(product)}
-                        >
-                          <RiDeleteBin6Line size={22} />
-                        </button>
+                          <button
+                            className="Z_action_btn Z_delete_btn"
+                            onClick={() => handleDeleteClick(item)}
+                          >
+                            <RiDeleteBin6Line size={22} />
+                          </button>
                         </div>
                       </td>
                     </tr>
@@ -239,7 +258,7 @@ const filteredCategories = filterInventoriesByTime(inventory);
       </div>
 
       {/* Delete Confirmation Modal */}
-      <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
+      {/* <Modal show={showDeleteModal} onHide={() => setShowDeleteModal(false)}>
         <Modal.Header closeButton>
           <Modal.Title>Confirm Delete</Modal.Title>
         </Modal.Header>
@@ -264,6 +283,24 @@ const filteredCategories = filterInventoriesByTime(inventory);
               'Delete'
             )}
           </Button>
+        </Modal.Footer>
+      </Modal> */}
+
+      <Modal
+        show={showDeleteModal}
+        onHide={handleDeleteCancel}
+        centered
+        className={`z_delete_modal ${isDarkMode ? 'd_dark' : 'd_light'}`}
+      >
+        <Modal.Header closeButton>
+          <Modal.Title>Delete Product</Modal.Title>
+        </Modal.Header>
+        <Modal.Body>
+          Are you sure you want to delete the product "{productToDelete?.product?.productName}"?
+        </Modal.Body>
+        <Modal.Footer>
+          <button className="Z_btn Z_btn_cancel" onClick={handleDeleteCancel}>Cancel</button>
+          <button className="Z_btn Z_btn_delete" onClick={handleDeleteConfirm}>Delete</button>
         </Modal.Footer>
       </Modal>
     </section>

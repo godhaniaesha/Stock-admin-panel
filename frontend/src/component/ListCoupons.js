@@ -304,29 +304,17 @@ function ListCoupons() {
                 show={showDeleteModal}
                 onHide={handleDeleteCancel}
                 centered
-                className='d_delete_model'
+                className={`z_delete_modal ${isDarkMode ? 'd_dark' : 'd_light'}`}
             >
-                <Modal.Header closeButton className={isDarkMode ? 'dark-modal-header' : ''}>
-                    <Modal.Title>Delete Confirmation</Modal.Title>
+                <Modal.Header closeButton>
+                    <Modal.Title>Delete Coupon</Modal.Title>
                 </Modal.Header>
-                <Modal.Body className={isDarkMode ? 'dark-modal-body' : ''}>
-                    {deleteMultiple ? (
-                        <>
-                            Are you sure you want to delete <strong>{selectedCoupons.length}</strong> selected coupons?
-                        </>
-                    ) : (
-                        <>
-                            Are you sure you want to delete the coupon "<strong>{couponToDelete?.title || couponToDelete?.code || 'N/A'}</strong>"?
-                        </>
-                    )}
+                <Modal.Body>
+                    Are you sure you want to delete the Coupon "{couponToDelete?.title || couponToDelete?.code || 'N/A'}"?
                 </Modal.Body>
-                <Modal.Footer className={isDarkMode ? 'dark-modal-footer' : ''}>
-                    <div style={{ display: 'flex', gap: '12px', justifyContent: 'flex-center' }}>
-                        <button className="Z_btn Z_btn_cancel" onClick={handleDeleteCancel} disabled={isLoading}>Cancel</button>
-                        <button className="Z_btn Z_btn_delete" onClick={handleDeleteConfirm} disabled={isLoading}>
-                            {isLoading ? 'Deleting...' : 'Delete'}
-                        </button>
-                    </div>
+                <Modal.Footer>
+                    <button className="Z_btn Z_btn_cancel" onClick={handleDeleteCancel}>Cancel</button>
+                    <button className="Z_btn Z_btn_delete" onClick={handleDeleteConfirm}>Delete</button>
                 </Modal.Footer>
             </Modal>
         </section>

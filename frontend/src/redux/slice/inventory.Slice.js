@@ -71,7 +71,7 @@ export const deleteInventory = createAsyncThunk(
     'inventory/delete',
     async (id, { rejectWithValue }) => {
         try {
-            await axiosInstance.delete(`/inventory/${id}`);
+            await axiosInstance.delete(`/inventory/${id}`); // fixed endpoint
             return id;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to delete inventory');

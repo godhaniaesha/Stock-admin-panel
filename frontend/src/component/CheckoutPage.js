@@ -399,8 +399,12 @@ const CheckoutPage = () => {
                         <Field
                           type="tel"
                           name="phone"
+                          pattern="[0-9]{10}"
+                          maxLength={10}
+                          inputMode="numeric"
                           className={`d_input ${touched.phone && errors.phone ? 'is-invalid' : ''}`}
                           placeholder="Enter your phone number"
+                          onInput={e => e.target.value = e.target.value.replace(/[^0-9]/g, '')}
                         />
                         <ErrorMessage name="phone" component="div" className="error-message" />
                       </div>

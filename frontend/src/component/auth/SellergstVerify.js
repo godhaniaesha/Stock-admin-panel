@@ -15,9 +15,11 @@ import {
 import CustomStepper from '../CustomStepper';
 import '../../styles/seller.css';
 import axios from 'axios';
+import { useNavigate } from 'react-router-dom';
 
 function SellergstVerify() {
     const dispatch = useDispatch();
+    const navigate = useNavigate();
     const {
         loading,
         error,
@@ -70,10 +72,8 @@ function SellergstVerify() {
     const [showBankDetails, setShowBankDetails] = useState(false);
     const [showPickupAddress, setShowPickupAddress] = useState(false);
     const [showSubscription, setShowSubscription] = useState(false);
-    // ...existing code...
     const [otpStepCompleted, setOtpStepCompleted] = useState(false);
     const [gstDetailsStepCompleted, setGstDetailsStepCompleted] = useState(false);
-    // ...existing code...
     // Progress state
     const [userProgress, setUserProgress] = useState({
         currentStep: 0,
@@ -671,6 +671,7 @@ function SellergstVerify() {
                         setShowModal(false);
                         clearProgress();
                         alert("Payment successful! Subscription activated.");
+                        navigate('/'); // Navigate to home after payment
                         // Optionally redirect or update UI
                     } else {
                         alert("Payment verification failed.");
@@ -1294,7 +1295,12 @@ function SellergstVerify() {
                                     </ul>
                                 </div>
                                 <div className="Z_modal_actions">
-                                    <button onClick={handleConfirmPlan} className="Z_btn">Confirm</button>
+                                    {/* <button 
+                                    onClick={handleConfirmPlan}
+                                     className="Z_btn">Confirm</button> */}
+                                     <button 
+                                    onClick={() => navigate('/')} 
+                                    className="Z_btn">Confirm</button>
                                     <button onClick={handleCancelModal} className="Z_btn Z_btn_secondary">Cancel</button>
                                 </div>
                             </div>

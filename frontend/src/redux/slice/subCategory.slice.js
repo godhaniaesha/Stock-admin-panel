@@ -32,13 +32,16 @@ export const createSubcategory = createAsyncThunk(
     async (formData, { rejectWithValue }) => {
         try {
             const token = localStorage.getItem('token');
-            const response = await axiosInstance.post('/subcategory/CreateSubcat',{
-                headers: {
-                    'Content-Type': 'multipart/form-data',
-                    'Authorization': `Bearer ${token}`
-                },
-                body: formData
-            });
+            const response = await axiosInstance.post(
+                '/subcategory/CreateSubcat',
+                formData,
+                {
+                    headers: {
+                        'Content-Type': 'multipart/form-data',
+                        'Authorization': `Bearer ${token}`
+                    }
+                }
+            );
             return response.data;
         } catch (error) {
             return rejectWithValue(error.response?.data?.message || 'Failed to create subcategory');

@@ -251,7 +251,7 @@ export default function SalesReport() {
  
  
   return (
-    <div className={`Z_product_section d_sales-report-container x_d_sales ${isDarkMode ? 'd_dark' : 'd_light'}`}>
+    <div className={`Z_product_section d_sales-report-container my-4 x_d_sales ${isDarkMode ? 'd_dark' : 'd_light'}`}>
       <div className="d_header-section mb-4">
         <div>
           <h1 className="d_main-title">Sales Report</h1>

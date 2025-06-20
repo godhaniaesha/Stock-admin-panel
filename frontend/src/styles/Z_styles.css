@@ -1620,7 +1620,7 @@
 }
 
 .Z_page_btn:hover:not(.active):not(:disabled) {
-  background: #f5f5f5;
+  background: #6a9c89;
 }
 
 .Z_page_btn:disabled {

@@ -100,35 +100,20 @@ const StockOverview = () => {
     setProductToDelete(null);
   };
 
-  const getPageNumbers = () => {
+const getPageNumbers = () => {
     const pageNumbers = [];
     const maxVisiblePages = 1;
-
-    if (totalPages <= maxVisiblePages) {
+    if (totalPages <= maxVisiblePages + 1) {
       for (let i = 1; i <= totalPages; i++) {
         pageNumbers.push(i);
       }
     } else {
-      if (currentPage <= 2) {
-        for (let i = 1; i <= maxVisiblePages; i++) {
-          pageNumbers.push(i);
-        }
+      pageNumbers.push(1);
+      if (totalPages > 2) {
         pageNumbers.push('...');
         pageNumbers.push(totalPages);
-      } else if (currentPage >= totalPages - 1) {
-        pageNumbers.push(1);
-        pageNumbers.push('...');
-        for (let i = totalPages - 2; i <= totalPages; i++) {
-          pageNumbers.push(i);
-        }
-      } else {
-        pageNumbers.push(1);
-        pageNumbers.push('...');
-        for (let i = currentPage - 1; i <= currentPage + 1; i++) {
-          pageNumbers.push(i);
-        }
-        pageNumbers.push('...');
-        pageNumbers.push(totalPages);
+      } else if (totalPages === 2) {
+        pageNumbers.push(2);
       }
     }
     return pageNumbers;

@@ -401,22 +401,26 @@ const AddProduct = () => {
                             <div className="x_upload_content">
                                 {productImages.length > 0 ? (
                                     <div className="x_image_preview">
-                                        <img
-                                            src={productImages.url}
-                                            alt="Product preview"
-                                            className="x_preview_image"
-                                        />
-                                        <button
-                                            className="x_remove_image"
-                                            onClick={e => {
-                                                e.stopPropagation();
-                                               setProductImages([]);
-                                                setFileError('');
-                                                setFormErrors(prev => ({ ...prev, image: null }));
-                                            }}
-                                        >
-                                            ×
-                                        </button>
+                                        {productImages.map((img, idx) => (
+                                            <div key={idx} style={{ position: 'relative', display: 'inline-block', marginRight: 8 }}>
+                                                <img
+                                                    src={img.url}
+                                                    alt="Product preview"
+                                                    className="x_preview_image"
+                                                />
+                                                <button
+                                                    className="x_remove_image"
+                                                    onClick={e => {
+                                                        e.stopPropagation();
+                                                        setProductImages(productImages.filter((_, i) => i !== idx));
+                                                        setFileError('');
+                                                        setFormErrors(prev => ({ ...prev, image: null }));
+                                                    }}
+                                                >
+                                                    ×
+                                                </button>
+                                            </div>
+                                        ))}
                                     </div>
                                 ) : (
                                     <>
